@@ -2,9 +2,9 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.11 |
+| **Версия индекса** | 0.12 |
 | **Дата** | 2026-04-10 |
-| **STORY** | GM1-03 + REQ-11 A–B (GM1-05) + **GM2-01…06** (`issue-interview-flow` §12 REQ-04.2, §7.1, REQ-12/13, overlays) |
+| **STORY** | GM1-03 + REQ-11 A–B (GM1-05) + **GM1-06** (`activity-legacy-paths-inventory`) + **GM2-01…06** (`issue-interview-flow` §12 REQ-04.2, §7.1, REQ-12/13, overlays) |
 
 This document lists instruction modules in the repository. **Two tracks:**
 
@@ -59,6 +59,8 @@ Internal content of `base.md`, `ingest-validation.md`, `ingest-deep-parsing.md`,
 ---
 
 ## Legacy Amanita domain references (Activities)
+
+**Inventory (GM1-06):** [`activity-legacy-paths-inventory.md`](./activity-legacy-paths-inventory.md) — ripgrep commands, summary table, owner epics (M1-03 … M1-06).
 
 | File | Note |
 |------|------|
@@ -212,4 +214,5 @@ This module may interrupt any flow if safety rules are violated.
 | 0.9 | 2026-04-10 | GM2-04: `issue-interview-flow` v0.5 — REQ-12/13 §8–9; canonical + roadmap. |
 | 0.10 | 2026-04-10 | GM2-05: `issue-interview-flow` v0.6 — §7.1 FR-M1-017 reframe templates. |
 | 0.11 | 2026-04-10 | GM2-06: `issue-interview-flow` v0.7 — §12 latent + limited-depth; EPIC-M1-04 pointer. |
+| 0.12 | 2026-04-10 | GM1-06: `activity-legacy-paths-inventory.md` + link in Legacy Amanita section. |
 | 0.1 | *(prior)* | Amanita list + initial DOGEstonia Issue stub (GM1-01/02). |
