@@ -2,10 +2,13 @@
 
 **Purpose:** Describe **ingest pipeline stages** from the instruction modules’ perspective: which artifacts and handoffs lead to backend-ready data, **without** equating them to the **`ISSUE_STATUS`** enum in UI/DB (`spa-app`).
 
-**Related files:** [`issue-data-model.md`](./issue-data-model.md) (entity fields) · [`issue-interview-flow.md`](./issue-interview-flow.md) (conversation phases 1–7, REQ-08) · [`root.md`](./root.md) (backend authority) · [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) · [technical-architecture.md](../docs/technical-architecture.md) §2–3.2
+**Related files:** [`issue-data-model.md`](./issue-data-model.md) (entity fields) · [`issue-interview-flow.md`](./issue-interview-flow.md) (conversation phases 1–7, REQ-08) · [`issue-policy-gate.md`](./issue-policy-gate.md) (strict-chain admission, **GM4-01** / **GM4-02**) · [`issue-normalizer.md`](./issue-normalizer.md) (**GM5-01** / **GIM-24**) · [`root.md`](./root.md) (backend authority) · [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) · [technical-architecture.md](../docs/technical-architecture.md) §2–3.2
 
 | Version | Date |
 |---------|------|
+| 0.6 | 2026-04-10 |
+| 0.5 | 2026-04-10 |
+| 0.4 | 2026-04-10 |
 | 0.3 | 2026-04-10 |
 
 ---
@@ -18,7 +21,7 @@ Per **openai-custom-gpt-builder**: behavior and **step order** live in instructi
 
 ## 2. Stages “from the instructions’ viewpoint” (Issue track)
 
-Names below are **logical dialogue/chain phases**, not JSON fields on the node. Order follows [technical-architecture.md](../docs/technical-architecture.md) §2 and the strict chain §3.2; for Issue the terminal artifact is **`normalized_issue_payload`** (planned — see epic M1-05).
+Names below are **logical dialogue/chain phases**, not JSON fields on the node. Order follows [technical-architecture.md](../docs/technical-architecture.md) §2 and the strict chain §3.2; for Issue the terminal artifact is **`normalized_issue_payload`** ([`issue-normalizer.md`](./issue-normalizer.md) **v0.1** scaffold — **GM5-01** / **EPIC-M1-05**).
 
 | # | Stage (instructions) | Meaning | Typical artifacts / output |
 |---|----------------------|---------|----------------------------|
@@ -28,10 +31,22 @@ Names below are **logical dialogue/chain phases**, not JSON fields on the node. 
 | 4 | **Ingest validation** | Required-field completeness, stop-the-line; **no API**. | `ingest_validation_report`; optional `gate_request_package` draft. |
 | 5 | **Safety** | Checkpoints raw / extracted / validated / (later) normalized. | `safety_compliance_report`. |
 | 6 | **Policy gate** (DOGEstonia) | Admission per operator rulebook; **no API**; not the same as “ticket status”. | `policy_gate_result` (reference pattern). |
-| 7 | **Issue normalization** | Canonical JSON for orchestrator contract + metadata referencing steps 4–6. | `normalized_issue_payload` (target name; until module lands — align with `activity-normalizer` / `issue-normalizer`). |
+| 7 | **Issue normalization** | Canonical JSON for orchestrator contract + metadata referencing steps 4–6. | [`issue-normalizer.md`](./issue-normalizer.md) → **`normalized_issue_payload`** (`canonical_payload` + `normalization_metadata`). |
 | 8 | **API orchestrator** | Only module that initiates HTTP (Actions). | OpenAPI operation call; **server response** is source of truth for `id`, `status`, errors. |
 
 Between steps, **stop-the-line** from `base.md` §1.5 applies: on validation/safety/gate blocks, **do not** proceed to normalizer and **do not** call API.
+
+### 2.1 Mandatory Issue strict-chain order (EPIC-M1-04, GM4-02)
+
+For **DOGEstonia / Issue** ingest when using the **strict** artifact discipline ([technical-architecture.md](../docs/technical-architecture.md) §3.2), the engineering modules **after** narrative + structural readiness (§2 rows 2–4) MUST follow this order — **no skipping**:
+
+1. **Ingest validation** — `ingest_validation_report`; may prepare **`gate_request_package`** (must **not** contain a gate **decision**).
+2. **Safety & compliance** — `safety_compliance_report` at product-required checkpoints (see [`safety-compliance.md`](./safety-compliance.md)).
+3. **[`issue-policy-gate.md`](./issue-policy-gate.md)** — consumes `gate_request_package` (+ references to validation/safety artifacts); emits **`policy_gate_result`**; **no API**.
+4. **Issue normalization** — [`issue-normalizer.md`](./issue-normalizer.md) → **`normalized_issue_payload`** (**EPIC-M1-05** / **GM5-01**).
+5. **API orchestrator** — HTTP only here.
+
+**Normative shorthand:** **validation → safety → policy gate → normalization → API**. Issue normalization **must not** run on a strict progression path **without** an explicit **`policy_gate_result`** (including outcomes under [`issue-policy-gate.md`](./issue-policy-gate.md) §9 degraded mode), unless the operator documents a **narrower** exception in product config / **REQ-16**. **GM5-02:** [`base.md`](./base.md) §1.5, [`ingest-validation.md`](./ingest-validation.md) Issue overlay, and [`safety-compliance.md`](./safety-compliance.md) Point **4** (Issue) all align on **`normalized_issue_payload`** / [`issue-normalizer.md`](./issue-normalizer.md) — no API skip.
 
 ---
 
@@ -63,3 +78,6 @@ Until the node publishes canonical Issue OpenAPI — **explicit TBD**. After sch
 | 0.1 | 2026-04-10 | STORY-GM1-02: first version aligned with technical-architecture §3.2 and issue-data-model. |
 | 0.2 | 2026-04-10 | GM2-01: link to `issue-interview-flow.md`; clarified “stages vs REQ-08” row. |
 | 0.3 | 2026-04-10 | **English-only** instruction text (repo policy). |
+| 0.4 | 2026-04-10 | **GM4-02:** §2.1 mandatory Issue strict order (validation → safety → `issue-policy-gate` → normalization → API); related-files link to `issue-policy-gate.md`. |
+| 0.5 | 2026-04-10 | **GM5-01:** pointers to [`issue-normalizer.md`](./issue-normalizer.md) in §2 row 7, §2.1 step 4, intro; related-files. |
+| 0.6 | 2026-04-10 | **GM5-02:** normative shorthand cross-links `base` §1.5 / `ingest-validation` / `safety-compliance` Point 4 (Issue) on **`normalized_issue_payload`**. |

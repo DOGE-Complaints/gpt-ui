@@ -27,16 +27,28 @@ When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`is
 
 - [`issue-interview-flow.md`](./issue-interview-flow.md) — civic interview phases 1–7 (REQ-08), four layers (REQ-06), **§5 seven-question completeness** before treating dialogue as ready for Phase 7 summary / draft Issue framing.
 - [`issue-data-model.md`](./issue-data-model.md) — §4.1 logical Issue fields (`type`, `labels`, trilingual `title` / `description`, optional `summary`, optional `institution`) for structural completeness toward the normalizer.
+- [`issue-i18n-policy.md`](./issue-i18n-policy.md) — **FR-M1-028…031**: session language, `{ et, ru, en }` drafts, fidelity vs translation polish (**GM3-06**).
 - [`issue-api-methods-reference.md`](./issue-api-methods-reference.md) — HTTP SSOT (this module still **never** calls APIs).
+- [`issue-policy-gate.md`](./issue-policy-gate.md) — **policy admission** after validation + safety; consumes `gate_request_package`, emits `policy_gate_result` (**GM4-01** / **GM4-02**).
+- [`issue-normalizer.md`](./issue-normalizer.md) — after **`policy_gate_result.status = "approved"`**, emits **`normalized_issue_payload`** (**GM5-01**); strict-chain alignment **GM5-02** / **GIM-25**.
 
 **Two-layer readiness (Issue)**
 
 1. **Narrative completeness (REQ-07, GM2-02):** Do not treat the interview as ready for **final** Phase 7 summary (per `issue-interview-flow.md` §7) while **§5** has unresolved gaps, unless the user **explicitly** accepts the listed gaps. Until then, **block** “summary-as-complete” progression: continue phases 2–6 or list gaps plainly (aligned with epic M1-02 DoD: incomplete interview explicit **before** confirmation-as-final).
-2. **Structural / field completeness:** When narrative gates pass, validate Issue §4.1 fields using the same **batch** discipline as §1.2 where applicable (list all missing Issue fields once, not one-by-one).
+2. **Phase 7 confirmation loop (FR-M1-032…034, GM3-04):** After §5 is satisfied (or gaps accepted), do **not** treat Issue dialogue as ready for **final** structural validation / normalizer handoff until **`issue-interview-flow.md` §7.2** is satisfied: **summary of interpretation** → **invitation to correct** facts/location/meaning/desired state → **revised framing** if the user disagrees with gist or emphasis → **explicit user affirmation** or accepted residual uncertainty. If this loop is incomplete, keep `stop_the_line.blocked = true` for progression to “structurally final” downstream steps (wording per `ingest_validation_report` until schema is frozen in M1-05). Even when §7.2 is complete, **do not** skip **[`issue-policy-gate.md`](./issue-policy-gate.md)** on a strict Issue chain — see **`issue-lifecycle-instructions.md`** §2.1 (**GM4-02**).
+3. **Structural / field completeness:** When §5 **and** §7.2 are satisfied, validate Issue §4.1 fields using the same **batch** discipline as §1.2 where applicable (list all missing Issue fields once, not one-by-one).
+
+**Policy gate — chain position (GM4-02 / EPIC-M1-04):** On the **strict** Issue ingest path, this module **prepares** validated material and, when applicable, the **`gate_request_package`** for **[`issue-policy-gate.md`](./issue-policy-gate.md)**. It **does not** emit `policy_gate_result` and **does not** authorize jumping **directly** to Issue normalization (`normalized_issue_payload`, **EPIC-M1-05**) or API. Order: validation → safety → **issue-policy-gate** → **[`issue-normalizer.md`](./issue-normalizer.md)** → API (same as `issue-lifecycle-instructions.md` §2.1).
+
+**Post-gate handoff — Issue normalizer vs API (GM5-02 / GIM-25):** After the gate returns **`approved`**, the **next** instruction module on a strict Issue chain is **[`issue-normalizer.md`](./issue-normalizer.md)** (emitting **`normalized_issue_payload`**). **Do not** skip normalization and **do not** invoke **[`api-orchestrator.md`](./api-orchestrator.md)** / HTTP until that envelope exists. “Continue to API” without `normalized_issue_payload` violates the Issue strict protocol ([`base.md`](./base.md) §1.5 Issue note).
 
 **Conflict with Activity strict protocol (§1.1–1.2):** For **Issue-only** ingest, **do not** run Activity `SentToReview-ready` enum batch (format, delivery_mode, etc.) as the **first** gate. Use the **civic interview** path first (`issue-interview-flow.md`); apply strict batch rules only to **Issue** enumerated fields from `issue-data-model.md` once §5 is satisfied (or gaps accepted).
 
-**Artifacts:** Keep emitting `ingest_validation_report` with `stop_the_line.blocked = true` when Issue §4.1 validation fails. For narrative incompleteness before Phase 7, set `stop_the_line.blocked = true` for progression to **final** summary/framing until §5 passes or gaps are accepted; record gaps in `missing_required_fields[]` using clear synthetic keys (e.g. `issue_narrative:REQ07_Q3`) **or** a short free-text `narrative_completeness_notes` field inside the report body until M1-03 defines a schema.
+**ADR — REQ-16 Q3 (closed, GM3-03):** Accepted decision text for **interview depth vs Activity-style strict batch** (FR-M1-007 / 013 / 018 / 022–023 alignment): [`REQ-16-Q3-interview-versus-strict-batch-issue.md`](../docs/analysis/tasks/epics/EPIC-M1-03-FR-M1-traceability-and-ingest-core/artifacts/REQ-16-Q3-interview-versus-strict-batch-issue.md). This is the **normative** cross-link for operators tracing “batch missing fields” vs **§5** narrative completeness.
+
+**Issue `type` — provisional observation (REQ-15.3, FR-M1-025, GM3-05):** After **`issue-interview-flow.md` §5** and **§7.2** are satisfied, when assembling **draft** Issue material for structural validation: map **positive improvement ideas without stated clear harm** (no focal victim, no acute harm narrative) to proposed **`type` = `observation`**, per [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) working assumption **#3**, until product introduces a separate Issue type (REQ-16 / backlog). If substance clearly matches **complaint**, **absurdity**, or **system_bug** per **FR-M1-024**, prefer those instead. **Never** relabel articulated **harm** as **observation** to skip civic depth — **REQ-12**, **GM2-04**. Interview **still** defers locking `type` / `labels` until narrative maturity + **§7.2** per **§8** row 2; user corrections override hints from [`ingest-deep-parsing.md`](./ingest-deep-parsing.md). **FR-M1-026:** offer **labels** only in the structural batch / metadata, not as mid-interview interrogation. **FR-M1-027:** keep **surface topic**, **deep need**, and **institutional hypothesis** separable in validation notes without asserting real institution IDs.
+
+**Artifacts:** Keep emitting `ingest_validation_report` with `stop_the_line.blocked = true` when Issue §4.1 validation fails. For narrative incompleteness before Phase 7, set `stop_the_line.blocked = true` for progression to **final** summary/framing until §5 passes or gaps are accepted; likewise block while **§7.2** (FR-M1-032…034) is incomplete. Record gaps in `missing_required_fields[]` using clear synthetic keys (e.g. `issue_narrative:REQ07_Q3`) **or** a short free-text `narrative_completeness_notes` field inside the report body until M1-03 defines a schema.
 
 **Deep parsing / multimodal:** Non-dialogue Issue ingest still follows §1.3 below when applicable; Question batches must reference `deep_parsing_artifact` ambiguities.
 
@@ -1666,6 +1678,8 @@ For the **structure** of input data, see Section 2.1.
    - If ALLOW → continue to Normalizer
 ```
 
+**DOGEstonia / Issue track (GM4-02):** After **Validated Data Check** → ALLOW, the next step on a strict Issue chain is **not** the Activity Normalizer nor Issue normalization **directly** — it is **[`issue-policy-gate.md`](./issue-policy-gate.md)** (after any remaining safety checkpoints product requires), per **`issue-lifecycle-instructions.md`** §2.1. The Activity-era wording “continue to Normalizer” above applies to **Activity** pipelines only; for Issue, interpret ALLOW as “continue the **safety → gate → normalization** sequence,” never “skip gate.”
+
 **Processing Safety & Compliance result:**
 ```
 1. **If BLOCK:**
@@ -1684,6 +1698,8 @@ For the **structure** of input data, see Section 2.1.
 ```
 
 ### 11.3 Integration with Activity Normalizer
+
+**DOGEstonia / Issue (GM5-02):** The protocol below is for **Activity** pipelines. For **Issue**, after validation + safety + **[`issue-policy-gate.md`](./issue-policy-gate.md)** (**approved**), hand off to **[`issue-normalizer.md`](./issue-normalizer.md)** for **`normalized_issue_payload`** — not “straight to API.” See Issue overlay at the top of this file (**Post-gate handoff**).
 
 **Handoff protocol:**
 ```
@@ -1744,7 +1760,9 @@ Ingest Validation MUST produce `ingest_validation_report` as output artifact:
   - Pass `ingest_validation_report`
   - Pass validated_payload
 
-**Reference:** Base Instruction Section 1.5 (Rule 1: Mandatory Artifacts)
+- **DOGEstonia / Issue — after policy gate (GM5-02):** **Not** from this section’s Activity “To Normalizer” shortcut alone — strict Issue chain requires **`issue-policy-gate`** **approved**, then **[`issue-normalizer.md`](./issue-normalizer.md)** → **`normalized_issue_payload`**, then (if product requires) Safety **Point 4** at `check_point: "normalized"`, then **`api-orchestrator.md`**.
+
+**Reference:** Base Instruction Section 1.5 (Rule 1: Mandatory Artifacts + DOGEstonia / Issue normalization artifact note)
 
 ---
 

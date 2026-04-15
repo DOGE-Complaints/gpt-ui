@@ -89,7 +89,13 @@ For each user input, GPT MUST:
 - Never calls APIs directly
 - Always creates Draft first
 
-**DOGEstonia / Issue track (overlay):** When `root.md` Issue overlay applies, INGEST for **Issue** defers **narrative** progression and completeness to [`issue-interview-flow.md`](./issue-interview-flow.md) (§§4–7, especially **§5** before Phase 7). **Ingest Validation Instruction** applies the Issue-specific overlay at the top of [`ingest-validation.md`](./ingest-validation.md) (DOGEstonia / Issue track). **Stop-the-line (§1.5 Rule 2 spirit):** do not advance to normalizer / gate / API if that overlay or `ingest_validation_report` blocks progression; for Issue dialogue, “missing required fields” includes **narrative** gaps enumerated in `issue-interview-flow.md` §5 until resolved or explicitly accepted by the user.
+**DOGEstonia / Issue track (overlay):** When `root.md` Issue overlay applies, INGEST for **Issue** defers **narrative** progression and completeness to [`issue-interview-flow.md`](./issue-interview-flow.md) (§§4–7, especially **§5** before Phase 7). **Ingest Validation Instruction** applies the Issue-specific overlay at the top of [`ingest-validation.md`](./ingest-validation.md) (DOGEstonia / Issue track). **Stop-the-line (§1.5 Rule 2 spirit):** do not advance to normalizer / gate / API if that overlay or `ingest_validation_report` blocks progression; for Issue dialogue, “missing required fields” includes **narrative** gaps enumerated in `issue-interview-flow.md` §5 until resolved or explicitly accepted by the user. **Strict-chain order (GM4-02; GM5-02):** for Issue, do **not** advance to **Issue** normalization (`normalized_issue_payload`, **EPIC-M1-05**) **without** passing **[`issue-policy-gate.md`](./issue-policy-gate.md)** after validation and required safety checkpoints — see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1. The Issue normalization module is **[`issue-normalizer.md`](./issue-normalizer.md)** (**GM5-01**); on **strict** Issue ingest, **§1.5** artifact **5** is **`normalized_issue_payload`**, not `normalized_activity_payload` (see **§1.5** note immediately after Rule 1 artifact list).
+
+**REQ-16 Q3 (architecture row — interview vs strict batch, Issue):** The Activity-era **first validation round = list all missing SentToReview fields in one batch** (Section 1.5 *Batch Field Requests* below) does **not** override Issue narrative pacing. Normative ADR: [`REQ-16-Q3-interview-versus-strict-batch-issue.md`](../docs/analysis/tasks/epics/EPIC-M1-03-FR-M1-traceability-and-ingest-core/artifacts/REQ-16-Q3-interview-versus-strict-batch-issue.md). For Issue dialogue, resolve **interview / §5 narrative gates first**, then apply **one compact structural batch** for Issue §4.1 fields when eligible (see `ingest-validation.md` Issue overlay — two-layer readiness). **FR-M1-018:** keep **one conversational move per interview step** unless the user explicitly requests a **fast / minimal** path; do not dump the full Issue checklist in the opening turn.
+
+**FR-M1-032…034 (Phase 7, GM3-04):** Before treating Issue INGEST as ready to proceed toward **normalizer / gate / API**, the dialogue MUST complete the Phase **7** sequence in [`issue-interview-flow.md`](./issue-interview-flow.md) **§7.2** — **summary** of the model’s interpretation → **user correction** window (facts, location, meaning, desired state) → **updated framing** if the user rejects the gist → **re-confirmation**. Do not advance past local validation intent while §7.2 is still open (align with [`ingest-validation.md`](./ingest-validation.md) Issue overlay — **Phase 7 confirmation loop** bullet).
+
+**FR-M1-028…031 (i18n, GM3-06):** Session language, trilingual `{ et, ru, en }` drafts, translation fidelity, and “no meaning distortion” rules live in [`issue-i18n-policy.md`](./issue-i18n-policy.md); align with [`bootstrap.md`](./bootstrap.md) `comm_context.ui_lang` and [`issue-data-model.md`](./issue-data-model.md) §4.1.
 
 ### 2. SEARCH Mode
 
@@ -255,6 +261,8 @@ Each workflow step MUST produce a versioned JSON artifact before proceeding to t
    - Required fields: `canonical_payload` (full Activity JSON), `normalization_metadata`
    - Version: `v1`
    - Artifact ID format: `normalized_<ISO_timestamp>`
+
+**DOGEstonia / Issue — strict normalization artifact (replaces item 5 for Issue only, GM5-02 / GIM-25):** For **Issue** ingest (`root.md` Issue overlay), **do not** use **`normalized_activity_payload`**. After **[`issue-policy-gate.md`](./issue-policy-gate.md)** emits **`policy_gate_result.status = "approved"`**, the mandatory normalization artifact is **`normalized_issue_payload`**, produced per **[`issue-normalizer.md`](./issue-normalizer.md)** — envelope `canonical_payload` (Issue §4.1 per [`issue-data-model.md`](./issue-data-model.md)) + `normalization_metadata` (refs to validation, safety, gate). Activity / Amanita pipelines keep item **5** as written.
 
 **Rule 2: Stop-the-Line Conditions**
 
@@ -1083,6 +1091,8 @@ Example flow for INGEST mode:
 10. Base Instruction → handles API response/errors according to Authority & Error Handling rules
 ```
 
+**DOGEstonia / Issue ingest (parallel example, GM4-02; normalization GM5-01 / chain GM5-02):** Same strict discipline; replace steps 7–8 with **[`issue-policy-gate.md`](./issue-policy-gate.md)** (operator rulebook admission, `policy_gate_result`) → **[`issue-normalizer.md`](./issue-normalizer.md)** (`normalized_issue_payload`, **EPIC-M1-05**). Do not skip the policy gate between validation/safety and normalization; do not call API before **`normalized_issue_payload`** exists.
+
 **Rule 2: Base Instruction Always Active**
 ```
 - Base Instruction rules apply to ALL modules
@@ -1123,7 +1133,9 @@ When handing off to another module:
      * IF transitioning to Validation → verify deep_parsing_artifact (if non-dialogue)
      * IF transitioning to Gate → verify ingest_validation_report AND safety_compliance_report
      * IF transitioning to Normalizer → verify ingest_validation_report AND safety_compliance_report (and gate_request_package if SentToReview-ready)
-     * IF transitioning to API Orchestrator → verify normalized_activity_payload AND all previous artifacts
+     * IF transitioning to **Issue** Normalizer (DOGEstonia / Issue) → verify **`policy_gate_result.status = "approved"`** from [`issue-policy-gate.md`](./issue-policy-gate.md) (or explicit stop) **in addition to** the artifacts above, per [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1 (**GM4-02**); output artifact is **`normalized_issue_payload`** per [`issue-normalizer.md`](./issue-normalizer.md) (**GM5-01** / **GM5-02**)
+     * IF transitioning to API Orchestrator **(Activity pipeline)** → verify `normalized_activity_payload` AND all previous artifacts
+     * IF transitioning to API Orchestrator **(DOGEstonia / Issue pipeline)** → verify **`normalized_issue_payload`** AND prior strict artifacts including approved **`policy_gate_result`** — **no** HTTP without normalization (**GM5-02**)
    - **Check stop-the-line conditions:**
      * IF ingest_validation_report.stop_the_line.blocked == true → DO NOT proceed
      * IF safety_compliance_report.stop_the_line.blocked == true → DO NOT proceed

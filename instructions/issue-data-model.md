@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.3 |
+| **Version** | 0.6 |
 | **Date** | 2026-04-10 |
-| **Traceability** | [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5–10.6, [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §4–6; SPA: [`spa-app/docs/mock-layer-issues-guide.md`](../../spa-app/docs/mock-layer-issues-guide.md), [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) |
+| **Traceability** | [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5–10.6, [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §4–6; [`issue-i18n-policy.md`](./issue-i18n-policy.md) (FR-M1-028…031, **GM3-06**); [`issue-normalizer.md`](./issue-normalizer.md) (**GM5-01** / **GIM-24**); SPA: [`spa-app/docs/mock-layer-issues-guide.md`](../../spa-app/docs/mock-layer-issues-guide.md), [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) |
 
 ---
 
@@ -55,7 +55,7 @@ Below is the **target display contract** for `spa-app` (mocks and UI). Enum type
 |-------|----------------|------|
 | `type` | string enum | One of `ISSUE_TYPE`: `complaint`, `observation`, `absurdity`, `system_bug`. |
 | `labels` | `string[]` | Tag keys (as in mocks). New keys — per UI rules (`AVAILABLE_LABELS` and dictionaries); see mock-guide. |
-| `title` | `{ et: string, ru: string, en: string }` | Draft title; all three keys filled meaningfully or explicitly flagged “needs translation” in validator report (i18n policy — separate module). |
+| `title` | `{ et: string, ru: string, en: string }` | Draft title; all three keys filled meaningfully or explicitly flagged “needs translation” in validator report — see [`issue-i18n-policy.md`](./issue-i18n-policy.md). |
 | `description` | `{ et, ru, en }` | Full detail-page text. |
 | `summary` | `{ et, ru, en }` (optional) | Short card text; if absent, UI may use `title` ([mock-layer-issues-guide](../../spa-app/docs/mock-layer-issues-guide.md)). |
 
@@ -96,8 +96,9 @@ Follow [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5: do not 
 | Module | Link to Issue |
 |--------|----------------|
 | [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) | Ingest phase order and strict-chain artifacts **in instruction terms** (not UI statuses). |
+| [`issue-policy-gate.md`](./issue-policy-gate.md) | Policy admission; `policy_gate_result` / `review_metadata` alignment (**GM4-01**); no API. |
 | `ingest-validation.md` | §4.1 completeness, batch follow-ups. |
-| `issue-normalizer.md` (planned) | Canonical JSON for orchestrator / `normalized_issue_payload`. |
+| [`issue-normalizer.md`](./issue-normalizer.md) | Canonical JSON for orchestrator / **`normalized_issue_payload`** (**GM5-01** / **GIM-24**, v0.1). |
 | `api-orchestrator.md` | Only HTTP entrypoint; response interpretation is authoritative. |
 | `root.md` | Forbid false claims about backend/Gate/status. |
 
@@ -110,3 +111,6 @@ Follow [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5: do not 
 | 0.1 | 2026-04-10 | First draft (STORY-GM1-01); REQ-10/REQ-15 and SPA mock-guide alignment. |
 | 0.2 | 2026-04-10 | Link to [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) (STORY-GM1-02). |
 | 0.3 | 2026-04-10 | **English-only** instruction text (repo policy). |
+| 0.4 | 2026-04-10 | **GM3-06:** §4.1 `title` row links [`issue-i18n-policy.md`](./issue-i18n-policy.md). |
+| 0.5 | 2026-04-10 | **GM4-01:** §7 link to [`issue-policy-gate.md`](./issue-policy-gate.md) (`policy_gate_result`). |
+| 0.6 | 2026-04-10 | **GM5-01:** §7 link to [`issue-normalizer.md`](./issue-normalizer.md) (`normalized_issue_payload` scaffold). |
