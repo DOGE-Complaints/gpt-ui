@@ -14,6 +14,11 @@ Bootstrap executes **before** routing to functional modules (INGEST/SEARCH/HELP/
 
 **Critical:** Bootstrap has priority over all functional modules but executes after core Root Wrapper principles.
 
+### Traceability (DOGEstonia / Issue)
+
+- **REQ-09 §9.7 (FR-M1-028…031):** session language and multilingual discipline align with [`issue-i18n-policy.md`](./issue-i18n-policy.md) and `comm_context.ui_lang`.
+- **REQ-15 (working assumptions):** communication defaults and overrides remain operator/user-driven context, then applied by downstream modules.
+
 ## Activation Algorithm
 
 **Step 1: Check if Bootstrap already completed**

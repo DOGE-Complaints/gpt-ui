@@ -5,9 +5,9 @@
 
 ## TODO: интеграция
 
-- Матрица **блоки A–B → файлы инструкций:** [`../analysis/REQ-11-blocks-AB-instruction-traceability.md`](../analysis/REQ-11-blocks-AB-instruction-traceability.md) (GM1-05, 2026-04-10).
-- [ ] Расширить матрицу на **блоки C–H** и держать в синхроне после рефакторинга Activity → Issue.
-- [ ] Держать в синхроне с `REQ-09` и `REQ-08`.
+- Матрица блоков **A–H → файлы инструкций:** [`../analysis/REQ-11-blocks-AB-instruction-traceability.md`](../analysis/REQ-11-blocks-AB-instruction-traceability.md) (обновление v0.2, 2026-04-21).
+- [x] Расширить матрицу на **блоки C–H** и держать в синхроне; целевой домен выхода — **Issue** / Story Intake (**REQ-18**), не legacy-домен донора.
+- [x] Держать в синхроне с `REQ-09` и `REQ-08` (см. секцию проверки в матрице A-H).
 
 ---
 

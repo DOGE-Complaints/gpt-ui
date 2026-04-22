@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.1.2 |
-| **Date** | 2026-04-10 |
-| **Traceability** | [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-035–037; [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5; [`issue-data-model.md`](./issue-data-model.md) §4.1; [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-policy-gate.md`](./issue-policy-gate.md); [technical-architecture.md](../docs/technical-architecture.md) §3.2, §7.2–7.4; **STORY-GM5-01** / **GIM-24**; **GM5-02** / **GIM-25** (`base` / `ingest-validation` / `safety-compliance` chain) |
+| **Version** | 0.1.3 |
+| **Date** | 2026-04-20 |
+| **Traceability** | [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-035–037; [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5; [`issue-data-model.md`](./issue-data-model.md) §4.1; [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-policy-gate.md`](./issue-policy-gate.md); [technical-architecture.md](../docs/technical-architecture.md) §3.2, §7.2–7.4; strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -31,7 +31,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 ### 2.2 This instruction MUST NOT
 
 - **Call APIs or GPT Actions** — ever; orchestrator owns HTTP.
-- **Ask the user** clarification or follow-up questions (same separation as the Activity normalizer reference: normalization is not a dialogue step). Missing data must have been resolved **upstream** (`ingest-validation`, interview flow, or gate **`needs_clarification`** loop), not here.
+- **Ask the user** clarification or follow-up questions (same separation as the legacy normalizer reference: normalization is not a dialogue step). Missing data must have been resolved **upstream** (`ingest-validation`, interview flow, or gate **`needs_clarification`** loop), not here.
 - **Parse raw** multimodal input — belongs to ingest deep parsing / validation.
 - **Re-evaluate** structural completeness — belongs to [`ingest-validation.md`](./ingest-validation.md).
 - **Re-run** safety or policy — belongs to [`safety-compliance.md`](./safety-compliance.md) and [`issue-policy-gate.md`](./issue-policy-gate.md).
@@ -40,7 +40,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 ### 2.3 Source of truth for Issue shape
 
 - **Authoritative for Module 1 Issue normalization:** [`issue-data-model.md`](./issue-data-model.md).  
-- **Do not** use `GPT UI/docs/activity-data-model.md` or [`activity-normalizer.md`](./activity-normalizer.md) as SoT for Issue fields (Activity stack is a **donor reference** only).
+- **Do not** use removed donor-era paths or donor schema names as SoT; this file + [`issue-data-model.md`](./issue-data-model.md) are authoritative for Issue normalization.
 
 ---
 
@@ -54,7 +54,7 @@ The normalizer consumes a **handoff package** produced by upstream modules (name
 | **`policy_gate_result`** | Must be **`approved`**; include `policy_ref`, `rulebook_version` for traceability in metadata. |
 | **Pointers to upstream artifacts** | Stable references (e.g. logical ids, timestamps, or one-line summaries) to **`ingest_validation_report`**, relevant **`safety_compliance_report`** checkpoints, and the **gate** result — for `normalization_metadata` (§6). |
 
-If `policy_gate_result.status` is not **`approved`**: **do not** emit `normalized_issue_payload` for API-bound ingest; return control to lifecycle / gate (same pattern as Activity reference normalizer after rejection).
+If `policy_gate_result.status` is not **`approved`**: **do not** emit `normalized_issue_payload` for API-bound ingest; return control to lifecycle / gate (same pattern as legacy reference normalizer after rejection).
 
 ---
 
@@ -81,9 +81,10 @@ Must conform to [`issue-data-model.md`](./issue-data-model.md) **§4.1** (requir
 | `labels` | String array; keys must be allowed for UI / product rules. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }`; if omitted, orchestrator/UI may fall back per REQ-10 / mock guide. |
-| `institution` | Optional `{ et, ru, en }` if present in validated material. |
+| `institution` | Optional `{ et, ru, en }` **only** when product scope allows; **demo default:** omit (REQ-16 Q5). |
+| `severity`, `impact_estimation`, `problem_status` | Optional — resident-perceived intake per [`issue-data-model.md`](./issue-data-model.md) **§4.3** when collected upstream. |
 
-Do not add Activity-only or Search-only fields.
+Do not add legacy-only or Search-only fields.
 
 ### 4.2 `normalization_metadata` (required keys — instruction-layer scaffold)
 
@@ -91,6 +92,7 @@ Stable **references** to upstream work (opaque strings or objects — align with
 
 | Key | Purpose |
 |-----|---------|
+| `session_language` | **Required** for Issue ingest: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](./bootstrap.md) **`comm_context.ui_lang`** (see [`issue-i18n-policy.md`](./issue-i18n-policy.md) §1–2). Backend readers use this to know which `{ et, ru, en }` slot was primary-authored. |
 | `ingest_validation_report_ref` | Reference to the validation artifact used (id, hash, or short summary line). |
 | `safety_compliance_report_ref` | Reference to relevant safety checkpoint output for this handoff. |
 | `policy_gate_ref` | At minimum: `policy_ref`, `rulebook_version`, and `policy_gate_result.status` copy or stable id. |
@@ -103,7 +105,7 @@ Stable **references** to upstream work (opaque strings or objects — align with
 
 Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summary` / `description` / `labels` / `type` — see [`issue-data-model.md`](./issue-data-model.md) §3. This module **projects** already validated material into the §4.1 card shape; it does not re-author the interview.
 
-### 5.1 REQ-10 projection → Issue card fields (GM5-03)
+### 5.1 REQ-10 projection → Issue card fields
 
 | REQ-10 layer | Projection target in `canonical_payload` |
 |--------------|------------------------------------------|
@@ -122,8 +124,8 @@ Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summa
 | [`ingest-validation.md`](./ingest-validation.md) | Upstream — completeness / batch rules. |
 | [`safety-compliance.md`](./safety-compliance.md) | Upstream — safety checkpoints before or beside gate per lifecycle. |
 | [`issue-policy-gate.md`](./issue-policy-gate.md) | Immediate upstream — **approval** required. |
-| [`api-orchestrator.md`](./api-orchestrator.md) | Downstream — **only** module that performs HTTP (**GM5-03** / **M1-06** wire `normalized_issue_payload` explicitly). |
-| [`base.md`](./base.md) | §1.5 — Issue strict chain uses **`normalized_issue_payload`** instead of `normalized_activity_payload` (**GM5-02** / **GIM-25**). |
+| [`api-orchestrator.md`](./api-orchestrator.md) | Downstream — **only** module that performs HTTP and consumes `normalized_issue_payload`. |
+| [`base.md`](./base.md) | §1.5 — Issue strict chain uses **`normalized_issue_payload`** as the canonical normalization artifact. |
 
 ---
 
@@ -131,6 +133,7 @@ Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summa
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-04-10 | Initial scaffold (**GM5-01** / **GIM-24**): `normalized_issue_payload`, `canonical_payload`, `normalization_metadata`, Plain GPT, no API, no user questions; Issue SoT = `issue-data-model.md` §4.1. |
-| 0.1.1 | 2026-04-10 | **GM5-02:** §6 cross-link to `base.md` §1.5 Issue artifact alignment. |
-| 0.1.2 | 2026-04-10 | **GM5-03:** §5.1 concise REQ-10 projection table for `title` / `summary` / `description` / optional `institution`. |
+| 0.1 | 2026-04-10 | Initial scaffold: `normalized_issue_payload`, `canonical_payload`, `normalization_metadata`, Plain GPT, no API, no user questions; Issue SoT = `issue-data-model.md` §4.1. |
+| 0.1.1 | 2026-04-10 | Added §6 cross-link to `base.md` §1.5 Issue artifact alignment. |
+| 0.1.2 | 2026-04-10 | Added §5.1 concise REQ-10 projection table for `title` / `summary` / `description` / optional `institution`. |
+| 0.1.3 | 2026-04-20 | Added required `normalization_metadata.session_language`; optional subjective intake fields in `canonical_payload`; demo `institution` omit. |

@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.1 |
-| **Date** | 2026-04-10 |
-| **Traceability** | REQ-09 §9.7 (FR-M1-028…031), REQ-10 §10.5–10.6, REQ-15 item 4 (SPA field shape); **STORY GM3-06** (EPIC-M1-03) |
+| **Version** | 0.2 |
+| **Date** | 2026-04-20 |
+| **Traceability** | REQ-09 §9.7 (FR-M1-028…031), REQ-10 §10.5–10.6, REQ-15 item 4 (SPA field shape) |
 
 ---
 
@@ -52,8 +52,17 @@
 
 ---
 
-## 6. Version history
+## 6. Artifact: `session_language` in `normalized_issue_payload` (REQ-16 Q2)
+
+1. [`issue-normalizer.md`](./issue-normalizer.md) **MUST** emit **`normalization_metadata.session_language`** with value `et` \| `ru` \| `en`, matching the **primary** user-facing language from §1 (`comm_context.ui_lang` / substantive content default).
+2. Downstream modules and backends **MUST NOT** infer primary slot only by longest string — use **`session_language`** as the explicit marker alongside trilingual `{ et, ru, en }` objects.
+3. This does **not** change OpenAPI request shapes until the node publishes a matching field; until then the key is **instruction-layer + logical handoff** truth.
+
+---
+
+## 7. Version history
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-04-10 | **GM3-06:** initial policy (FR-M1-028…031); links to bootstrap, issue-data-model, interview flow, presets. |
+| 0.1 | 2026-04-10 | Initial policy (FR-M1-028…031); links to bootstrap, issue-data-model, interview flow, presets. |
+| 0.2 | 2026-04-20 | Added §6 `session_language` in `normalization_metadata`. |

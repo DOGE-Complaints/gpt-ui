@@ -2,10 +2,12 @@
 
 **Источник истины (SoT):** PDF `GPT UI/docs/DOGEstonia — GPT Requirements.pdf` (перенос в Markdown). При расхождении приоритет у PDF.
 
+**Связка GPT → HTTP API (Story Intake, полный конверт):** продуктовые требования — **[REQ-18](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md)**; детальный контракт полей и примеры — `doge-complaints-gateway/docs/requirements/19-inbound-api-gpt-preprocessing-and-spa-issue-contracts.md` (**§19**).
+
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (17 файлов)
+## Оглавление REQ (18 файлов)
 
 | № | Файл |
 |---|------|
@@ -26,5 +28,6 @@
 | 15 | [REQ-15-working-assumptions.md](./REQ-15-working-assumptions.md) |
 | 16 | [REQ-16-open-decisions.md](./REQ-16-open-decisions.md) |
 | 17 | [REQ-17-module-formula.md](./REQ-17-module-formula.md) |
+| 18 | [REQ-18-api-inbound-story-intake-and-gpt-handoff.md](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md) |
 
-**Версия:** 0.2 · 2026-04-11 (восстановлен индекс; ссылка на эпики).
+**Версия:** 0.3 · 2026-04-19 (добавлен REQ-18; связь с §19 gateway).

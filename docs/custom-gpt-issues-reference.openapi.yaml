@@ -1,0 +1,262 @@
+# DOGEstonia — OpenAPI subset for Custom GPT Actions (Issues / draft lifecycle).
+#
+# Auth (ChatGPT → Configure → Actions): same Issue runtime pattern — API Key → Bearer = server GPT_ACTIONS_BEARER_SECRET.
+# servers.url: replace with public HTTPS origin of DOGEstonia Bot API when deployed.
+#
+# STATUS: CONTRACT CANDIDATE — lock paths and schemas to the node’s GET /openapi.json when available (EPIC-M1-06).
+# SSOT companion: GPT UI/instructions/issue-api-methods-reference.md
+# Template lineage: custom-gpt-actions-activities-reference.openapi.yaml
+# Skill: strong operationId + narrow operations — .cursor/skills/openai-custom-gpt-builder/SKILL.md
+#
+openapi: 3.0.3
+info:
+  title: DOGEstonia Bot API — Issues (Custom GPT Actions, draft)
+  version: "0.1.3"
+  description: >
+    Minimal subset for GPT Actions targeting Issue ingest. All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
+    Replace servers.url and reconcile components with the live FastAPI OpenAPI before production.
+    Lockstep: operationId/method/path/request/response/auth/version parity with issue-api-methods-reference.md.
+
+servers:
+  - url: https://api.example.com
+    description: REPLACE with DOGEstonia node public origin (no trailing path).
+
+security:
+  - GptActionsBearer: []
+
+components:
+  securitySchemes:
+    GptActionsBearer:
+      type: http
+      scheme: bearer
+      description: >
+        Shared secret = GPT_ACTIONS_BEARER_SECRET on the API host. Same value as ChatGPT Actions API Key (Bearer).
+        Custom headers (e.g. X-User-Id) are typically NOT available from Actions — see gpt-actions-bot-api-auth-mapping.md.
+        Current model is app-level integration bearer (no per-user OAuth identity claims in this schema).
+
+  schemas:
+    LocalizedString:
+      type: object
+      required: [et, ru, en]
+      properties:
+        et: { type: string }
+        ru: { type: string }
+        en: { type: string }
+      description: UI copy for et / ru / en (spa-app mock contract).
+
+    IssueDraftCreateRequest:
+      type: object
+      required: [type, labels, title, description]
+      properties:
+        type:
+          type: string
+          enum: [complaint, observation, absurdity, system_bug]
+          description: Issue type (ISSUE_TYPE in spa-app domain types).
+        labels:
+          type: array
+          items: { type: string }
+          description: Filter keys / tags (string[]).
+        title:
+          $ref: "#/components/schemas/LocalizedString"
+        summary:
+          $ref: "#/components/schemas/LocalizedString"
+        description:
+          $ref: "#/components/schemas/LocalizedString"
+        institution:
+          $ref: "#/components/schemas/LocalizedString"
+      description: >
+        Draft payload after instruction normalizer. Server assigns id, status, timestamps (FR-M1-038 — GPT must not invent).
+
+    IssueEnvelope:
+      type: object
+      required: [success, issue]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        issue:
+          type: object
+          description: Issue object returned by node (contract candidate until /openapi.json lock).
+          additionalProperties: true
+        request_id:
+          type: string
+        timestamp:
+          oneOf:
+            - type: integer
+            - type: string
+      additionalProperties: false
+
+    ErrorEnvelope:
+      type: object
+      required: [success, error, message]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        request_id:
+          type: string
+        timestamp:
+          oneOf:
+            - type: integer
+            - type: string
+      additionalProperties: false
+
+paths:
+  /issues/draft:
+    post:
+      operationId: createIssueDraft
+      summary: Create Issue draft on the node
+      description: >
+        Use after normalized_issue_payload is ready. Do not claim success until HTTP 2xx body is returned.
+        Backend is source of truth for id and ISSUE_STATUS.
+      x-openai-isConsequential: true
+      security:
+        - GptActionsBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueDraftCreateRequest"
+      responses:
+        "201":
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueEnvelope"
+        "401":
+          description: Missing or invalid GPT Actions Bearer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+
+  /issues/{issue_id}:
+    get:
+      operationId: getIssueById
+      summary: Fetch Issue by id
+      description: Read-only; use for confirmation or display after create/update.
+      security:
+        - GptActionsBearer: []
+      parameters:
+        - name: issue_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Issue found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueEnvelope"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+    put:
+      operationId: updateIssueDraft
+      summary: Update existing Issue draft
+      description: >
+        Partial/full update of draft fields. Same Bearer rules. Confirm allowed transitions with node OpenAPI.
+      x-openai-isConsequential: true
+      security:
+        - GptActionsBearer: []
+      parameters:
+        - name: issue_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueDraftCreateRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssueEnvelope"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "429":
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"

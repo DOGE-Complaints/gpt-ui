@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.3 |
-| **Date** | 2026-04-10 |
-| **Traceability** | [REQ-03](../docs/requirements/REQ-03-scope.md) (safety / scope); [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) §9.10 (FR-M1-039–043); [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1 (**GM4-02**); [`issue-data-model.md`](./issue-data-model.md); [technical-architecture.md](../docs/technical-architecture.md) §2–3.2; **STORY-GM4-01** / **GIM-20**; **STORY-GM4-02** / **GIM-21**; **STORY-GM4-03** / **GIM-22** |
+| **Version** | 0.4 |
+| **Date** | 2026-04-21 |
+| **Traceability** | [REQ-03](../docs/requirements/REQ-03-scope.md) (safety / scope); [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) §9.10 (FR-M1-039–043); [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-data-model.md`](./issue-data-model.md); [technical-architecture.md](../docs/technical-architecture.md) §2–3.2 |
 
 ---
 
@@ -30,7 +30,7 @@ Operator-approved rules live in an **external** operator rulebook (OP-DOC). This
 
 - Parse raw multimodal input (that belongs to ingest deep parsing / validation).
 - Fix or invent Issue field values (that belongs to [`ingest-validation.md`](./ingest-validation.md)).
-- Normalize canonical JSON (that belongs to `issue-normalizer` / **EPIC-M1-05**).
+- Normalize canonical JSON (that belongs to `issue-normalizer`).
 - **Call backend APIs or GPT Actions** — no exceptions for policy fetch in Module 1 instructions; the model uses the configured rulebook **as provided in session context** (paste, knowledge, or operator bundle), identified by `policy_ref` + `rulebook_version`.
 - Decide final publication or ticket **status** — only admission **eligibility** for the next chain step.
 
@@ -46,7 +46,7 @@ This instruction MUST:
 - **Not** invent policy categories, soften operator rules, or expand scope beyond that document.
 - If the rulebook text is missing from context: follow **§9 Degraded mode**.
 
-**Template (non-authoritative):** [`operator-rulebook-template.md`](../docs/analysis/tasks/epics/EPIC-M1-04-policy-gate-operator-rulebook/artifacts/operator-rulebook-template.md) **v0.2** — metadata, reason codes, topic matrix, degraded-mode contract; aligns with `policy_gate_result` (**GM4-03** / **GIM-22**).
+**Template (non-authoritative):** Use an operator-managed rulebook template that includes metadata, reason codes, topic matrix, and degraded-mode contract aligned with `policy_gate_result`.
 
 ---
 
@@ -77,7 +77,7 @@ If `gate_request_package` is missing or structurally invalid: output **`needs_cl
 
 ## 6. Output contract — `policy_gate_result`
 
-Emit a single structured result compatible with **Issue review metadata** (same pattern as Activity `review_metadata.policy_gate_result` in the reference gate; Issue transport may map these fields under `review_metadata` or an equivalent envelope agreed with the node).
+Emit a single structured result compatible with **Issue review metadata** (same pattern as the legacy `review_metadata.policy_gate_result` gate contract; Issue transport may map these fields under `review_metadata` or an equivalent envelope agreed with the node).
 
 | Field | Type (logical) | Description |
 |-------|----------------|-------------|
@@ -87,7 +87,7 @@ Emit a single structured result compatible with **Issue review metadata** (same 
 | `rulebook_version` | string | Version string of the applied rulebook (must match the document the model was instructed to use). |
 | `clarification_prompt` | string? | If `needs_clarification`: what must be clarified before re-evaluation. |
 
-**Compatibility note:** Until the node publishes a final JSON Schema for Issue `review_metadata`, treat this table as the **instruction-layer contract**; align OpenAPI / SPA with **EPIC-M1-01** / **M1-06** when schemas land.
+**Compatibility note:** Until the node publishes a final JSON Schema for Issue `review_metadata`, treat this table as the **instruction-layer contract**; align OpenAPI / SPA when schemas land.
 
 ---
 
@@ -101,12 +101,27 @@ Emit a single structured result compatible with **Issue review metadata** (same 
 
 Always prefer **conservative** interpretation when OP-DOC is ambiguous.
 
+### 7.1 Demo baseline rule pack (when operator enables demo profile)
+
+For DOGEstonia demo sessions where operator policy profile is explicitly set to `demo_baseline`, apply this minimum admission matrix:
+
+- `BLOCK`:
+  - clear off-topic / non-civic content (`IRRELEVANT_NON_CIVIC`);
+  - scam, phishing, spam, promo bait (`SCAM_OR_SPAM`);
+  - obscene/sexualized/trolling payload unrelated to civic issue intake (`OBSCENE_OR_TROLL`).
+- `needs_clarification`:
+  - weakly relevant but noisy content where civic intent is not explicit (`RELEVANCE_UNCLEAR`).
+- `approved`:
+  - content that is recognizably civic and can continue through strict chain.
+
+This demo pack does not replace safety controls in [`safety-compliance.md`](./safety-compliance.md); it is an admission filter before normalization.
+
 ---
 
 ## 8. Relationship to safety modules
 
 [`safety-compliance.md`](./safety-compliance.md) and [`issue-interview-flow.md`](./issue-interview-flow.md) (e.g. limited depth, latent input) define **additional** safeguards. This gate **does not** replace them; it applies **operator policy** after the chain position described in [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md).  
-**GM4-04** tracks explicit overlay alignment for REQ-03 / FR-M1-039–043.
+Overlay alignment is enforced by REQ-03 / FR-M1-039–043 constraints and linked safety modules.
 
 ---
 
@@ -126,6 +141,7 @@ Document the effective mode in `reasons` (e.g. code `POLICY_DEGRADED_MODE`).
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-04-10 | Initial scaffold (**GM4-01**): inputs/outputs, external SoT, no API, degraded mode. |
-| 0.2 | 2026-04-10 | **GM4-02:** trace + §4 pointer to lifecycle **§2.1** strict-chain order. |
-| 0.3 | 2026-04-10 | **GM4-03:** traceability **GIM-22**; template **v0.2** pointer in §3. |
+| 0.1 | 2026-04-10 | Initial scaffold: inputs/outputs, external SoT, no API, degraded mode. |
+| 0.2 | 2026-04-10 | Added trace + §4 pointer to lifecycle **§2.1** strict-chain order. |
+| 0.3 | 2026-04-10 | Refined traceability and external template guidance in §3. |
+| 0.4 | 2026-04-21 | Added demo baseline gate profile (irrelevant/scam/spam/obscene filtering) with stable reason codes. |

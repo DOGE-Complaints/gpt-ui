@@ -2,11 +2,11 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.31 |
+| **Версия индекса** | 0.32 |
 | **Дата** | 2026-04-21 |
 | **Scope** | Runtime navigation map for DOGEstonia Issue instructions; no task/epic dependency in operational sections. |
 
-This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy Activity content must remain only in explicit stub or migration-log files.
+This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy donor content is removed from the active runtime surface.
 
 Use this index together with [`issue-data-model.md`](./issue-data-model.md), [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md), [`issue-policy-gate.md`](./issue-policy-gate.md), [`issue-normalizer.md`](./issue-normalizer.md), and [`issue-api-methods-reference.md`](./issue-api-methods-reference.md).
 
@@ -55,20 +55,7 @@ with `base.md` as global constitution and `issue-lifecycle-instructions.md` as c
 | Policy gate | [`issue-policy-gate.md`](./issue-policy-gate.md) | `policy_gate_result`; admission decision only. |
 | Normalization | [`issue-normalizer.md`](./issue-normalizer.md) | `normalized_issue_payload`; no user questions/API. |
 | API orchestration | [`api-orchestrator.md`](./api-orchestrator.md) | The only module allowed to execute HTTP actions. |
-| Search dialogue | [`search-dialogue.md`](./search-dialogue.md) | Optional SEARCH-mode flow; not required for ingest-first path. |
-
----
-
-## Legacy and migration contour
-
-Legacy files are allowed only as explicit stubs and migration documentation:
-
-| File | Status |
-|------|--------|
-| [`activity-data-model.md`](./activity-data-model.md) | Historical stub; not used in active Issue chain. |
-| [`activity-normalizer.md`](./activity-normalizer.md) | Historical stub; replaced by Issue normalizer path. |
-| [`api-methods-reference.md`](./api-methods-reference.md) | Historical donor reference; non-normative for Issue runtime. |
-| [`activity-legacy-paths-inventory.md`](./activity-legacy-paths-inventory.md) | Migration log and verification checklist. |
+| Search flow | SEARCH-mode handoff via base/orchestrator contracts | Optional; activate only when Issue search operations exist in OpenAPI. |
 
 ---
 
@@ -76,5 +63,6 @@ Legacy files are allowed only as explicit stubs and migration documentation:
 
 | Версия | Дата | Изменение |
 |--------|------|-----------|
+| 0.32 | 2026-04-21 | Removed legacy stub file references and search-dialogue file dependency from runtime index. |
 | 0.31 | 2026-04-21 | Final cleanup: operational-only index, removed task/epic and roadmap noise from runtime navigation. |
-| 0.30 | 2026-04-20 | Activity legacy cleanup synchronized with Issue-first module set. |
+| 0.30 | 2026-04-20 | Legacy donor cleanup synchronized with Issue-first module set. |

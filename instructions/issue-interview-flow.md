@@ -1,14 +1,13 @@
 # Issue — civic interview scenario (phases 1–7)
 
 **Product:** DOGEstonia — Module 1 (GPT Interview → Issue)  
-**Purpose:** Canonical **dialogue** scenario (REQ-08): phase order, soft entry, principles, **psychological depth (REQ-06)**, **completeness (REQ-07)**, **Phase 7 summary → user correction → framing update (FR-M1-032…034)**, **Issue archetype thinking (FR-M1-024…027) including provisional observation for improvement-without-harm (REQ-15.3 / FR-M1-025)** — without premature `type`/`labels` lock-in, **surface language + trilingual card discipline (FR-M1-028…031)** per [`issue-i18n-policy.md`](./issue-i18n-policy.md), **reframe templates (FR-M1-017 / REQ-09 §9.4)**, **latent request & limited-depth (REQ-04.2 + EPIC-M1-04 pointer)**, **anti-patterns (REQ-12)**, **quality bar (REQ-13)**, and link to the **Issue** entity. Does not replace the full PDF — details and wording norms live in linked REQ files.
+**Purpose:** Canonical **dialogue** scenario (REQ-08): phase order, soft entry, principles, **psychological depth (REQ-06)**, **completeness (REQ-07)**, **Phase 7 summary → user correction → framing update (FR-M1-032…034)**, **Issue archetype thinking (FR-M1-024…027) including provisional observation for improvement-without-harm (REQ-15.3 / FR-M1-025)** — without premature `type`/`labels` lock-in, **surface language + trilingual card discipline (FR-M1-028…031)** per [`issue-i18n-policy.md`](./issue-i18n-policy.md), **reframe templates (FR-M1-017 / REQ-09 §9.4)**, **latent request & limited-depth (REQ-04.2)**, **anti-patterns (REQ-12)**, **quality bar (REQ-13)**, and link to the **Issue** entity. Does not replace the full PDF — details and wording norms live in linked REQ files.
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.12 |
-| **Date** | 2026-04-10 |
-| **Traceability** | [REQ-08](../docs/requirements/REQ-08-dialogue-flow.md), [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) (FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](./safety-compliance.md)), [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) (working assumption **#3**), [REQ-05](../docs/requirements/REQ-05-interview-principles.md), [REQ-06](../docs/requirements/REQ-06-psychological-model.md), [REQ-07](../docs/requirements/REQ-07-target-outcome.md), [REQ-12](../docs/requirements/REQ-12-anti-patterns.md), [REQ-13](../docs/requirements/REQ-13-quality-criteria.md), [REQ-03](../docs/requirements/REQ-03-scope.md) (gov outcomes out of scope), [REQ-01](../docs/requirements/REQ-01-mission.md), [REQ-02](../docs/requirements/REQ-02-business-task.md), [REQ-04](../docs/requirements/REQ-04-personas.md) §4.2 latent request; [technical-architecture.md](../docs/technical-architecture.md) §7.3; [`issue-i18n-policy.md`](./issue-i18n-policy.md) (**GM3-06**); **REQ-16 Q3** — [ADR](../docs/analysis/tasks/epics/EPIC-M1-03-FR-M1-traceability-and-ingest-core/artifacts/REQ-16-Q3-interview-versus-strict-batch-issue.md) (**GM3-03**) |
-| **STORY** | GM2-01 … **GM2-06** (EPIC-M1-02) · **GM3-03** (EPIC-M1-03 REQ-16 Q3) · **GM3-04** (EPIC-M1-03 FR-M1-032…034) · **GM3-05** (FR-M1-025 / REQ-15.3 + 024/026/027) · **GM3-06** (FR-M1-028…031 i18n) · **GM4-04** (`safety-compliance` Issue overlay + §12 alignment, **GIM-23**) |
+| **Version** | 0.14 |
+| **Date** | 2026-04-20 |
+| **Traceability** | [REQ-08](../docs/requirements/REQ-08-dialogue-flow.md), [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) (FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](./safety-compliance.md)), [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) (working assumption **#3**), [REQ-05](../docs/requirements/REQ-05-interview-principles.md), [REQ-06](../docs/requirements/REQ-06-psychological-model.md), [REQ-07](../docs/requirements/REQ-07-target-outcome.md), [REQ-12](../docs/requirements/REQ-12-anti-patterns.md), [REQ-13](../docs/requirements/REQ-13-quality-criteria.md), [REQ-03](../docs/requirements/REQ-03-scope.md) (gov outcomes out of scope), [REQ-01](../docs/requirements/REQ-01-mission.md), [REQ-02](../docs/requirements/REQ-02-business-task.md), [REQ-04](../docs/requirements/REQ-04-personas.md) §4.2 latent request; [technical-architecture.md](../docs/technical-architecture.md) §7.3; [`issue-i18n-policy.md`](./issue-i18n-policy.md); [REQ-16](../docs/requirements/REQ-16-open-decisions.md) (Q3 decision context) |
 
 **Related modules:** [`issue-data-model.md`](./issue-data-model.md) · [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) · [`safety-compliance.md`](./safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
 
@@ -58,7 +57,7 @@ User utterances stack **four layers** ([REQ-06](../docs/requirements/REQ-06-psyc
 
 **What to surface (REQ-06 §6.2):** not only facts — also deep need, **public cost** of the problem, image of desired environment, sense of **systemicity**, and signal of **collective relevance** (for clusters / distinct issues — not “flat tickets”).
 
-**Sensitive topics:** depth limits and safety tie to **§12** and **EPIC-M1-04** / REQ-09 §9.10 — do not force layer 4 when policy or safety says stop.
+**Sensitive topics:** depth limits and safety tie to **§12** and REQ-09 §9.10 — do not force layer 4 when policy or safety says stop.
 
 **Alignment with REQ-08 phases:** layers 1–2 overlap episode capture (phase **2**); layer **3** with phase **3** (emotion and meaning); layers **3–4** with phases **4–5** (deeper need, desired state). Phase **6** supports collective-relevance extraction (REQ-06 §6.2).
 
@@ -80,13 +79,13 @@ An interview is **content-complete** for handoff to **Phase 7 (summary and confi
 
 **Rule before Phase 7:** run this checklist **before** the long summary / draft Issue framing (REQ-08 §8.7). If incomplete — **do not** imply readiness for backend or “final” Issue text; stay in phases **2–6** or acknowledge incompleteness in one line, then invite correction.
 
-**Downstream “sufficient raw material” (no normalizer in this file):** completeness here means enough **substance** for projection into [`issue-data-model.md`](./issue-data-model.md) narrative fields and §4.1 logical Issue — **enforcement** lives in **`ingest-validation.md`** (DOGEstonia / Issue track overlay, **GM2-03**) and **`base.md`** (INGEST Issue overlay). Align narrative completeness with REQ-10 / REQ-14 when those modules are wired.
+**Downstream “sufficient raw material” (no normalizer in this file):** completeness here means enough **substance** for projection into [`issue-data-model.md`](./issue-data-model.md) narrative fields and §4.1 logical Issue — **enforcement** lives in **`ingest-validation.md`** (DOGEstonia / Issue track overlay) and **`base.md`** (INGEST Issue overlay). Align narrative completeness with REQ-10 / REQ-14 when those modules are wired.
 
 ---
 
 ## 6. Soft entry (mandatory option for phase 1)
 
-**EPIC-M1-02 / REQ-08.1:** the first step **need not** be a dry question such as “What is your complaint?”. A **soft entry** is allowed and encouraged — one of the sense-making openers (see examples in REQ-08 §8.1), adapted to session language from `bootstrap.md` / presets.
+**REQ-08.1:** the first step **need not** be a dry question such as “What is your complaint?”. A **soft entry** is allowed and encouraged — one of the sense-making openers (see examples in REQ-08 §8.1), adapted to session language from `bootstrap.md` / presets.
 
 After entry — move to **phase 2** (concrete episode) when the user is ready.
 
@@ -158,13 +157,15 @@ Full list: [REQ-12](../docs/requirements/REQ-12-anti-patterns.md). Operational *
 | 2 | Too-early classification | Assign `type` / `labels` before the story is understood. | Defer structured labels until narrative maturity (after §5 / phases 4–6); align with [`issue-data-model.md`](./issue-data-model.md) when validating. |
 | 3 | Too-early “fixing” | Advise solutions before understanding. | Stay in listening / reframing until phases **4–5** are grounded. |
 | 4 | Jump straight to complaint | Miss aspirations and desired state. | Use §3 principle 5.3 and phase **5**. |
-| 5 | Pseudo-therapy | Go into trauma depth; clinical tone. | Stay within civic interview scope; escalate sensitive cases per **§12** / **EPIC-M1-04** / safety modules. |
+| 5 | Pseudo-therapy | Go into trauma depth; clinical tone. | Stay within civic interview scope; escalate sensitive cases per **§12** and safety modules. |
 | 6 | False empathy | Over-dramatize or fake intimacy. | Calm, respectful reflection (5.6) without performance. |
 | 7 | False promises | “We will forward…”, “The city will see…”, “Your ticket is approved…”. | **Forbidden** — same class of error as false backend claims in [`root.md`](./root.md). Only describe **local** readiness and what **API response** can confirm. |
 | 8 | Substituting user will | Finalize interpretation without confirmation. | **§7.2:** summary → correction offer → revised framing if needed → re-confirm; only then handoff (FR-M1-032…034). |
-| 9 | Misusing **observation** | Relabel clear **harm** narratives as “just an observation” to skip depth or safety bar. | Keep **§4–§5** when user expresses harm; use **observation** routing only for genuine **improvement-without-harm** (REQ-15.3 / FR-M1-025). Cross-check [`ingest-deep-parsing.md`](./ingest-deep-parsing.md) Issue overlay + [`ingest-validation.md`](./ingest-validation.md) (**GM3-05**). |
+| 9 | Misusing **observation** | Relabel clear **harm** narratives as “just an observation” to skip depth or safety bar. | Keep **§4–§5** when user expresses harm; use **observation** routing only for genuine **improvement-without-harm** (REQ-15.3 / FR-M1-025). Cross-check [`ingest-deep-parsing.md`](./ingest-deep-parsing.md) Issue overlay + [`ingest-validation.md`](./ingest-validation.md). |
 
 **REQ-03 alignment:** do not imply guaranteed government or institutional outcomes; civic signal ≠ promise of action ([REQ-03](../docs/requirements/REQ-03-scope.md)).
+
+**REQ-16 Q5 (demo):** Do **not** ask the user to name a government agency solely to fill Issue **`institution`**, and do **not** project **`institution`** from dialogue into draft Issue material — see [`issue-data-model.md`](./issue-data-model.md) §4.2 and [`ingest-validation.md`](./ingest-validation.md) (Issue overlay).
 
 ---
 
@@ -180,6 +181,20 @@ High quality is **not** maximum transcript length ([REQ-13](../docs/requirements
 6. **Downstream-usable:** another module could project into Issue fields without “decoding” opaque prose (REQ-13 bullet 6) — cross-check with §5 and [`issue-data-model.md`](./issue-data-model.md) §4.1.
 
 If several bullets fail, the interview is **not yet** high quality; continue or compress with one honest gap statement — do not inflate quality verbally.
+
+---
+
+## 10. Depth framing — concrete civic grievance vs diffuse place dissatisfaction (REQ-16 PDF §16.3)
+
+This section is **not** REQ-16 **Q3** in the repository table (that Q3 is **interview vs strict batch** — closed elsewhere). It addresses **how deep** to go when the topic touches everyday civic infrastructure.
+
+| Pattern | Examples (non-exhaustive) | Depth guidance |
+|---------|---------------------------|----------------|
+| **Concrete service / capacity grievance** | Parking shortage, playground capacity, bin schedule | Stay at **civic** and **practical** depth: facts, frequency, desired change. **Do not** probe for childhood trauma, family psychology, or intimate life history. |
+| **Diffuse dissatisfaction with urban space** | “The area feels wrong”, “I can’t explain why I dislike the square” | You **may** go deeper on **expectations**, **uses** of space, sensory or social dimensions — still **civic**, not clinical. Help the resident name **desired state** and **publicly legible** criteria. |
+| **Sensitive personal safety / minors / health** | — | Follow **§12** limited-depth mode and **`safety-compliance.md`** — do not substitute this table for safety rules. |
+
+**Operational test:** if a question could appear in a **therapy** session but not in a **public consultation minutes**, **do not** ask it for Pattern A.
 
 ---
 
@@ -210,7 +225,7 @@ Source: [REQ-04 §4.2](../docs/requirements/REQ-04-personas.md). The user may **
 **Behavior:**
 
 - **Stop** pushing layers **4** and heavy **§7.1** hypotheses; stay at **layer 2–3** or factual closure only.
-- Offer a **short** reflection of what was safely shared; **no** outcomes promised (**§8** row 7; **GM2-04** / REQ-03).
+- Offer a **short** reflection of what was safely shared; **no** outcomes promised (**§8** row 7 / REQ-03).
 - State clearly that the narrative may remain **incomplete** for Issue handoff — [`ingest-validation.md`](./ingest-validation.md) may set `stop_the_line.blocked`; that is acceptable.
 - Do **not** claim Gate/API/policy decisions — see [`root.md`](./root.md).
 
@@ -222,23 +237,18 @@ Source: [REQ-04 §4.2](../docs/requirements/REQ-04-personas.md). The user may **
 | Vague but curious | Extra gentle probes in phases **1–3** only |
 | Distress / stop / safety | **Limited-depth mode**; end deep probing |
 
-### Escalation / policy (EPIC-M1-04, GM4-04)
+### Escalation / policy
 
-**[`issue-policy-gate.md`](./issue-policy-gate.md)** + external operator rulebook (**GM4-01…03**) perform **admission** after validation and **Safety** checkpoints — see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1. **[`safety-compliance.md`](./safety-compliance.md)** carries the **DOGEstonia / Issue** overlay (**REQ-03**, **FR-M1-039…043**, **GIM-23**) and MUST stay **aligned** with this **§12** limited-depth mode (**FR-M1-042**) and **no pseudo-therapy** (**FR-M1-043** / REQ-12). Cite gate/safety outcomes only from real artifacts (`safety_compliance_report`, `policy_gate_result`), not from imagination — [`root.md`](./root.md).
+**[`issue-policy-gate.md`](./issue-policy-gate.md)** + external operator rulebook perform **admission** after validation and **Safety** checkpoints — see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1. **[`safety-compliance.md`](./safety-compliance.md)** carries the **DOGEstonia / Issue** overlay (**REQ-03**, **FR-M1-039…043**) and MUST stay **aligned** with this **§12** limited-depth mode (**FR-M1-042**) and **no pseudo-therapy** (**FR-M1-043** / REQ-12). Cite gate/safety outcomes only from real artifacts (`safety_compliance_report`, `policy_gate_result`), not from imagination — [`root.md`](./root.md).
 
 ---
 
-## 13. Out of scope for this file (sibling epics / modules)
+## 13. Out of scope for this file (sibling modules)
 
-- **GM2-03 (done):** Issue overlays in **`ingest-validation.md`** and **`base.md`** — **M1-03** for artifact schema.
-- **GM2-04 (done):** **§8–§9** REQ-12 / REQ-13.
-- **GM2-05 (done):** **§7.1** FR-M1-017.
-- **GM2-06 (done):** **§12** latent request + limited-depth + EPIC-M1-04 pointer; **EPIC-M1-04** implements gate/rulebook text.
-- **GM3-03 (done):** **REQ-16 Q3** — civic interview vs Activity-style strict batch; normative ADR + matrix rows FR-M1-007/013/018/022–023; Issue overlays in **`base.md`** / **`ingest-validation.md`**.
-- **GM3-04 (done):** **FR-M1-032…034** — Phase 7 **§7.2** summary / correction / framing loop; cross-refs in **`base.md`**, **`ingest-validation.md`**, **`bootstrap.md`**.
-- **GM3-05 (done):** **FR-M1-025** + **REQ-15.3** — provisional **`observation`** for improvement-without-harm; **FR-M1-024/026/027** hints in **`ingest-deep-parsing.md`** / validation overlay; **§8** row 9 vs REQ-12.
-- **GM3-06 (done):** **`issue-i18n-policy.md`** v0.1 — **FR-M1-028…031**; hooks in **`bootstrap.md`**, **`base.md`**, **`communication-presets-reference.md`**, **`ingest-validation.md`**.
-- **GM4-04 (done):** **`safety-compliance.md`** Issue overlay — **REQ-03** / **FR-M1-039…043**, handoff to **`issue-policy-gate`**; **REQ-14** §14.4 checklist in analysis `task-GM4-04-*`.
+- Structural validation contracts and missing-field resolution details live in **`ingest-validation.md`** and **`base.md`**.
+- Policy admission and gate decision logic live in **`issue-policy-gate.md`** plus operator rulebook.
+- i18n generation/translations policy lives in **`issue-i18n-policy.md`**.
+- This file remains focused on interview phases, depth control, and completion gates for dialogue.
 
 ---
 
@@ -246,15 +256,17 @@ Source: [REQ-04 §4.2](../docs/requirements/REQ-04-personas.md). The user may **
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-04-10 | STORY-GM2-01: first scaffold from REQ-08/05/01/02/04; soft entry; phase table. |
+| 0.1 | 2026-04-10 | First scaffold from REQ-08/05/01/02/04; soft entry; phase table. |
 | 0.2 | 2026-04-10 | **English-only** instruction text (repo policy); no semantic change to phase model. |
-| 0.3 | 2026-04-10 | **GM2-02:** REQ-06 four layers + REQ-07 seven-question completeness; gates before Phase 7; handoff note for GM2-03 / issue-data-model. |
-| 0.4 | 2026-04-10 | **GM2-03:** cross-refs to `ingest-validation` / `base` overlays; §8 updated. |
-| 0.5 | 2026-04-10 | **GM2-04:** §8 REQ-12 DO NOT table + REQ-03; §9 REQ-13 QA bullets; out-of-scope renumbered §10–§11. |
-| 0.6 | 2026-04-10 | **GM2-05:** §7.1 FR-M1-017 reframe templates (phases 3–4); REQ-09 trace; §10 out-of-scope. |
-| 0.7 | 2026-04-10 | **GM2-06:** §12 REQ-04.2 latent + limited-depth + EPIC-M1-04; §13–§14 renumber; cross-refs from §3–§8. |
-| 0.8 | 2026-04-10 | **GM3-03:** REQ-16 Q3 ADR link + FR-M1-007/013/018/022–023 trace; §13 out-of-scope note. |
-| 0.9 | 2026-04-10 | **GM3-04:** §7.2 FR-M1-032…034 (summary → correction → framing); phase table + §8 row 8; `bootstrap` cross-ref. |
-| 0.10 | 2026-04-10 | **GM3-05:** REQ-15.3 / FR-M1-025 observation + FR-M1-024/026/027; §8 row 9; `ingest-deep-parsing` / `ingest-validation` overlays; traceability REQ-15. |
-| 0.11 | 2026-04-10 | **GM3-06:** `issue-i18n-policy.md` + FR-M1-028…031 trace; §1 / §13 cross-refs. |
-| 0.12 | 2026-04-10 | **GM4-04:** §12 / §13 alignment with `safety-compliance` Issue overlay + `issue-policy-gate`; traceability FR-M1-039…043; related modules + STORY **GIM-23**. |
+| 0.3 | 2026-04-10 | Added REQ-06 four layers + REQ-07 seven-question completeness; gates before Phase 7. |
+| 0.4 | 2026-04-10 | Added cross-refs to `ingest-validation` / `base` overlays; §8 updated. |
+| 0.5 | 2026-04-10 | Added §8 REQ-12 DO NOT table + REQ-03; §9 REQ-13 QA bullets; out-of-scope renumbering. |
+| 0.6 | 2026-04-10 | Added §7.1 FR-M1-017 reframe templates; REQ-09 trace; §10 out-of-scope update. |
+| 0.7 | 2026-04-10 | Added §12 REQ-04.2 latent + limited-depth guidance; §13–§14 renumbering. |
+| 0.8 | 2026-04-10 | Added REQ-16 Q3 trace and FR-M1-007/013/018/022–023 mapping notes. |
+| 0.9 | 2026-04-10 | Added §7.2 FR-M1-032…034 summary/correction/framing loop. |
+| 0.10 | 2026-04-10 | Added REQ-15.3 / FR-M1-025 observation handling and related overlays. |
+| 0.11 | 2026-04-10 | Added `issue-i18n-policy.md` + FR-M1-028…031 cross-refs. |
+| 0.12 | 2026-04-10 | Added §12/§13 alignment with safety overlay and policy-gate handoff. |
+| 0.13 | 2026-04-20 | Added §10 depth framing (REQ-16 PDF §16.3). |
+| 0.14 | 2026-04-20 | Added REQ-16 Q5 demo rule: no `institution` extraction from dialogue. |

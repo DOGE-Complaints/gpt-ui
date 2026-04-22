@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.6 |
-| **Date** | 2026-04-10 |
-| **Traceability** | [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5–10.6, [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §4–6; [`issue-i18n-policy.md`](./issue-i18n-policy.md) (FR-M1-028…031, **GM3-06**); [`issue-normalizer.md`](./issue-normalizer.md) (**GM5-01** / **GIM-24**); SPA: [`spa-app/docs/mock-layer-issues-guide.md`](../../spa-app/docs/mock-layer-issues-guide.md), [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) |
+| **Version** | 0.7 |
+| **Date** | 2026-04-20 |
+| **Traceability** | [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5–10.6, [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §4–6; [`issue-i18n-policy.md`](./issue-i18n-policy.md) (FR-M1-028…031); [`issue-normalizer.md`](./issue-normalizer.md); SPA: [`spa-app/docs/mock-layer-issues-guide.md`](../../spa-app/docs/mock-layer-issues-guide.md), [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) |
 
 ---
 
@@ -16,7 +16,7 @@
 Per Custom GPT methodology:
 
 - **Instructions** encode behavior and workflow; they **do not** duplicate long API specs.
-- This file is a **domain module reference** in the same spirit as `activity-data-model.md` for the Amanita reference: single place for Issue fields during extraction, validation, and normalization **before** Actions calls.
+- This file is a **domain module reference**: single place for Issue fields during extraction, validation, and normalization **before** Actions calls (same structural role the repo formerly used for a separate entity schema — that schema file is now a **stub**; use **git history** if needed).
 
 HTTP calls remain only in `api-orchestrator.md` per OpenAPI contract (epic M1-06).
 
@@ -63,9 +63,21 @@ Below is the **target display contract** for `spa-app` (mocks and UI). Enum type
 
 | Field | Type | Rule |
 |-------|------|------|
-| `institution` | `{ et, ru, en }` | Agency / institution if inferred from interview. |
+| `institution` | `{ et, ru, en }` | Agency / institution **if** product scope allows inferring it from interview. **Demo scope (REQ-16 Q5):** do **not** populate from dialogue; keep field **absent** / null in `canonical_payload` until integration matures. |
 
-### 4.3 Not filled by GPT as facts without backend
+### 4.3 Subjective intake extensions (resident-perceived, REQ-16 Q4)
+
+Optional fields aligned with `IssueIntakePayload` enums in [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) — **`SEVERITY`**, **`IMPACT_ESTIMATION`**, **`PROBLEM_STATUS`**. Values are **subjective** (how the resident experiences impact), not an objective audit.
+
+| Field | Type (logical) | Rule |
+|-------|------------------|------|
+| `severity` | `low` \| `medium` \| `high` \| `critical` | Resident-perceived seriousness; optional until interview collects it without leading the user. |
+| `impact_estimation` | `personal` \| `city/town` \| `state` \| `country` \| `Earth` | Self-reported perceived scope of impact. |
+| `problem_status` | `ongoing` \| `resolved` \| `worsened` | How the resident frames change over time, if stated. |
+
+These may live beside §4.1 in `canonical_payload` or in a sibling object per [`issue-normalizer.md`](./issue-normalizer.md) until HTTP/OpenAPI lockstep explicitly includes them (YAML/SSOT updates in lockstep).
+
+### 4.4 Not filled by GPT as facts without backend
 
 | Field | Why |
 |-------|-----|
@@ -96,9 +108,9 @@ Follow [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5: do not 
 | Module | Link to Issue |
 |--------|----------------|
 | [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) | Ingest phase order and strict-chain artifacts **in instruction terms** (not UI statuses). |
-| [`issue-policy-gate.md`](./issue-policy-gate.md) | Policy admission; `policy_gate_result` / `review_metadata` alignment (**GM4-01**); no API. |
+| [`issue-policy-gate.md`](./issue-policy-gate.md) | Policy admission; `policy_gate_result` / `review_metadata` alignment; no API. |
 | `ingest-validation.md` | §4.1 completeness, batch follow-ups. |
-| [`issue-normalizer.md`](./issue-normalizer.md) | Canonical JSON for orchestrator / **`normalized_issue_payload`** (**GM5-01** / **GIM-24**, v0.1). |
+| [`issue-normalizer.md`](./issue-normalizer.md) | Canonical JSON for orchestrator / **`normalized_issue_payload`**. |
 | `api-orchestrator.md` | Only HTTP entrypoint; response interpretation is authoritative. |
 | `root.md` | Forbid false claims about backend/Gate/status. |
 
@@ -108,9 +120,10 @@ Follow [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5: do not 
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-04-10 | First draft (STORY-GM1-01); REQ-10/REQ-15 and SPA mock-guide alignment. |
-| 0.2 | 2026-04-10 | Link to [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) (STORY-GM1-02). |
+| 0.1 | 2026-04-10 | First draft; REQ-10/REQ-15 and SPA mock-guide alignment. |
+| 0.2 | 2026-04-10 | Link to [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md). |
 | 0.3 | 2026-04-10 | **English-only** instruction text (repo policy). |
-| 0.4 | 2026-04-10 | **GM3-06:** §4.1 `title` row links [`issue-i18n-policy.md`](./issue-i18n-policy.md). |
-| 0.5 | 2026-04-10 | **GM4-01:** §7 link to [`issue-policy-gate.md`](./issue-policy-gate.md) (`policy_gate_result`). |
-| 0.6 | 2026-04-10 | **GM5-01:** §7 link to [`issue-normalizer.md`](./issue-normalizer.md) (`normalized_issue_payload` scaffold). |
+| 0.4 | 2026-04-10 | Added §4.1 `title` row link to [`issue-i18n-policy.md`](./issue-i18n-policy.md). |
+| 0.5 | 2026-04-10 | Added §7 link to [`issue-policy-gate.md`](./issue-policy-gate.md) (`policy_gate_result`). |
+| 0.6 | 2026-04-10 | Added §7 link to [`issue-normalizer.md`](./issue-normalizer.md) (`normalized_issue_payload` scaffold). |
+| 0.7 | 2026-04-20 | Added §4.3 subjective intake fields; added demo `institution` scope rule; kept `spa-app` path updates. |
