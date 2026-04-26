@@ -28,6 +28,7 @@ When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`is
 
 - [`issue-interview-flow.md`](./issue-interview-flow.md) — civic interview phases 1–7 (REQ-08), four layers (REQ-06), **§5 seven-question completeness** before treating dialogue as ready for Phase 7 summary / draft Issue framing.
 - [`issue-data-model.md`](./issue-data-model.md) — §4.1 logical Issue fields (`type`, `labels`, trilingual `title` / `description`, optional `summary`, optional `institution`) for structural completeness toward the normalizer.
+- [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) — controlled label axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling.
 - [`issue-data-model-api-alignment-baseline.md`](../docs/analysis/issue-data-model-api-alignment-baseline.md) — GIM-78 baseline: logical/domain Issue model vs transport/API schemas.
 - [`issue-i18n-policy.md`](./issue-i18n-policy.md) — **FR-M1-028…031**: session language, `{ et, ru, en }` drafts, fidelity vs translation polish.
 - [`issue-api-methods-reference.md`](./issue-api-methods-reference.md) — HTTP SSOT (this module still **never** calls APIs).
@@ -51,6 +52,8 @@ When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`is
 **REQ-16 Q5 — demo scope:** For the **current demo**, do **not** treat **`institution`** as a field to **extract or infer from dialogue** into draft Issue material for structural completion. Keep institutional hypotheses as **non-authoritative** notes only; **`institution`** in `canonical_payload` should remain **omitted** until product lifts this restriction.
 
 **GIM-79 validation boundary:** Subjective fields (`severity`, `impact_estimation`, `problem_status`) are non-wire metadata in the current runtime contract. They may be retained in validation/report notes if stated, but they are not required for `StoryIntake` or draft handoff and must not set `stop_the_line.blocked = true` by themselves. Donor-era structured minors fields must not be reintroduced as validation targets; minors handling stays in safety/risk logic and narrative/report obligations only.
+
+**GIM-88 label vocabulary guardrail:** Validate `labels` against [`issue-label-taxonomy.md`](./issue-label-taxonomy.md). Every value in `canonical_payload.labels[]` must be a canonical allowed key with story evidence and source/provenance. Unknown free-text labels, metadata-only candidates, internal-only safety/privacy labels, and low-confidence hypotheses must **not** enter canonical labels. Keep them in validation notes as `metadata_only`, `needs_clarification`, or `rejected`. If a user correction in Phase 7 rejects the framing that produced a label, remove that label or downgrade it before normalizer handoff.
 
 **Artifacts:** Keep emitting `ingest_validation_report` with `stop_the_line.blocked = true` when Issue §4.1 validation fails. For narrative incompleteness before Phase 7, set `stop_the_line.blocked = true` for progression to **final** summary/framing until §5 passes or gaps are accepted; likewise block while **§7.2** (FR-M1-032…034) is incomplete. Record gaps in `missing_required_fields[]` using clear synthetic keys (e.g. `issue_narrative:REQ07_Q3`) **or** a short free-text `narrative_completeness_notes` field inside the report body until M1-03 defines a schema.
 
@@ -153,6 +156,7 @@ For **Issue** ingest (per `root.md` and the Issue overlay at the top of this fil
 
 - Read **`extracted_data`** and **`metadata`** from [`ingest-deep-parsing.md`](./ingest-deep-parsing.md).
 - Validate that hints do **not** assert final `ISSUE_STATUS` or backend-only fields (`id`, `created_at`, … — see `issue-data-model.md` §4.4).
+- Validate `labels_hints[]` against [`issue-label-taxonomy.md`](./issue-label-taxonomy.md); unsupported hints stay metadata-only or require clarification.
 - Map gaps in Issue §4.1 into `missing_required_fields[]` for batch user questions; use `metadata.ambiguities` for clarification batches.
 - **Provisional `type` / labels:** follow the Issue overlay (REQ-15.3, FR-M1-024…027).
 
@@ -186,7 +190,17 @@ Optional and subjective fields per [`issue-data-model.md`](./issue-data-model.md
 ## 6. Enum validation (Issue)
 
 - **`type`:** `ISSUE_TYPE` per [`issue-data-model.md`](./issue-data-model.md) §5 / `spa-app` types.
-- **`labels`:** per product vocabulary; do not invent Issue `type` enum values.
+- **`labels`:** controlled keys per [`issue-label-taxonomy.md`](./issue-label-taxonomy.md). Do not invent labels, do not pass metadata-only/internal labels as canonical labels, and do not invent Issue `type` enum values.
+
+### 6.1 Label validation checklist
+
+Before handoff to the normalizer:
+
+1. Confirm each canonical label key appears in the taxonomy with canonical disposition.
+2. Confirm each canonical label has evidence from dialogue, deep parsing, validation notes, or Phase 7 confirmed framing.
+3. Move metadata-only, internal-only, low-confidence, or unknown candidates out of `canonical_payload.labels[]`.
+4. If the label is useful but not canonical, record it as a candidate note with `axis`, `source`, `confidence`, and `disposition`.
+5. If the label is required for meaning but evidence is insufficient, set `needs_clarification` rather than guessing.
 
 ---
 

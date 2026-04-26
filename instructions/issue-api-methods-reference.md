@@ -1,6 +1,6 @@
 # Issue API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 0.8 · 2026-04-26  
+**Version:** 0.9 · 2026-04-26  
 **Scope:** Module 1 Issue API SSOT  
 **OpenAPI build/import artifact:** [`../docs/custom-gpt-issues-reference.openapi.yaml`](../docs/custom-gpt-issues-reference.openapi.yaml)  
 **Auth / Actions constraints:** [`../docs/gpt-actions-bot-api-auth-mapping.md`](../docs/gpt-actions-bot-api-auth-mapping.md)  
@@ -31,13 +31,13 @@ Additional operations (submit, search, reference) — add when node contract exi
 | Field | Required | Source |
 |---|---:|---|
 | `type` | yes | `normalized_issue_payload.canonical_payload.type` |
-| `labels` | yes | `normalized_issue_payload.canonical_payload.labels` |
+| `labels` | yes | `normalized_issue_payload.canonical_payload.labels` after taxonomy/validation approval |
 | `title` | yes | `normalized_issue_payload.canonical_payload.title` |
 | `description` | yes | `normalized_issue_payload.canonical_payload.description` |
 | `summary` | no | `normalized_issue_payload.canonical_payload.summary`, only when present |
 | `institution` | no | `normalized_issue_payload.canonical_payload.institution`, only when allowed; demo default omitted/null |
 
-The request must not contain subjective non-wire fields (`severity`, `impact_estimation`, `problem_status`), donor-era minors fields, or backend-issued fields (`id`, `status`, timestamps, txids).
+The request must not contain label extraction metadata, subjective non-wire fields (`severity`, `impact_estimation`, `problem_status`), donor-era minors fields, or backend-issued fields (`id`, `status`, timestamps, txids).
 
 **PUT semantics note:** `updateIssueDraft` still intentionally references the same body schema as `createIssueDraft` in the current candidate contract. Whether PUT should accept a full object, a partial update schema, or a different method remains the separate GIM-60 follow-up and is not resolved by GIM-82.
 
@@ -107,3 +107,4 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 | 0.6 | 2026-04-22 | **GIM-59:** link to `openapi-lock-snapshot-GIM-59.md` as tracking doc until live `GET /openapi.json` exists for Issues routes. |
 | 0.7 | 2026-04-23 | **GIM-46:** linked executable SSOT governance playbook and formalized one-changeset operational flow for contract updates. |
 | 0.8 | 2026-04-26 | **GIM-82:** aligned `IssueDraftCreateRequest` field lock with `issue-data-model.md`, YAML `0.1.4`, and GIM-81 transform; kept PUT semantics as GIM-60 follow-up. |
+| 0.9 | 2026-04-26 | **GIM-90:** clarified labels must be taxonomy/validation-approved and label extraction metadata is not part of `IssueDraftCreateRequest`. |

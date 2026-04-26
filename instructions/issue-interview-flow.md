@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.14 |
-| **Date** | 2026-04-20 |
-| **Traceability** | [REQ-08](../docs/requirements/REQ-08-dialogue-flow.md), [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) (FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](./safety-compliance.md)), [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) (working assumption **#3**), [REQ-05](../docs/requirements/REQ-05-interview-principles.md), [REQ-06](../docs/requirements/REQ-06-psychological-model.md), [REQ-07](../docs/requirements/REQ-07-target-outcome.md), [REQ-12](../docs/requirements/REQ-12-anti-patterns.md), [REQ-13](../docs/requirements/REQ-13-quality-criteria.md), [REQ-03](../docs/requirements/REQ-03-scope.md) (gov outcomes out of scope), [REQ-01](../docs/requirements/REQ-01-mission.md), [REQ-02](../docs/requirements/REQ-02-business-task.md), [REQ-04](../docs/requirements/REQ-04-personas.md) §4.2 latent request; [technical-architecture.md](../docs/technical-architecture.md) §7.3; [`issue-i18n-policy.md`](./issue-i18n-policy.md); [REQ-16](../docs/requirements/REQ-16-open-decisions.md) (Q3 decision context) |
+| **Version** | 0.15 |
+| **Date** | 2026-04-26 |
+| **Traceability** | [REQ-08](../docs/requirements/REQ-08-dialogue-flow.md), [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) (FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](./safety-compliance.md)), [REQ-20](../docs/requirements/REQ-20-label-taxonomy-and-extraction-axes.md), [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) (working assumption **#3**), [REQ-05](../docs/requirements/REQ-05-interview-principles.md), [REQ-06](../docs/requirements/REQ-06-psychological-model.md), [REQ-07](../docs/requirements/REQ-07-target-outcome.md), [REQ-12](../docs/requirements/REQ-12-anti-patterns.md), [REQ-13](../docs/requirements/REQ-13-quality-criteria.md), [REQ-03](../docs/requirements/REQ-03-scope.md) (gov outcomes out of scope), [REQ-01](../docs/requirements/REQ-01-mission.md), [REQ-02](../docs/requirements/REQ-02-business-task.md), [REQ-04](../docs/requirements/REQ-04-personas.md) §4.2 latent request; [technical-architecture.md](../docs/technical-architecture.md) §7.3; [`issue-i18n-policy.md`](./issue-i18n-policy.md); [`issue-label-taxonomy.md`](./issue-label-taxonomy.md); [REQ-16](../docs/requirements/REQ-16-open-decisions.md) (Q3 decision context) |
 
 **Related modules:** [`issue-data-model.md`](./issue-data-model.md) · [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) · [`safety-compliance.md`](./safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
 
@@ -147,6 +147,28 @@ Sources: [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) — **
 
 ---
 
+### 7.3 Label evidence capture (REQ-20 / GIM-87)
+
+Labels are an **internal projection** from the mature story, not a questionnaire topic. During phases 2–6, collect evidence that later modules can map to [`issue-label-taxonomy.md`](./issue-label-taxonomy.md), but do **not** ask the resident to choose labels or show taxonomy keys.
+
+| Phase | Evidence to capture | Label axes supported |
+|---|---|---|
+| **2** Episode capture | What happened, object/service, place/context, concrete friction. | `topic_domain`, `service_object`, `location_context`, `failure_mode` |
+| **3** Emotion and meaning | What felt unfair, draining, unsafe, disrespectful, or confusing. | `deep_need`, `failure_mode`, `civic_signal` |
+| **4** Deeper need | Confirmed value/need such as predictability, respect, dignity, agency, fairness. | `deep_need` as metadata-only unless taxonomy later promotes it |
+| **5** Desired state | Better future scenario or specific improvement shape. | `desired_outcome`, `topic_domain`, `service_object` |
+| **6** Civic generalization | Recurrence, others affected, system pattern, public cost. | `civic_signal`, `affected_scope`, `issue_archetype_support` |
+| **Safety/limited-depth** | PII, minors, health, violence, or trust/safety limits. | `risk_privacy_safety` internal-only labels |
+
+Operational rules:
+
+- Keep candidate labels in notes or downstream metadata until §5 completeness and §7.2 confirmation are satisfied.
+- If the user corrects facts, location, meaning, desired state, or civic framing in Phase 7, remove or downgrade label candidates based on the rejected framing.
+- Use surface topic labels only when deeper evidence is absent; do not invent civic/deep labels to make the Issue look richer.
+- Internal safety/privacy candidates must remain internal and never become public/card labels.
+
+---
+
 ## 8. Anti-patterns — DO NOT (REQ-12)
 
 Full list: [REQ-12](../docs/requirements/REQ-12-anti-patterns.md). Operational **DO NOT** in Issue interview:
@@ -270,3 +292,4 @@ Source: [REQ-04 §4.2](../docs/requirements/REQ-04-personas.md). The user may **
 | 0.12 | 2026-04-10 | Added §12/§13 alignment with safety overlay and policy-gate handoff. |
 | 0.13 | 2026-04-20 | Added §10 depth framing (REQ-16 PDF §16.3). |
 | 0.14 | 2026-04-20 | Added REQ-16 Q5 demo rule: no `institution` extraction from dialogue. |
+| 0.15 | 2026-04-26 | Added label evidence capture by dialogue phase and Phase 7 correction disposition (GIM-87). |

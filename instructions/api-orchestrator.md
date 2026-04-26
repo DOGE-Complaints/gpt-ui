@@ -148,7 +148,10 @@ This instruction is activated when:
       "ingest_validation_report_ref": "validation_<timestamp>",
       "safety_compliance_report_ref": "safety_<timestamp>_validated",
       "policy_gate_ref": "gate_<timestamp>",
-      "normalizer_module": "issue-normalizer@<version>"
+      "normalizer_module": "issue-normalizer@<version>",
+      "label_extraction_metadata": {
+        "candidates": []
+      }
     },
     "non_wire_metadata": {
       "severity": null,
@@ -168,21 +171,22 @@ For `createIssueDraft` / `updateIssueDraft`, build the Actions request body only
 | `IssueDraftCreateRequest` field | Source | Required by YAML | Rule |
 |---|---|---:|---|
 | `type` | `canonical_payload.type` | yes | Must be one of `complaint`, `observation`, `absurdity`, `system_bug`; do not invent fallback enum values. |
-| `labels` | `canonical_payload.labels` | yes | Pass validated string array as-is; do not add label guesses in orchestrator. |
+| `labels` | `canonical_payload.labels` | yes | Pass only validated canonical labels allowed by `issue-label-taxonomy.md`; do not add label guesses in orchestrator. |
 | `title` | `canonical_payload.title` | yes | Pass full `{ et, ru, en }` object from normalizer. |
 | `description` | `canonical_payload.description` | yes | Pass full `{ et, ru, en }` object from normalizer. |
 | `summary` | `canonical_payload.summary` | no | Include only when present and validated; omit otherwise. |
 | `institution` | `canonical_payload.institution` | no | Include only when product scope allows and value is present; demo default is omit/null. |
 
-Do **not** copy `normalization_metadata` or `non_wire_metadata` into `IssueDraftCreateRequest` unless the YAML/schema is explicitly changed in lockstep. They remain trace/debug sidecars for orchestration and audit.
+Do **not** copy `normalization_metadata`, `normalization_metadata.label_extraction_metadata`, or `non_wire_metadata` into `IssueDraftCreateRequest` unless the YAML/schema is explicitly changed in lockstep. They remain trace/debug sidecars for orchestration and audit.
 
 **Issue pre-flight checks:**
 
 1. `normalized_issue_payload.canonical_payload` exists and contains YAML-required fields: `type`, `labels`, `title`, `description`.
 2. `normalization_metadata` contains refs to validation, safety, policy gate artifacts, and `session_language`.
-3. No direct jump from gate package to HTTP is allowed; normalization is mandatory on strict Issue path.
-4. Build HTTP requests from `canonical_payload` plus OpenAPI/SSOT contract (`issue-api-methods-reference.md`).
-5. The outgoing request body must not contain backend-issued fields: `id`, `status`, `created_at`, `updated_at`, `arweave_txid`, `image_txid`, `image_hash`, `txid`.
+3. `canonical_payload.labels[]` contains only validated canonical labels from `issue-label-taxonomy.md`; unknown, metadata-only, internal-only, and low-confidence candidates must stop before HTTP.
+4. No direct jump from gate package to HTTP is allowed; normalization is mandatory on strict Issue path.
+5. Build HTTP requests from `canonical_payload` plus OpenAPI/SSOT contract (`issue-api-methods-reference.md`).
+6. The outgoing request body must not contain label extraction metadata, non-wire metadata, or backend-issued fields: `id`, `status`, `created_at`, `updated_at`, `arweave_txid`, `image_txid`, `image_hash`, `txid`.
 
 **Issue stop-the-line gates (M6-03):**
 

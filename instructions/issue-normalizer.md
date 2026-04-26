@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.1.7 |
+| **Version** | 0.1.8 |
 | **Date** | 2026-04-26 |
-| **Traceability** | [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-035–037; [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5; [`issue-data-model.md`](./issue-data-model.md) §4.1; [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-policy-gate.md`](./issue-policy-gate.md); [technical-architecture.md](../docs/technical-architecture.md) §3.2, §7.2–7.4; strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-035–037; [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5; [REQ-20](../docs/requirements/REQ-20-label-taxonomy-and-extraction-axes.md); [`issue-data-model.md`](./issue-data-model.md) §4.1; [`issue-label-taxonomy.md`](./issue-label-taxonomy.md); [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-policy-gate.md`](./issue-policy-gate.md); [technical-architecture.md](../docs/technical-architecture.md) §3.2, §7.2–7.4; strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -25,8 +25,8 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 - Run **only after** [`issue-policy-gate.md`](./issue-policy-gate.md) has produced `policy_gate_result.status = "approved"` for the same ingest handoff (see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) **§2.1**).
 - Emit **`normalized_issue_payload`** with:
   - **`canonical_payload`** — Issue fields aligned with [`issue-data-model.md`](./issue-data-model.md) **§4.1** (`type`, `labels`, `title`, `description`, optional `summary`, optional `institution`; trilingual objects `{ et, ru, en }` per that file and [`issue-i18n-policy.md`](./issue-i18n-policy.md)).
-  - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), not a full duplicate of raw interview text or multimodal sources.
-- Preserve **conservative** typing: enums and label keys must match **Issue** SoT ([`issue-data-model.md`](./issue-data-model.md) §4–5, `spa-app` types / mock guide as linked there).
+  - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
+- Preserve **conservative** typing: enums and label keys must match **Issue** SoT ([`issue-data-model.md`](./issue-data-model.md) §4–5 and [`issue-label-taxonomy.md`](./issue-label-taxonomy.md)).
 
 ### 2.2 This instruction MUST NOT
 
@@ -94,7 +94,18 @@ Single final envelope:
         "rulebook_version": "v1",
         "status": "approved"
       },
-      "normalizer_module": "issue-normalizer@0.1.7",
+      "label_extraction_metadata": {
+        "candidates": [
+          {
+            "label": "transport",
+            "axis": "topic_domain",
+            "source": "ingest_validation_report",
+            "confidence": "high",
+            "disposition": "canonical"
+          }
+        ]
+      },
+      "normalizer_module": "issue-normalizer@0.1.8",
       "trace_notes": []
     },
     "non_wire_metadata": {
@@ -115,7 +126,7 @@ Must conform to [`issue-data-model.md`](./issue-data-model.md) **§4.1** (requir
 | Field | Rule |
 |-------|------|
 | `type` | One of `ISSUE_TYPE` values per issue-data-model / SPA SoT. |
-| `labels` | String array; keys must be allowed for UI / product rules. |
+| `labels` | String array; keys must be `canonical` labels allowed by [`issue-label-taxonomy.md`](./issue-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }`; if omitted, orchestrator/UI may fall back per REQ-10 / mock guide. |
 | `institution` | Optional `{ et, ru, en }` **only** when product scope allows; **demo default:** omit (REQ-16 Q5). |
@@ -134,6 +145,34 @@ Stable **references** to upstream work (opaque strings or objects — align with
 | `policy_gate_ref` | At minimum: `policy_ref`, `rulebook_version`, and `policy_gate_result.status` copy or stable id. |
 | `normalizer_module` | e.g. `issue-normalizer` + **version** of this instruction file (from document header). |
 | `trace_notes` | Optional: free-text **internal** consistency notes (not for end-user display). |
+| `label_extraction_metadata` | Optional label candidate metadata from validation; stores label, axis, source, confidence, and disposition. It is not copied to transport unless schema changes in lockstep. |
+
+#### 4.2.1 `label_extraction_metadata`
+
+When validation supplies label reasoning, keep it under `normalization_metadata.label_extraction_metadata`:
+
+```json
+{
+  "candidates": [
+    {
+      "label": "transport",
+      "axis": "topic_domain",
+      "source": "Phase 2 resident story / validation report",
+      "confidence": "high",
+      "disposition": "canonical"
+    },
+    {
+      "label": "predictability",
+      "axis": "deep_need",
+      "source": "Phase 4 reframe accepted by user",
+      "confidence": "medium",
+      "disposition": "metadata_only"
+    }
+  ]
+}
+```
+
+Only candidates with `disposition = "canonical"` and keys allowed by [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, or `rejected` disposition remain in metadata only.
 
 ### 4.3 `non_wire_metadata` (optional sidecar)
 
@@ -183,3 +222,4 @@ Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summa
 | 0.1.5 | 2026-04-25 | Removed donor-era minors metadata from `canonical_payload`; system-only reference restored to §4.4 (GIM-72). |
 | 0.1.6 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |
 | 0.1.7 | 2026-04-26 | Locked final `normalized_issue_payload` shape, optional `non_wire_metadata` sidecar, and no-direct-transport rule (GIM-80). |
+| 0.1.8 | 2026-04-26 | Added label extraction metadata and canonical label disposition rules (GIM-89). |

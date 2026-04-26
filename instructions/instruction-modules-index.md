@@ -2,15 +2,15 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.35 |
-| **Дата** | 2026-04-23 |
+| **Версия индекса** | 0.36 |
+| **Дата** | 2026-04-26 |
 | **Scope** | Runtime navigation map for DOGEstonia Issue instructions; no task/epic dependency in operational sections. |
 
 This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy donor content is removed from the active runtime surface.
 
 **For Custom GPT DOGEstonia ingest use Issue track modules only** (`issue-*`, `ingest-*`, `api-orchestrator.md` in Issue mode). Legacy donor guardrails and review checklist: [`activity-legacy-paths-inventory.md`](./activity-legacy-paths-inventory.md).
 
-Use this index together with [`issue-data-model.md`](./issue-data-model.md), [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md), [`issue-policy-gate.md`](./issue-policy-gate.md), [`issue-normalizer.md`](./issue-normalizer.md), and [`issue-api-methods-reference.md`](./issue-api-methods-reference.md).
+Use this index together with [`issue-data-model.md`](./issue-data-model.md), [`issue-label-taxonomy.md`](./issue-label-taxonomy.md), [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md), [`issue-policy-gate.md`](./issue-policy-gate.md), [`issue-normalizer.md`](./issue-normalizer.md), and [`issue-api-methods-reference.md`](./issue-api-methods-reference.md).
 
 ---
 
@@ -19,6 +19,7 @@ Use this index together with [`issue-data-model.md`](./issue-data-model.md), [`i
 | File | Role |
 |------|------|
 | [`issue-data-model.md`](./issue-data-model.md) | Canonical logical Issue fields and structural contracts. |
+| [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) | Controlled label axes, allowed canonical keys, metadata-only candidates, and internal label disposition. |
 | [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) | Strict chain and handoff order for Module 1. |
 | [`issue-interview-flow.md`](./issue-interview-flow.md) | Dialogue intake flow and clarification boundaries. |
 | [`issue-i18n-policy.md`](./issue-i18n-policy.md) | Session language and `{ et, ru, en }` output policy. |
@@ -66,6 +67,7 @@ with `base.md` as global constitution and `issue-lifecycle-instructions.md` as c
 
 | Версия | Дата | Изменение |
 |--------|------|-----------|
+| 0.36 | 2026-04-26 | Added `issue-label-taxonomy.md` as the controlled label axes and vocabulary reference (GIM-85). |
 | 0.35 | 2026-04-23 | Added explicit Issue-first ingest pointer with link to legacy guardrails inventory. |
 | 0.34 | 2026-04-23 | Added GIM-46 OpenAPI SSOT governance playbook to canonical references. |
 | 0.33 | 2026-04-22 | Operator readiness table: link OP-DOC pilot checklist (GIM-58) + pilot/demo criticality rubric; no runtime chain changes. |
