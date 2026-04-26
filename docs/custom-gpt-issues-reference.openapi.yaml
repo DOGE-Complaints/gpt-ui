@@ -4,6 +4,7 @@
 # servers.url: replace with public HTTPS origin of DOGEstonia Bot API when deployed.
 #
 # STATUS: CONTRACT CANDIDATE — lock paths and schemas to the node’s GET /openapi.json when available (EPIC-M1-06).
+# Pilot lock tracking: GPT UI/docs/analysis/tasks/task-pilot-readiness-openapi-contract-candidate-live-lock/openapi-lock-snapshot-GIM-59.md (GIM-59).
 # SSOT companion: GPT UI/instructions/issue-api-methods-reference.md
 # Template lineage: custom-gpt-actions-activities-reference.openapi.yaml
 # Skill: strong operationId + narrow operations — .cursor/skills/openai-custom-gpt-builder/SKILL.md
@@ -11,14 +12,14 @@
 openapi: 3.0.3
 info:
   title: DOGEstonia Bot API — Issues (Custom GPT Actions, draft)
-  version: "0.1.3"
+  version: "0.1.4"
   description: >
     Minimal subset for GPT Actions targeting Issue ingest. All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Replace servers.url and reconcile components with the live FastAPI OpenAPI before production.
     Lockstep: operationId/method/path/request/response/auth/version parity with issue-api-methods-reference.md.
 
 servers:
-  - url: https://api.example.com
+  - url: https://dogestonia-tallinn-demo.up.railway.app
     description: REPLACE with DOGEstonia node public origin (no trailing path).
 
 security:
@@ -65,7 +66,10 @@ components:
         institution:
           $ref: "#/components/schemas/LocalizedString"
       description: >
-        Draft payload after instruction normalizer. Server assigns id, status, timestamps (FR-M1-038 — GPT must not invent).
+        Draft payload after instruction normalizer, aligned with issue-data-model.md logical fields:
+        required type, labels, title, description; optional summary and institution.
+        Do not include subjective non-wire metadata, donor-era minors fields, or backend-issued fields.
+        Server assigns id, status, timestamps (FR-M1-038 — GPT must not invent).
 
     IssueEnvelope:
       type: object

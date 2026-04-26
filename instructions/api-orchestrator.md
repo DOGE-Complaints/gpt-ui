@@ -7,8 +7,10 @@ When this deployment executes **DOGEstonia Issue** web2 calls:
 
 - **SSOT for HTTP (Issue):** [`issue-api-methods-reference.md`](./issue-api-methods-reference.md) + imported Actions contract (OpenAPI parity by operationId/method/path/request/response/security).
 - **Authentication:** same **Bearer** pattern as current Issue runtime — `GPT_ACTIONS_BEARER_SECRET`; Actions do not add arbitrary headers — see [`../docs/gpt-actions-bot-api-auth-mapping.md`](../docs/gpt-actions-bot-api-auth-mapping.md).
+- **Boundary rule:** this bearer is an app-level integration secret configured in Actions/OpenAPI security, not a user-auth mechanism and not a source of per-user identity claims.
 - **Executor rules:** unchanged for this module (backend is truth; never invent `id` or `ISSUE_STATUS`; cite response body — aligns with `root.md` DOGEstonia overlay).
 - **Strict Issue ingest input:** use **`normalized_issue_payload`** from [`issue-normalizer.md`](./issue-normalizer.md); do not call HTTP from gate/package drafts without normalization.
+- **Donor guardrail:** any legacy `/activities` references are historical/non-runtime notes only; do not use them for DOGEstonia Issue ingest (inventory: [`activity-legacy-paths-inventory.md`](./activity-legacy-paths-inventory.md)).
 
 Until the node publishes canonical OpenAPI, treat Issue paths in the YAML as **candidates** — reconcile with live `/openapi.json` before production import.
 
@@ -137,31 +139,57 @@ This instruction is activated when:
       "type": "complaint | observation | absurdity | system_bug",
       "labels": ["..."],
       "title": { "et": "...", "ru": "...", "en": "..." },
-      "summary": { "et": "...", "ru": "...", "en": "..." },
       "description": { "et": "...", "ru": "...", "en": "..." },
+      "summary": { "et": "...", "ru": "...", "en": "..." },
       "institution": { "et": "...", "ru": "...", "en": "..." }
     },
     "normalization_metadata": {
+      "session_language": "et | ru | en",
       "ingest_validation_report_ref": "validation_<timestamp>",
       "safety_compliance_report_ref": "safety_<timestamp>_validated",
-      "policy_gate_ref": "gate_<timestamp>"
+      "policy_gate_ref": "gate_<timestamp>",
+      "normalizer_module": "issue-normalizer@<version>"
+    },
+    "non_wire_metadata": {
+      "severity": null,
+      "impact_estimation": null,
+      "problem_status": null
     }
   }
 }
 ```
 
+Optional keys (`summary`, `institution`, `non_wire_metadata`) may be absent. Demo scope keeps `canonical_payload.institution` absent/null unless product explicitly allows it.
+
+### 4.1a Deterministic transform to `IssueDraftCreateRequest`
+
+For `createIssueDraft` / `updateIssueDraft`, build the Actions request body only from `normalized_issue_payload.canonical_payload`:
+
+| `IssueDraftCreateRequest` field | Source | Required by YAML | Rule |
+|---|---|---:|---|
+| `type` | `canonical_payload.type` | yes | Must be one of `complaint`, `observation`, `absurdity`, `system_bug`; do not invent fallback enum values. |
+| `labels` | `canonical_payload.labels` | yes | Pass validated string array as-is; do not add label guesses in orchestrator. |
+| `title` | `canonical_payload.title` | yes | Pass full `{ et, ru, en }` object from normalizer. |
+| `description` | `canonical_payload.description` | yes | Pass full `{ et, ru, en }` object from normalizer. |
+| `summary` | `canonical_payload.summary` | no | Include only when present and validated; omit otherwise. |
+| `institution` | `canonical_payload.institution` | no | Include only when product scope allows and value is present; demo default is omit/null. |
+
+Do **not** copy `normalization_metadata` or `non_wire_metadata` into `IssueDraftCreateRequest` unless the YAML/schema is explicitly changed in lockstep. They remain trace/debug sidecars for orchestration and audit.
+
 **Issue pre-flight checks:**
 
-1. `normalized_issue_payload.canonical_payload` exists and is structurally complete for the target operation.
-2. `normalization_metadata` contains refs to validation, safety, and policy gate artifacts.
+1. `normalized_issue_payload.canonical_payload` exists and contains YAML-required fields: `type`, `labels`, `title`, `description`.
+2. `normalization_metadata` contains refs to validation, safety, policy gate artifacts, and `session_language`.
 3. No direct jump from gate package to HTTP is allowed; normalization is mandatory on strict Issue path.
 4. Build HTTP requests from `canonical_payload` plus OpenAPI/SSOT contract (`issue-api-methods-reference.md`).
+5. The outgoing request body must not contain backend-issued fields: `id`, `status`, `created_at`, `updated_at`, `arweave_txid`, `image_txid`, `image_hash`, `txid`.
 
 **Issue stop-the-line gates (M6-03):**
 
 - If any pre-flight check fails, **STOP** before HTTP and return a structured blocking explanation (what is missing, where it is expected, what module must re-run).
 - Do **not** synthesize fallback payloads from partial gate/validation artifacts.
 - Do **not** downgrade to best-effort success messaging when contract checks fail.
+- Do **not** fabricate backend-issued identifiers, statuses, timestamps, or transaction ids to make a request or response look complete.
 
 **Issue response-truth discipline (M6-03):**
 
@@ -261,6 +289,8 @@ Issue request/response shapes are defined in the OpenAPI YAML and SSOT markdown 
 
 - **Normative:** [`../docs/gpt-actions-bot-api-auth-mapping.md`](../docs/gpt-actions-bot-api-auth-mapping.md) and [`issue-api-methods-reference.md`](./issue-api-methods-reference.md).
 - **Bearer** (`GPT_ACTIONS_BEARER_SECRET`) and header limits follow mapping doc — do not copy legacy handler prose from old commits into this file.
+- Bearer value is configured in Actions/OpenAPI security config and should not be described here as runtime user authorization.
+- If a product-level user-auth flow exists (for example, redirect to external IdP and return with user id), user identity must be handled as a separate input contract and must not be inferred from app-level bearer.
 
 ### 7.2 HTTP execution
 
