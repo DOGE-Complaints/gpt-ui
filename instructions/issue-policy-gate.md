@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.4 |
-| **Date** | 2026-04-21 |
+| **Version** | 0.5 |
+| **Date** | 2026-04-22 |
 | **Traceability** | [REQ-03](../docs/requirements/REQ-03-scope.md) (safety / scope); [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) §9.10 (FR-M1-039–043); [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-data-model.md`](./issue-data-model.md); [technical-architecture.md](../docs/technical-architecture.md) §2–3.2 |
 
 ---
@@ -47,6 +47,8 @@ This instruction MUST:
 - If the rulebook text is missing from context: follow **§9 Degraded mode**.
 
 **Template (non-authoritative):** Use an operator-managed rulebook template that includes metadata, reason codes, topic matrix, and degraded-mode contract aligned with `policy_gate_result`.
+
+**Operator deployment checklist (human-only, out of repo):** Before pilot/demo sessions, operators verify OP-DOC attachment and versioning using the checklist linked from [`instruction-modules-index.md`](./instruction-modules-index.md) (Operator readiness table). That checklist does not change model rules in this file; it aligns session setup with §3 / §9.
 
 ---
 
@@ -145,3 +147,4 @@ Document the effective mode in `reasons` (e.g. code `POLICY_DEGRADED_MODE`).
 | 0.2 | 2026-04-10 | Added trace + §4 pointer to lifecycle **§2.1** strict-chain order. |
 | 0.3 | 2026-04-10 | Refined traceability and external template guidance in §3. |
 | 0.4 | 2026-04-21 | Added demo baseline gate profile (irrelevant/scam/spam/obscene filtering) with stable reason codes. |
+| 0.5 | 2026-04-22 | §3: pointer to human operator OP-DOC deployment checklist (`instruction-modules-index` Operator readiness); no change to gate logic. |

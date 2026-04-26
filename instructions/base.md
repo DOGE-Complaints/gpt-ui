@@ -4,6 +4,7 @@
 ### Purpose
 
 Base Instruction defines the **functional constitution** of the Custom GPT for **DOGEstonia Module 1 (Issue)**. Legacy donor-only bodies were removed (**2026-04-20**); historical wording lives in **git**.
+For edit safety, treat this file as **Issue-first runtime**; donor/Activity mentions (if any) are historical context only and not executable for DOGEstonia ingest (see [`activity-legacy-paths-inventory.md`](./activity-legacy-paths-inventory.md)).
 
 It establishes:
 - how GPT interprets user intent,

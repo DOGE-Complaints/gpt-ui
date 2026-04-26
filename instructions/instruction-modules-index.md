@@ -2,11 +2,13 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.32 |
-| **Дата** | 2026-04-21 |
+| **Версия индекса** | 0.35 |
+| **Дата** | 2026-04-23 |
 | **Scope** | Runtime navigation map for DOGEstonia Issue instructions; no task/epic dependency in operational sections. |
 
 This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy donor content is removed from the active runtime surface.
+
+**For Custom GPT DOGEstonia ingest use Issue track modules only** (`issue-*`, `ingest-*`, `api-orchestrator.md` in Issue mode). Legacy donor guardrails and review checklist: [`activity-legacy-paths-inventory.md`](./activity-legacy-paths-inventory.md).
 
 Use this index together with [`issue-data-model.md`](./issue-data-model.md), [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md), [`issue-policy-gate.md`](./issue-policy-gate.md), [`issue-normalizer.md`](./issue-normalizer.md), and [`issue-api-methods-reference.md`](./issue-api-methods-reference.md).
 
@@ -23,6 +25,7 @@ Use this index together with [`issue-data-model.md`](./issue-data-model.md), [`i
 | [`issue-policy-gate.md`](./issue-policy-gate.md) | Policy admission gate for Issue ingest (no HTTP calls). |
 | [`issue-normalizer.md`](./issue-normalizer.md) | Builds `normalized_issue_payload` after gate approval. |
 | [`issue-api-methods-reference.md`](./issue-api-methods-reference.md) | HTTP/OpenAPI reference for Issue actions and lockstep policy. |
+| [`openapi-ssot-governance-playbook-GIM-46.md`](../docs/analysis/tasks/task-implement-m1-issues-api-openapi-ssot-governance/openapi-ssot-governance-playbook-GIM-46.md) | Executable governance checklist for one-changeset OpenAPI/SSOT updates (GIM-46). |
 
 Core requirement references: `GPT UI/docs/requirements/REQ-09-functional-requirements-m1.md`, `REQ-10-output-content-model.md`, `REQ-11-instruction-blocks.md`, `REQ-14-acceptance-criteria.md`, `REQ-15-working-assumptions.md`, `REQ-18-api-inbound-story-intake-and-gpt-handoff.md`.
 
@@ -63,6 +66,9 @@ with `base.md` as global constitution and `issue-lifecycle-instructions.md` as c
 
 | Версия | Дата | Изменение |
 |--------|------|-----------|
+| 0.35 | 2026-04-23 | Added explicit Issue-first ingest pointer with link to legacy guardrails inventory. |
+| 0.34 | 2026-04-23 | Added GIM-46 OpenAPI SSOT governance playbook to canonical references. |
+| 0.33 | 2026-04-22 | Operator readiness table: link OP-DOC pilot checklist (GIM-58) + pilot/demo criticality rubric; no runtime chain changes. |
 | 0.32 | 2026-04-21 | Removed legacy stub file references and search-dialogue file dependency from runtime index. |
 | 0.31 | 2026-04-21 | Final cleanup: operational-only index, removed task/epic and roadmap noise from runtime navigation. |
 | 0.30 | 2026-04-20 | Legacy donor cleanup synchronized with Issue-first module set. |

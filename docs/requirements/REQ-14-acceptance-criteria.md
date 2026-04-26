@@ -8,6 +8,7 @@
 - [ ] Превратить буллеты в проверяемые сценарии (given/when/then) и связать с FR-M1-xxx.
 - [ ] Добавить ссылку на будущий `acceptance-verification-*.md` для модуля GPT Interview.
 - [ ] Для интеграционного контура API: не смешивать критерии §14 только с instruction-слоем — см. **REQ-18** §10 и §20/§23 контракта Story Intake (**§19** gateway).
+- [x] Операционный cadence review для REQ-13/14 зафиксирован: [`../analysis/m1-dialogue-quality-review-cadence.md`](../analysis/m1-dialogue-quality-review-cadence.md) (GIM-48).
 
 ---
 

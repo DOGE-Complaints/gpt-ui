@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (18 файлов)
+## Оглавление REQ (19 файлов)
 
 | № | Файл |
 |---|------|
@@ -29,5 +29,6 @@
 | 16 | [REQ-16-open-decisions.md](./REQ-16-open-decisions.md) |
 | 17 | [REQ-17-module-formula.md](./REQ-17-module-formula.md) |
 | 18 | [REQ-18-api-inbound-story-intake-and-gpt-handoff.md](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md) |
+| 19 | [REQ-19-security-auth-boundaries-and-user-identity-flow.md](./REQ-19-security-auth-boundaries-and-user-identity-flow.md) |
 
-**Версия:** 0.3 · 2026-04-19 (добавлен REQ-18; связь с §19 gateway).
+**Версия:** 0.4 · 2026-04-21 (добавлен REQ-19 по security boundaries bearer/user-auth).
