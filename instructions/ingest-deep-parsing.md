@@ -61,7 +61,7 @@ Does **not**:
 
 Receives: raw user input; input type from Base Instruction; optional session context.
 
-**Issue Data Model reference:** extraction hints MUST align with logical fields in [`issue-data-model.md`](./issue-data-model.md) **§4.1–§4.3** (trilingual text, `type`, `labels`, optional fields). Do **not** populate §4.4 system-only fields from parsing.
+**Issue Data Model reference:** extraction hints MUST align with logical fields in [`issue-data-model.md`](./issue-data-model.md) **§4.1–§4.3** (trilingual text, `type`, `labels`, optional fields). Do **not** populate §4.4 system-only fields from parsing, and do not introduce donor-era structured minors fields into Issue hints.
 
 ---
 

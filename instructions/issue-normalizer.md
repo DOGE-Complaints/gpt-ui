@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.1.3 |
-| **Date** | 2026-04-20 |
+| **Version** | 0.1.7 |
+| **Date** | 2026-04-26 |
 | **Traceability** | [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-035–037; [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5; [`issue-data-model.md`](./issue-data-model.md) §4.1; [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-policy-gate.md`](./issue-policy-gate.md); [technical-architecture.md](../docs/technical-architecture.md) §3.2, §7.2–7.4; strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
@@ -31,11 +31,12 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 ### 2.2 This instruction MUST NOT
 
 - **Call APIs or GPT Actions** — ever; orchestrator owns HTTP.
+- **Create transport request bodies** such as `IssueDraftCreateRequest`, `StoryIntakeRequest`, or `IssueCreateRequest`. This module emits only `normalized_issue_payload`; transport shaping belongs to [`api-orchestrator.md`](./api-orchestrator.md) or a runtime bridge.
 - **Ask the user** clarification or follow-up questions (same separation as the legacy normalizer reference: normalization is not a dialogue step). Missing data must have been resolved **upstream** (`ingest-validation`, interview flow, or gate **`needs_clarification`** loop), not here.
 - **Parse raw** multimodal input — belongs to ingest deep parsing / validation.
 - **Re-evaluate** structural completeness — belongs to [`ingest-validation.md`](./ingest-validation.md).
 - **Re-run** safety or policy — belongs to [`safety-compliance.md`](./safety-compliance.md) and [`issue-policy-gate.md`](./issue-policy-gate.md).
-- **Invent** `id`, `status`, `created_at`, `arweave_txid`, `image_txid`, `image_hash`, or any backend-issued field ([`issue-data-model.md`](./issue-data-model.md) §4.3). Omit them or set explicit placeholders only if the orchestrator contract requires keys (then mark as `null` / `"pending_backend"` per **M1-06** alignment — do not fabricate values).
+- **Invent** `id`, `status`, `created_at`, `arweave_txid`, `image_txid`, `image_hash`, or any backend-issued field ([`issue-data-model.md`](./issue-data-model.md) §4.4). Omit them or set explicit placeholders only if the orchestrator contract requires keys (then mark as `null` / `"pending_backend"` per **M1-06** alignment — do not fabricate values).
 
 ### 2.3 Source of truth for Issue shape
 
@@ -60,20 +61,56 @@ If `policy_gate_result.status` is not **`approved`**: **do not** emit `normalize
 
 ## 4. Output — `normalized_issue_payload` (top level)
 
-Single envelope:
+Single final envelope:
 
 ```json
 {
   "normalized_issue_payload": {
-    "canonical_payload": { },
-    "normalization_metadata": { }
+    "canonical_payload": {
+      "type": "complaint",
+      "labels": ["transport", "accessibility"],
+      "title": {
+        "et": "Primary-language or translated title",
+        "ru": "Primary-language or translated title",
+        "en": "Primary-language or translated title"
+      },
+      "description": {
+        "et": "Primary-language or translated description",
+        "ru": "Primary-language or translated description",
+        "en": "Primary-language or translated description"
+      },
+      "summary": {
+        "et": "Optional short card text",
+        "ru": "Optional short card text",
+        "en": "Optional short card text"
+      }
+    },
+    "normalization_metadata": {
+      "session_language": "et",
+      "ingest_validation_report_ref": "validation_<id>",
+      "safety_compliance_report_ref": "safety_<id>",
+      "policy_gate_ref": {
+        "policy_ref": "policy_<id>",
+        "rulebook_version": "v1",
+        "status": "approved"
+      },
+      "normalizer_module": "issue-normalizer@0.1.7",
+      "trace_notes": []
+    },
+    "non_wire_metadata": {
+      "severity": null,
+      "impact_estimation": null,
+      "problem_status": null
+    }
   }
 }
 ```
 
+Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` in demo scope unless product explicitly lifts REQ-16 Q5. Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream.
+
 ### 4.1 `canonical_payload`
 
-Must conform to [`issue-data-model.md`](./issue-data-model.md) **§4.1** (required logical fields) and **§4.2** (optional), using the **Issue** enums and trilingual rules documented there.
+Must conform to [`issue-data-model.md`](./issue-data-model.md) **§4.1** (required logical fields) and **§4.2** (optional logical fields), using the **Issue** enums and trilingual rules documented there. System-only fields in **§4.4** are not filled by GPT as facts.
 
 | Field | Rule |
 |-------|------|
@@ -82,9 +119,8 @@ Must conform to [`issue-data-model.md`](./issue-data-model.md) **§4.1** (requir
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }`; if omitted, orchestrator/UI may fall back per REQ-10 / mock guide. |
 | `institution` | Optional `{ et, ru, en }` **only** when product scope allows; **demo default:** omit (REQ-16 Q5). |
-| `severity`, `impact_estimation`, `problem_status` | Optional — resident-perceived intake per [`issue-data-model.md`](./issue-data-model.md) **§4.3** when collected upstream. |
 
-Do not add legacy-only or Search-only fields.
+Do not add donor-era, legacy-only, Search-only, or backend-issued fields to `canonical_payload`.
 
 ### 4.2 `normalization_metadata` (required keys — instruction-layer scaffold)
 
@@ -98,6 +134,12 @@ Stable **references** to upstream work (opaque strings or objects — align with
 | `policy_gate_ref` | At minimum: `policy_ref`, `rulebook_version`, and `policy_gate_result.status` copy or stable id. |
 | `normalizer_module` | e.g. `issue-normalizer` + **version** of this instruction file (from document header). |
 | `trace_notes` | Optional: free-text **internal** consistency notes (not for end-user display). |
+
+### 4.3 `non_wire_metadata` (optional sidecar)
+
+`severity`, `impact_estimation`, and `problem_status` are resident-perceived subjective fields from [`issue-data-model.md`](./issue-data-model.md) **§4.3**. If collected and confirmed upstream, place them in optional `non_wire_metadata`; otherwise omit this sidecar.
+
+`non_wire_metadata` is not a transport object. It must not be copied into current `StoryIntakeRequest`, `IssueCreateRequest`, or `IssueDraftCreateRequest` unless a separate OpenAPI/schema task explicitly adds those fields.
 
 ---
 
@@ -137,3 +179,7 @@ Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summa
 | 0.1.1 | 2026-04-10 | Added §6 cross-link to `base.md` §1.5 Issue artifact alignment. |
 | 0.1.2 | 2026-04-10 | Added §5.1 concise REQ-10 projection table for `title` / `summary` / `description` / optional `institution`. |
 | 0.1.3 | 2026-04-20 | Added required `normalization_metadata.session_language`; optional subjective intake fields in `canonical_payload`; demo `institution` omit. |
+| 0.1.4 | 2026-04-22 | Added donor-era minors metadata per `issue-data-model` §4.4 (GIM-65). |
+| 0.1.5 | 2026-04-25 | Removed donor-era minors metadata from `canonical_payload`; system-only reference restored to §4.4 (GIM-72). |
+| 0.1.6 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |
+| 0.1.7 | 2026-04-26 | Locked final `normalized_issue_payload` shape, optional `non_wire_metadata` sidecar, and no-direct-transport rule (GIM-80). |

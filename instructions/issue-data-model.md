@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.7 |
-| **Date** | 2026-04-20 |
+| **Version** | 0.10 |
+| **Date** | 2026-04-25 |
 | **Traceability** | [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5–10.6, [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §4–6; [`issue-i18n-policy.md`](./issue-i18n-policy.md) (FR-M1-028…031); [`issue-normalizer.md`](./issue-normalizer.md); SPA: [`spa-app/docs/mock-layer-issues-guide.md`](../../spa-app/docs/mock-layer-issues-guide.md), [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) |
 
 ---
@@ -65,9 +65,9 @@ Below is the **target display contract** for `spa-app` (mocks and UI). Enum type
 |-------|------|------|
 | `institution` | `{ et, ru, en }` | Agency / institution **if** product scope allows inferring it from interview. **Demo scope (REQ-16 Q5):** do **not** populate from dialogue; keep field **absent** / null in `canonical_payload` until integration matures. |
 
-### 4.3 Subjective intake extensions (resident-perceived, REQ-16 Q4)
+### 4.3 Subjective intake extensions (resident-perceived, non-wire; REQ-16 Q4)
 
-Optional fields aligned with `IssueIntakePayload` enums in [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) — **`SEVERITY`**, **`IMPACT_ESTIMATION`**, **`PROBLEM_STATUS`**. Values are **subjective** (how the resident experiences impact), not an objective audit.
+Optional fields aligned with `IssueIntakePayload` enums in [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) — **`SEVERITY`**, **`IMPACT_ESTIMATION`**, **`PROBLEM_STATUS`**. Values are **subjective** (how the resident experiences impact), not an objective audit. Per [`subjective-fields-wire-disposition.md`](../docs/analysis/subjective-fields-wire-disposition.md), these fields are **non-wire metadata** for the current runtime contract and must not be sent as `StoryIntakeRequest` fields.
 
 | Field | Type (logical) | Rule |
 |-------|------------------|------|
@@ -75,7 +75,7 @@ Optional fields aligned with `IssueIntakePayload` enums in [`spa-app/src/domain/
 | `impact_estimation` | `personal` \| `city/town` \| `state` \| `country` \| `Earth` | Self-reported perceived scope of impact. |
 | `problem_status` | `ongoing` \| `resolved` \| `worsened` | How the resident frames change over time, if stated. |
 
-These may live beside §4.1 in `canonical_payload` or in a sibling object per [`issue-normalizer.md`](./issue-normalizer.md) until HTTP/OpenAPI lockstep explicitly includes them (YAML/SSOT updates in lockstep).
+These should live in an explicit non-wire artifact (for example `ingest_validation_report`, mapping appendix, or a logical sidecar) until HTTP/OpenAPI lockstep explicitly includes them (YAML/SSOT updates in lockstep). They are not required for §4.1 completeness and must not block StoryIntake handoff.
 
 ### 4.4 Not filled by GPT as facts without backend
 
@@ -127,3 +127,6 @@ Follow [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5: do not 
 | 0.5 | 2026-04-10 | Added §7 link to [`issue-policy-gate.md`](./issue-policy-gate.md) (`policy_gate_result`). |
 | 0.6 | 2026-04-10 | Added §7 link to [`issue-normalizer.md`](./issue-normalizer.md) (`normalized_issue_payload` scaffold). |
 | 0.7 | 2026-04-20 | Added §4.3 subjective intake fields; added demo `institution` scope rule; kept `spa-app` path updates. |
+| 0.8 | 2026-04-22 | Added donor-era structured minors metadata and temporarily moved the system-only block (GIM-65). |
+| 0.9 | 2026-04-25 | Removed donor-era minors metadata from active Issue model; restored system-only block to §4.4 (GIM-72). |
+| 0.10 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |

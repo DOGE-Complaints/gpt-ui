@@ -386,31 +386,31 @@ Please revise the content to remove any exclusionary, violent, or discriminatory
 
 ### 3.1 Subject Matter Involving Minors
 
-When described **subject matter** (events, services, programs — legacy examples say “activities”) **targets minors**, the following requirements MUST be met:
+When described **subject matter** (events, services, programs — legacy examples say “activities”) targets minors, the following requirements MUST be met. These are **safety checks and narrative/report obligations**, not structured Issue `canonical_payload` fields.
 
-**Requirement 1: Age Group Explicitly Declared**
-
-```
-IF described subject targets minors (age_group includes < 18):
-    → Check: age appropriateness explicitly declared per product policy / `issue-data-model.md` where applicable?
-    → IF NO → BLOCK
-    → IF YES → Proceed to Requirement 2
-```
-
-**Requirement 2: Parental Accompaniment Rules Explicit**
+**Requirement 1: Minor-audience context is explicit enough for safety review**
 
 ```
 IF described subject targets minors:
-    → Check: parental_accompaniment rules explicit?
-    → IF NO → REQUEST clarification
-    → IF YES → Proceed to Requirement 3
+    → Check whether the narrative or safety artifact clearly states the relevant minor-audience context.
+    → IF context is missing and safety cannot be evaluated → BLOCK or request minimal clarification (unless §2.2 requires immediate halt).
+    → IF context is clear enough → Proceed to Requirement 2
 ```
 
-**Requirement 3: Content Age-Appropriate and Non-Exploitative**
+**Requirement 2: Guardian / adult supervision expectations are clear when relevant**
+
+```
+IF described subject targets minors and supervision expectations are relevant:
+    → Check whether the narrative or safety artifact makes the supervision expectation clear.
+    → IF unclear and needed for safety → REQUEST minimal clarification
+    → IF clear or not applicable → Proceed to Requirement 3
+```
+
+**Requirement 3: Content age-appropriate and non-exploitative**
 
 ```
 IF described subject targets minors:
-    → Check: content age-appropriate for declared age_group?
+    → Check: content age-appropriate for the stated minor-audience context?
     → IF NO → BLOCK
     → IF YES → Check: non-exploitative?
     → IF NO → BLOCK
@@ -419,30 +419,27 @@ IF described subject targets minors:
 
 **Integration with data model:**
 
-Safety & Compliance MUST check:
-- Field `age_group` or equivalent per product / [`issue-data-model.md`](./issue-data-model.md) (must be explicitly set when required)
-- Field `parental_accompaniment` (if exists in model, must be explicit)
-- Description text for age-appropriateness
+Safety & Compliance MUST check the **Issue narrative text**, `safety_compliance_report`, and relevant validation artifacts. It MUST NOT require or emit donor-era structured minors keys in `canonical_payload`. If details are needed, record them in the safety report / clarification flow, not as active Issue model fields.
 
 **Response Template (Missing Age Group):**
 
 ```
-"Processing has been halted. Content targeting minors must explicitly declare the age group. 
-Please specify the age group for the described subject."
+"Processing has been halted. Content involving minors needs enough context for safety review.
+Please clarify the relevant minor-audience context for the described subject."
 ```
 
 **Response Template (Missing Parental Rules):**
 
 ```
-"Processing has been halted. Content targeting minors must explicitly state parental accompaniment rules. 
-Please clarify: Is parental accompaniment required, optional, or not required?"
+"Processing has been halted. Content involving minors needs clear adult supervision expectations when relevant.
+Please clarify the supervision expectation for the described subject."
 ```
 
 **Response Template (Age-Inappropriate):**
 
 ```
-"Processing has been halted. The content does not appear to be age-appropriate for the declared age group. 
-Please revise the description to ensure it is suitable for [age_group]."
+"Processing has been halted. The content does not appear appropriate for the stated minor-audience context.
+Please revise the description so the safety review can proceed."
 ```
 
 ### 3.2 Vulnerable Contexts

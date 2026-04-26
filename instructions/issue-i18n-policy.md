@@ -5,8 +5,8 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.2 |
-| **Date** | 2026-04-20 |
+| **Version** | 0.3 |
+| **Date** | 2026-04-25 |
 | **Traceability** | REQ-09 §9.7 (FR-M1-028…031), REQ-10 §10.5–10.6, REQ-15 item 4 (SPA field shape) |
 
 ---
@@ -60,9 +60,22 @@
 
 ---
 
+## 6.1 Runtime single-string bridge (GIM-74)
+
+Current runtime OpenAPI fields such as `narrative.original_text`, `narrative.title_hint`, and `IssueCreateRequest.title` are **strings**, not `{ et, ru, en }` objects. When a runtime request is built from logical Issue text:
+
+1. Select the **primary slot** from `normalization_metadata.session_language` / `comm_context.ui_lang`.
+2. Use the primary-language user-confirmed testimony for `narrative.original_text`.
+3. Use the primary-language title as `narrative.title_hint` or `IssueCreateRequest.title` when those fields are in scope.
+4. Keep secondary-language variants in logical/non-wire artifacts; do not claim current runtime accepts trilingual objects.
+5. Full bridge policy: [`../docs/analysis/trilingual-to-runtime-string-policy.md`](../docs/analysis/trilingual-to-runtime-string-policy.md).
+
+---
+
 ## 7. Version history
 
 | Version | Date | Change |
 |---------|------|--------|
 | 0.1 | 2026-04-10 | Initial policy (FR-M1-028…031); links to bootstrap, issue-data-model, interview flow, presets. |
 | 0.2 | 2026-04-20 | Added §6 `session_language` in `normalization_metadata`. |
+| 0.3 | 2026-04-25 | Added §6.1 runtime single-string bridge for GIM-74. |
