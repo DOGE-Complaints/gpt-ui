@@ -40,7 +40,7 @@
 
 | Контур | Назначение | Типичный артефакт / wire |
 |--------|------------|---------------------------|
-| **Module 1 — Issues Actions (узел)** | Черновик Issue по строгой цепочке инструкций | Логически `normalized_issue_payload` → HTTP тело **`IssueDraftCreateRequest`** (`GPT UI/docs/custom-gpt-issues-reference.openapi.yaml`). |
+| **Module 1 — Issues Actions (узел)** | Черновик Issue по строгой цепочке инструкций | Логически `normalized_issue_payload` → HTTP тело **`IssueDraftCreateRequest`** (`GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml`). |
 | **Module 2 — Story Intake** | Полный пакет истории + авторство + сигналы для аналитики и проекции | **`StoryIntakeEnvelope`** в теле `POST` (логический контракт §4 §19). |
 
 **Требование:** инструкции и операторские чеклисты должны **не смешивать** проверку успеха по Issues OpenAPI с проверкой успеха по Story Intake; при необходимости оба контура документируются в приёмке (**REQ-14**) как разные слои (см. также `GPT UI/docs/analysis/doc19-inbound-api-audit-vs-gim33-41-gap-closure-tasks.md`).

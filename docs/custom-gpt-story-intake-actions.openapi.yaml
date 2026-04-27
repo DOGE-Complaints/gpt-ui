@@ -1,0 +1,198 @@
+# DOGEstonia — OpenAPI subset for Custom GPT Actions (Story Intake runtime).
+#
+# Auth (ChatGPT -> Configure -> Actions): API Key -> Bearer = server GPT_ACTIONS_BEARER_SECRET.
+# servers.url: replace with public HTTPS origin of DOGEstonia Bot API when deployed.
+#
+# STATUS: CONTRACT CANDIDATE — lock paths/schemas to node GET /openapi.json when available.
+# SSOT companion: GPT UI/instructions/story-api-methods-reference.md
+#
+openapi: 3.0.3
+info:
+  title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
+  version: "0.2.0"
+  description: >
+    Minimal subset for GPT Actions targeting story intake runtime.
+    All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
+    Replace servers.url and reconcile components with the live FastAPI OpenAPI before production.
+    Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
+
+servers:
+  - url: https://dogestonia-tallinn-demo.up.railway.app
+    description: REPLACE with DOGEstonia node public origin (no trailing path).
+
+security:
+  - GptActionsBearer: []
+
+components:
+  securitySchemes:
+    GptActionsBearer:
+      type: http
+      scheme: bearer
+      description: >
+        Shared secret = GPT_ACTIONS_BEARER_SECRET on the API host. Same value as ChatGPT Actions API Key (Bearer).
+        Custom headers (e.g. X-User-Id) are typically NOT available from Actions — see gpt-actions-bot-api-auth-mapping.md.
+        Current model is app-level integration bearer (no per-user OAuth identity claims in this schema).
+
+  schemas:
+    Submitter:
+      type: object
+      required: [external_user_id]
+      properties:
+        external_user_id:
+          type: string
+        identity_issuer:
+          type: string
+          nullable: true
+
+    Narrative:
+      type: object
+      required: [original_text, language, title_hint]
+      properties:
+        original_text:
+          type: string
+        language:
+          type: string
+          enum: [et, ru, en]
+        title_hint:
+          type: string
+        location_query:
+          type: string
+          nullable: true
+        canonical_type:
+          type: string
+          nullable: true
+        canonical_labels:
+          type: array
+          items:
+            type: string
+
+    Origin:
+      type: object
+      properties:
+        source:
+          type: string
+          nullable: true
+        conversation_id:
+          type: string
+          nullable: true
+        tool_call_id:
+          type: string
+          nullable: true
+
+    Privacy:
+      type: object
+      properties:
+        contains_pii:
+          type: boolean
+          default: false
+        redaction_requested:
+          type: boolean
+          default: false
+
+    LiveStoryContext:
+      type: object
+      properties:
+        consistency_notes:
+          type: string
+          nullable: true
+
+    StoryIntakeRequest:
+      type: object
+      required: [schema_version, submitter, narrative]
+      properties:
+        schema_version:
+          type: string
+          enum: [m2.story_intake_envelope.v1]
+        submitter:
+          $ref: "#/components/schemas/Submitter"
+        narrative:
+          $ref: "#/components/schemas/Narrative"
+        origin:
+          $ref: "#/components/schemas/Origin"
+        privacy:
+          $ref: "#/components/schemas/Privacy"
+        live_story_context:
+          $ref: "#/components/schemas/LiveStoryContext"
+
+    StoryIntakeResponseData:
+      type: object
+      required: [schema_version, story_id, status]
+      properties:
+        schema_version:
+          type: string
+          enum: [m2.story_intake_response.v1]
+        story_id:
+          type: string
+        status:
+          type: string
+
+    SuccessEnvelope_StoryIntake:
+      type: object
+      required: [data, trace_id]
+      properties:
+        data:
+          $ref: "#/components/schemas/StoryIntakeResponseData"
+        trace_id:
+          type: string
+
+    ErrorEnvelope:
+      type: object
+      required: [error, trace_id]
+      properties:
+        error:
+          type: object
+          required: [code, type, message, details]
+          properties:
+            code:
+              type: string
+            type:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
+        trace_id:
+          type: string
+
+paths:
+  /intake/stories:
+    post:
+      operationId: postStoryIntake
+      summary: Submit story intake payload
+      description: >
+        Story-first primary submission path for runtime intake.
+      x-openai-isConsequential: true
+      security:
+        - GptActionsBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StoryIntakeRequest"
+      responses:
+        "200":
+          description: Story intake success envelope
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessEnvelope_StoryIntake"
+        "400":
+          description: Intake validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"

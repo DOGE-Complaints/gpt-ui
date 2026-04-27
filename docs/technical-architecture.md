@@ -1,7 +1,7 @@
 # Экстракция технической архитектуры: инструкции GPT UI → JSON по диалогу → web2 API
 
 **Назначение:** зафиксировать **переиспользуемый технический паттерн** текущего Issue-контура из `GPT UI/instructions/*.md`: как пошагово формируются структуры данных в процессе диалога, **кто имеет право** инициировать вызовы backend и **как** это стыкуется с web2 (REST + Custom GPT Actions).  
-**SoT по коду инструкций:** файлы в `GPT UI/instructions/`; для **DOGEstonia Issue** контракт HTTP — **`GPT UI/instructions/story-api-methods-reference.md`** и импортированный Actions contract (build/import artifact: `GPT UI/docs/custom-gpt-issues-reference.openapi.yaml`).  
+**SoT по коду инструкций:** файлы в `GPT UI/instructions/`; для **DOGEstonia Issue** контракт HTTP — **`GPT UI/instructions/story-api-methods-reference.md`** и импортированный Actions contract (build/import artifact: `GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml`).  
 **Метод:** `@analysis.mdc` — только проверяемые факты из актуальных секций; legacy donor тела вырезаны (**2026-04-20**, strategy **C**).
 
 **Версия:** 0.3 · 2026-04-20
@@ -76,7 +76,7 @@
 
 ### 4.1. SSOT по HTTP
 
-- **`story-api-methods-reference.md`** + imported Actions contract (`custom-gpt-issues-reference.openapi.yaml`) — SSOT Issue для Actions.
+- **`story-api-methods-reference.md`** + imported Actions contract (`custom-gpt-story-intake-actions.openapi.yaml`) — SSOT Issue для Actions.
 
 ### 4.2. Механизм вызова (Custom GPT)
 
@@ -115,7 +115,7 @@
 | Контракт API (Issue) | `GPT UI/instructions/story-api-methods-reference.md` |
 | Safety | `GPT UI/instructions/safety-compliance.md` |
 | Search | SEARCH-mode handoff in `base.md` + `api-orchestrator.md` (when search endpoints exist) |
-| OpenAPI для Actions (Issue) | `GPT UI/docs/custom-gpt-issues-reference.openapi.yaml` |
+| OpenAPI для Actions (Issue) | `GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml` |
 
 ---
 
@@ -145,7 +145,7 @@
 | `activity-normalizer.md` | `story-normalizer.md` | Канонизация под Issue + `normalized_issue_payload` в strict-цепочке |
 | `activity-data-model.md` | `story-data-model.md` | Поля SPA + narrative layers |
 | legacy gate module | `story-policy-gate.md` | SoT = operator rulebook / demo policy profile |
-| `custom-gpt-actions-activities-reference.openapi.yaml` | `custom-gpt-issues-reference.openapi.yaml` | OpenAPI build/import artifact под ноду Issue |
+| `custom-gpt-actions-activities-reference.openapi.yaml` | `custom-gpt-story-intake-actions.openapi.yaml` | OpenAPI build/import artifact под ноду Issue |
 
 Файлы **`root.md`**, **`base.md`**, **`ingest-validation.md`**, **`ingest-deep-parsing.md`**, **`safety-compliance.md`**, **`api-orchestrator.md`** можно **не** переименовывать на первом шаге, но внутри — массово заменить термины и ссылки на `issue-*` / `Issue`.
 

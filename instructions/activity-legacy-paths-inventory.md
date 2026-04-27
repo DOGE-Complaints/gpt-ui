@@ -23,10 +23,10 @@ Before merging edits in instruction files, verify:
 
 Canonical chain references:
 
-- [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md)
-- [`story-normalizer.md`](./story-normalizer.md)
-- [`story-policy-gate.md`](./story-policy-gate.md)
-- [`story-api-methods-reference.md`](./story-api-methods-reference.md)
+- [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md)
+- [`story-normalizer.md`](story-normalizer.md)
+- [`story-policy-gate.md`](story-policy-gate.md)
+- [`story-api-methods-reference.md`](story-api-methods-reference.md)
 
 ---
 

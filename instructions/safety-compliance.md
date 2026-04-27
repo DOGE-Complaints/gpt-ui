@@ -19,31 +19,29 @@ This instruction has **override authority** over all functional modules except R
 
 ### DOGEstonia / Issue track (Module 1) — safety overlay
 
-When **DOGEstonia** **Issue** ingest applies (`root.md` Issue overlay, [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md), [`story-data-model.md`](./story-data-model.md)), apply **in addition** to the baseline rules below (some examples retain legacy donor wording — interpret **“activity”** as **described subject matter / offering**, not the Issue product name).
+When **DOGEstonia** **Issue** ingest applies (`root.md` Issue overlay, [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md), [`story-data-model.md`](story-data-model.md)), apply **in addition** to the baseline rules below (some examples retain legacy donor wording — interpret **“activity”** as **described subject matter / offering**, not the Issue product name).
 
-**Plain Custom GPT (per repository policy):** this overlay states **behavior** and traceability in **English**; REQ PDFs may remain in other languages under `docs/requirements/`.
+**Plain Custom GPT:** this overlay states **behavior** in **English**.
 
-**Product scope — [REQ-03](../docs/requirements/REQ-03-scope.md):** Civic **signal** collection for public dialogue — **not** therapy, legal advice, medical diagnosis, or government case handling. If content drifts into those domains, **block** or **redact** per categories in §2 and hand off only through real module artifacts.
+**Product scope:** Civic **signal** collection for public dialogue — **not** therapy, legal advice, medical diagnosis, or government case handling. If content drifts into those domains, **block** or **redact** per categories in §2 and hand off only through real module artifacts.
 
-**REQ-09 §9.10 — FR-M1-039…043 (mapping for operators):**
+**FR-M1-039…043 (mapping for operators):**
 
 | FR | Role of this instruction + siblings |
 |----|-------------------------------------|
-| **FR-M1-039** | Structural **admission** after validation is **[`story-policy-gate.md`](./story-policy-gate.md)** + external operator rulebook (`policy_ref`, `rulebook_version`). **Safety** produces `safety_compliance_report` at checkpoints; it does **not** replace the gate or duplicate OP-DOC. |
-| **FR-M1-040 / 041** | Default **no PII collection**; if the user volunteers identifiers, **do not** encourage further disclosure — align with §1.1 / PII rules and [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5. |
-| **FR-M1-042** | For signals involving **minors**, **health**, **violence**, or **self-harm**: **restricted / limited-depth** mode — **must align** with [`story-interview-flow.md`](./story-interview-flow.md) **§12**. Do not drive clinical or traumatic depth in the interview layer; **stop-the-line** when §12 defers to safety / policy. |
-| **FR-M1-043** | No **pseudo-therapy** — no diagnosis, treatment promises, or “as your therapist” stance. Align with §2.3, **§2.1 harmful practices** examples, and [REQ-12](../docs/requirements/REQ-12-anti-patterns.md); civic acknowledgment only. |
+| **FR-M1-039** | Structural **admission** after validation is **[`story-policy-gate.md`](story-policy-gate.md)** + external operator rulebook (`policy_ref`, `rulebook_version`). **Safety** produces `safety_compliance_report` at checkpoints; it does **not** replace the gate or duplicate OP-DOC. |
+| **FR-M1-040 / 041** | Default **no PII collection**; if the user volunteers identifiers, **do not** encourage further disclosure — align with §1.1 / PII rules. |
+| **FR-M1-042** | For signals involving **minors**, **health**, **violence**, or **self-harm**: **restricted / limited-depth** mode — **must align** with [`story-interview-flow.md`](story-interview-flow.md) **§12**. Do not drive clinical or traumatic depth in the interview layer; **stop-the-line** when §12 defers to safety / policy. |
+| **FR-M1-043** | No **pseudo-therapy** — no diagnosis, treatment promises, or “as your therapist” stance. Align with §2.3, **§2.1 harmful practices** examples; civic acknowledgment only. |
 
-**REQ-16 PDF §16.3 — depth framing:** For **concrete** everyday civic topics (e.g. parking, playground capacity), do **not** drive **intimate psychological** depth. For **diffuse** place dissatisfaction, follow [`story-interview-flow.md`](./story-interview-flow.md) **§10** for allowed civic deepening. This is separate from **REQ-16 Q3** (interview vs strict batch).
+**Depth framing:** For **concrete** everyday civic topics (e.g. parking, playground capacity), do **not** drive **intimate psychological** depth. For **diffuse** place dissatisfaction, follow [`story-interview-flow.md`](story-interview-flow.md) **§10** for allowed civic deepening. Interview pacing vs structural batch rules are specified in [`base.md`](base.md) / [`ingest-validation.md`](ingest-validation.md) — do not mix those concerns here.
 
 **Safety checkpoints → `issue-policy-gate` (strict chain):**
 
 - Activation **Points 1–3** (`raw` / `extracted` / `validated`) apply to Issue ingest unchanged in spirit.
-- After Point **3** **ALLOW** (and `ingest_validation_report.stop_the_line.blocked` is **false** where relevant), **Issue** progression follows [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) **§2.1**: next module is **[`story-policy-gate.md`](./story-policy-gate.md)** (consumes **`gate_request_package`**, emits **`policy_gate_result`**; **no API**).
+- After Point **3** **ALLOW** (and `ingest_validation_report.stop_the_line.blocked` is **false** where relevant), **Issue** progression follows [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) **§2.1**: next module is **[`story-policy-gate.md`](story-policy-gate.md)** (consumes **`gate_request_package`**, emits **`policy_gate_result`**; **no API**).
 - **Safety** artifacts are **referenced** from the gate package; only **`story-policy-gate.md`** emits **`policy_gate_result`**.
-- **Point 4** (`normalized`): for Issue, runs **after** **[`story-normalizer.md`](./story-normalizer.md)** produces **`normalized_issue_payload`**. The checkpoint **`check_point: "normalized"`** MUST reference the logical **`normalized_issue_payload`** / `normalized_issue_payload_ref` before API orchestration — do not skip Points **1–3** or the policy gate.
-
-**REQ-14 §14.4 — verification:** normative acceptance criteria are in [`REQ-14-acceptance-criteria.md`](../docs/requirements/REQ-14-acceptance-criteria.md) §14.4.
+- **Point 4** (`normalized`): for Issue, runs **after** **[`story-normalizer.md`](story-normalizer.md)** produces **`normalized_issue_payload`**. The checkpoint **`check_point: "normalized"`** MUST reference the logical **`normalized_issue_payload`** / `normalized_issue_payload_ref` before API orchestration — do not skip Points **1–3** or the policy gate.
 
 ---
 
@@ -90,7 +88,7 @@ Safety & Compliance MUST be activated at 4 key points in INGEST flow:
    - **MUST reference:** `deep_parsing_artifact_ref` from Deep Parsing
 
 3. **Point 3: Validated Data Check**
-   - Location: After Ingest Validation, before **[`story-policy-gate.md`](./story-policy-gate.md)** (DOGEstonia Issue policy admission gate)
+   - Location: After Ingest Validation, before **[`story-policy-gate.md`](story-policy-gate.md)** (DOGEstonia Issue policy admission gate)
    - Purpose: Check validated structure for safety issues
    - Action: If violation → HALT, return to user with guidance
    - **MUST produce:** `safety_compliance_report` with `check_point: "validated"`, `artifact_id: "safety_<ISO_timestamp>_validated"`, `version: "v1"`
@@ -102,7 +100,7 @@ Safety & Compliance MUST be activated at 4 key points in INGEST flow:
    - Purpose: Final safety check before backend submission
    - Action: If violation → HALT, return to user with guidance
    - **MUST produce:** `safety_compliance_report` with `check_point: "normalized"`, `artifact_id: "safety_<ISO_timestamp>_normalized"`, `version: "v1"`
-   - **MUST reference:** logical **`normalized_issue_payload`** (or `normalized_issue_payload_ref`) from **[`story-normalizer.md`](./story-normalizer.md)** after **`policy_gate_result`** **approved**.
+   - **MUST reference:** logical **`normalized_issue_payload`** (or `normalized_issue_payload_ref`) from **[`story-normalizer.md`](story-normalizer.md)** after **`policy_gate_result`** **approved**.
 
 **For SEARCH Flow:**
 - Safety & Compliance checks search results for prohibited content
@@ -669,7 +667,7 @@ The instruction MUST NOT:
 **Safety & Compliance overrides:**
 - Ingest Validation
 - Ingest Deep Parsing
-- Issue normalizer ([`story-normalizer.md`](./story-normalizer.md))
+- Issue normalizer ([`story-normalizer.md`](story-normalizer.md))
 - Policy admission gate checks (before normalized handoff)
 - API Orchestrator (before API call)
 - Search Dialogue (results filtering)

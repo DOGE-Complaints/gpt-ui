@@ -128,7 +128,7 @@
 
 **Смысл API Key для продукта:** один секрет в настройках GPT = **все** пользователи этого GPT ходят в API с **одним и тем же** Bearer. Это хорошо закрывает вопрос «только наш GPT (и никто с улицы) бьёт в эндпоинт», но **не** даёт per-user идентичность в ChatGPT без **OAuth** в том же Action или без прокси, который выставляет `X-User-Id`.
 
-**Статус таска на бекенд:** реализовано в `bot/api/middleware/gpt_actions_bearer.py` + `APIConfig.gpt_actions_bearer_secret`; постановка — `bot/docs/analysis/tasks/task-implement-gpt-actions-api-key-bearer-activities/`. Для Issue-контура security-контракт зафиксирован в `GPT UI/instructions/story-api-methods-reference.md` и `GPT UI/docs/custom-gpt-issues-reference.openapi.yaml`.
+**Статус таска на бекенд:** реализовано в `bot/api/middleware/gpt_actions_bearer.py` + `APIConfig.gpt_actions_bearer_secret`; постановка — `bot/docs/analysis/tasks/task-implement-gpt-actions-api-key-bearer-activities/`. Для Issue-контура security-контракт зафиксирован в `GPT UI/instructions/story-api-methods-reference.md` и `GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml`.
 
 **Вне скоупа одного маленького таска:** заменить HMAC на commerce одним API Key; отдельный OAuth для GPT без дизайна с прокси/Logto.
 

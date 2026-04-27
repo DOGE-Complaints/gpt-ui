@@ -7,7 +7,7 @@
 |----------------|--------|
 | **Version** | 0.1 |
 | **Date** | 2026-04-26 |
-| **Traceability** | [REQ-20](../docs/requirements/REQ-20-label-taxonomy-and-extraction-axes.md), [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-026/027/044…051, [`story-data-model.md`](./story-data-model.md), [`story-interview-flow.md`](./story-interview-flow.md), [`ingest-validation.md`](./ingest-validation.md), [`story-normalizer.md`](./story-normalizer.md) |
+| **Traceability** | FR-M1-026/027/044…051; [`story-data-model.md`](story-data-model.md), [`story-interview-flow.md`](story-interview-flow.md), [`ingest-validation.md`](ingest-validation.md), [`story-normalizer.md`](story-normalizer.md) |
 
 ---
 

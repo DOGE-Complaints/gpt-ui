@@ -1,30 +1,28 @@
 # API Orchestrator Instruction
 ## Backend Integration, Authorization & State Execution
 
-### DOGEstonia — Issue API track
+### DOGEstonia — Story Intake API track
 
 When this deployment executes **DOGEstonia Issue** web2 calls:
 
-- **SSOT for HTTP (Issue):** [`story-api-methods-reference.md`](./story-api-methods-reference.md) + imported Actions contract (OpenAPI parity by operationId/method/path/request/response/security).
-- **Authentication:** same **Bearer** pattern as current Issue runtime — `GPT_ACTIONS_BEARER_SECRET`; Actions do not add arbitrary headers — see [`../docs/gpt-actions-bot-api-auth-mapping.md`](../docs/gpt-actions-bot-api-auth-mapping.md).
+- **SSOT for HTTP (Story Intake):** [`story-api-methods-reference.md`](story-api-methods-reference.md) + imported Actions contract (OpenAPI parity by operationId/method/path/request/response/security).
+- **Authentication:** same **Bearer** pattern as current Issue runtime — `GPT_ACTIONS_BEARER_SECRET`; Actions do not add arbitrary headers beyond what the imported OpenAPI security scheme defines for GPT Actions.
 - **Boundary rule:** this bearer is an app-level integration secret configured in Actions/OpenAPI security, not a user-auth mechanism and not a source of per-user identity claims.
 - **Executor rules:** unchanged for this module (backend is truth; never invent `id` or `ISSUE_STATUS`; cite response body — aligns with `root.md` DOGEstonia overlay).
-- **Strict Issue ingest input:** use **`normalized_issue_payload`** from [`story-normalizer.md`](./story-normalizer.md); do not call HTTP from gate/package drafts without normalization.
-- **Donor guardrail:** any legacy `/activities` references are historical/non-runtime notes only; do not use them for DOGEstonia Issue ingest (inventory: [`activity-legacy-paths-inventory.md`](./activity-legacy-paths-inventory.md)).
+- **Strict ingest input:** use normalized artifact from [`story-normalizer.md`](story-normalizer.md); do not call HTTP from gate/package drafts without normalization.
+- **Donor guardrail:** any legacy `/activities` references are historical/non-runtime notes only; do not use them for DOGEstonia Issue ingest (inventory: [`activity-legacy-paths-inventory.md`](activity-legacy-paths-inventory.md)).
 
-Until the node publishes canonical OpenAPI, treat Issue paths in the YAML as **candidates** — reconcile with live `/openapi.json` before production import.
+Until the node publishes canonical OpenAPI, treat paths in the imported Actions contract as **candidates** — reconcile with live `/openapi.json` before production import.
 
-### contract lockstep (YAML ↔ SSOT ↔ orchestrator)
+### contract lockstep (Actions contract ↔ SSOT ↔ orchestrator, story-first)
 
-Issue orchestrator operations are locked one-to-one to the Issue Actions contract:
+Story intake orchestrator operations are locked one-to-one to the Actions contract:
 
 | operationId | Method | Path | Source |
 |-------------|--------|------|--------|
-| `createIssueDraft` | `POST` | `/issues/draft` | Actions imported contract + `story-api-methods-reference.md` |
-| `getIssueById` | `GET` | `/issues/{issue_id}` | same |
-| `updateIssueDraft` | `PUT` | `/issues/{issue_id}` | same |
+| `postStoryIntake` | `POST` | `/intake/stories` | Actions imported contract + `story-api-methods-reference.md` |
 
-For each operation above, required request fields and expected response envelope must match the same definitions in YAML and SSOT markdown before execution updates are merged.
+For each operation above, required request fields and expected response envelope must match the same definitions in the imported Actions contract and SSOT markdown before execution updates are merged.
 
 ---
 
@@ -33,8 +31,8 @@ For each operation above, required request fields and expected response envelope
 API Orchestrator Instruction is the **sole module authorized to call backend API** for operations.
 
 Its purpose is to:
-- execute all backend API calls for **DOGEstonia Issue** operations (and any remaining product-specific routes per SSOT),
-- for Issue ingest, consume **`normalized_issue_payload`** as the only strict pre-HTTP artifact,
+- execute backend API calls for **DOGEstonia story intake** runtime operations,
+- for strict ingest, consume normalized artifact as the only pre-HTTP source,
 - manage authorization (public vs authenticated vs activated endpoints),
 - handle state transitions correctly (always query current state before transitions),
 - translate backend errors into user-friendly messages,
@@ -45,8 +43,8 @@ This instruction is a **faithful executor** — it executes exactly what is requ
 It does NOT:
 - parse user input (Ingest Deep Parsing does this),
 - validate data structure (Ingest Validation does this),
-- normalize data ([`story-normalizer.md`](./story-normalizer.md) on Issue path; legacy donor normalizer removed),
-- evaluate policy compliance ([`story-policy-gate.md`](./story-policy-gate.md) on Issue path; legacy KоныРода stub does not gate HTTP),
+- normalize data ([`story-normalizer.md`](story-normalizer.md) on Issue path; legacy donor normalizer removed),
+- evaluate policy compliance ([`story-policy-gate.md`](story-policy-gate.md) on Issue path; legacy KоныРода stub does not gate HTTP),
 - interpret user intent (Base Instruction does this).
 
 ---
@@ -57,8 +55,8 @@ This instruction is activated after:
 - Base Instruction has established the mode (INGEST/SEARCH),
 - Upstream modules have completed successfully (Normalizer, Search Dialogue).
 
-It executes (per **Issue** SSOT — [`story-api-methods-reference.md`](./story-api-methods-reference.md)):
-- Issue draft create / read / update (`/issues/*` as in OpenAPI snapshot)
+It executes (per story-first SSOT — [`story-api-methods-reference.md`](story-api-methods-reference.md)):
+- story intake submit (`/intake/stories` as in OpenAPI snapshot)
 - Search / reference only if wired in product SSOT (do not assume legacy donor routes)
 
 **Legacy:** Donor lifecycle tables and legacy normalizer handoff were **removed** from this instruction (**2026-04-20**). Recover from **git history** if needed.
@@ -74,12 +72,12 @@ It executes (per **Issue** SSOT — [`story-api-methods-reference.md`](./story-a
 
 ## 2. Source of Truth
 
-**Primary Source (DOGEstonia Issue):** [`story-api-methods-reference.md`](./story-api-methods-reference.md) + imported Actions contract.
+**Primary Source (DOGEstonia Issue):** [`story-api-methods-reference.md`](story-api-methods-reference.md) + imported Actions contract.
 
 **Legacy:** donor HTTP/model files were removed from active runtime surface and are not part of the Issue hot path.
 
 **Other Sources:**
-- [`base.md`](./base.md) — mode and stop-the-line rules
+- [`base.md`](base.md) — mode and stop-the-line rules
 
 ---
 
@@ -90,7 +88,7 @@ It executes (per **Issue** SSOT — [`story-api-methods-reference.md`](./story-a
 This instruction is activated when:
 
 **For INGEST Flow:**
-- [`story-normalizer.md`](./story-normalizer.md) has produced **`normalized_issue_payload`**
+- [`story-normalizer.md`](story-normalizer.md) has produced **`normalized_issue_payload`**
 - Normalized JSON is ready for backend API call
 - Operation type is determined (e.g. create/update Issue draft per OpenAPI)
 
@@ -126,7 +124,7 @@ This instruction is activated when:
 
 ### 4.1 Input from Issue Normalizer (DOGEstonia / Issue)
 
-**Source:** [`story-normalizer.md`](./story-normalizer.md)
+**Source:** [`story-normalizer.md`](story-normalizer.md)
 
 **When:** strict Issue ingest after validation → safety → policy gate → normalization.
 
@@ -164,24 +162,15 @@ This instruction is activated when:
 
 Optional keys (`summary`, `institution`, `non_wire_metadata`) may be absent. Demo scope keeps `canonical_payload.institution` absent/null unless product explicitly allows it.
 
-### 4.1a Deterministic transform to `IssueDraftCreateRequest`
+### 4.1a Deterministic transform to `StoryIntakeRequest`
 
-For `createIssueDraft` / `updateIssueDraft`, build the Actions request body only from `normalized_issue_payload.canonical_payload`:
+For `postStoryIntake`, build the Actions request body from normalized artifact fields per §5.2.1 and runtime schema.
 
-| `IssueDraftCreateRequest` field | Source | Required by YAML | Rule |
-|---|---|---:|---|
-| `type` | `canonical_payload.type` | yes | Must be one of `complaint`, `observation`, `absurdity`, `system_bug`; do not invent fallback enum values. |
-| `labels` | `canonical_payload.labels` | yes | Pass only validated canonical labels allowed by `story-label-taxonomy.md`; do not add label guesses in orchestrator. |
-| `title` | `canonical_payload.title` | yes | Pass full `{ et, ru, en }` object from normalizer. |
-| `description` | `canonical_payload.description` | yes | Pass full `{ et, ru, en }` object from normalizer. |
-| `summary` | `canonical_payload.summary` | no | Include only when present and validated; omit otherwise. |
-| `institution` | `canonical_payload.institution` | no | Include only when product scope allows and value is present; demo default is omit/null. |
-
-Do **not** copy `normalization_metadata`, `normalization_metadata.label_extraction_metadata`, or `non_wire_metadata` into `IssueDraftCreateRequest` unless the YAML/schema is explicitly changed in lockstep. They remain trace/debug sidecars for orchestration and audit.
+Do **not** copy instruction-only metadata (`normalization_metadata`, `label_extraction_metadata`, `non_wire_metadata`) into `StoryIntakeRequest` unless runtime schema is explicitly changed in lockstep.
 
 **Issue pre-flight checks:**
 
-1. `normalized_issue_payload.canonical_payload` exists and contains YAML-required fields: `type`, `labels`, `title`, `description`.
+1. `normalized_issue_payload.canonical_payload` exists and contains required fields for the active imported Actions contract.
 2. `normalization_metadata` contains refs to validation, safety, policy gate artifacts, and `session_language`.
 3. `canonical_payload.labels[]` contains only validated canonical labels from `story-label-taxonomy.md`; unknown, metadata-only, internal-only, and low-confidence candidates must stop before HTTP.
 4. No direct jump from gate package to HTTP is allowed; normalization is mandatory on strict Issue path.
@@ -203,11 +192,11 @@ Do **not** copy `normalization_metadata`, `normalization_metadata.label_extracti
 
 ### 4.2 Input from SEARCH mode
 
-**Source:** Base SEARCH mode handoff (optional per REQ-15, only when search operations exist in OpenAPI).
+**Source:** Base SEARCH mode handoff (optional — only when search operations exist in the deployed OpenAPI).
 
 **When:** SEARCH flow operations.
 
-**Input shape:** product-defined structured query — do not assume donor-specific filters. When search lands in OpenAPI, mirror field names from SSOT + YAML only.
+**Input shape:** product-defined structured query — do not assume donor-specific filters. When search lands in OpenAPI, mirror field names from SSOT + imported Actions contract only.
 ```json
 {
   "query": { "text": "string | null", "filters": {} },
@@ -229,33 +218,29 @@ Do **not** copy `normalization_metadata`, `normalization_metadata.label_extracti
 
 ## 5. API Endpoints Reference
 
-**Primary Source (Issue):** [`story-api-methods-reference.md`](./story-api-methods-reference.md) + Issues OpenAPI YAML (lockstep updates only).
+**Primary Source:** [`story-api-methods-reference.md`](story-api-methods-reference.md) + imported Actions contract (lockstep updates only).
 
-### 5.1 Endpoints Mapping (Issue — DOGEstonia)
+### 5.1 Endpoints Mapping (Story Intake — DOGEstonia)
 
 | Operation | HTTP Method | Endpoint | Auth | Input Source |
 |-----------|-------------|----------|------|--------------|
-| Create Issue draft | POST | `/issues/draft` | Bearer per YAML / mapping doc | [`story-normalizer.md`](./story-normalizer.md) → `normalized_issue_payload` |
-| Get Issue by id | GET | `/issues/{issue_id}` | Bearer per YAML | User/orchestrator |
-| Update Issue draft | PUT | `/issues/{issue_id}` | Bearer per YAML | [`story-normalizer.md`](./story-normalizer.md) → `normalized_issue_payload` |
+| Submit Story | POST | `/intake/stories` | Bearer per imported Actions contract | Normalized artifact → transform per §5.2.1 |
 
-Search, submit, publish, and reference routes — add rows **only** when locked in the same YAML + SSOT (see `story-api-methods-reference.md` §1).
+Search, submit, publish, and reference routes — add rows **only** when locked in the same imported Actions contract + SSOT (see `story-api-methods-reference.md` §1).
 
 **Legacy:** Donor route matrices were removed from the hot path (**2026-04-20**). Old text may remain in **git history** alongside removed legacy references.
 
 ### 5.2 Story Intake — M2 demo primary path (D-07)
 
-**Source of requirements:** [`22-m2-demo-story-intake-interview-ssot-v1.md`](../../doge-complaints-gateway/docs/requirements/22-m2-demo-story-intake-interview-ssot-v1.md) decisions D-03…D-11; [REQ-18](../docs/requirements/REQ-18-api-inbound-story-intake-and-gpt-handoff.md) §4–§5.
-
-For demo M2, the **primary submission path** is Story Intake — not `POST /issues/draft`.
+For demo M2, the **primary submission path** is Story Intake (`POST /intake/stories`). Field mapping and decisions **D-03…D-11** are implemented by this module together with [`story-interview-flow.md`](story-interview-flow.md) / [`story-normalizer.md`](story-normalizer.md); do not invent gateway behavior outside the SSOT tables here.
 
 | Operation | HTTP Method | Endpoint | Auth | Source |
 |-----------|-------------|----------|------|--------|
 | Submit Story | POST | `/intake/stories` | Bearer (same `GPT_ACTIONS_BEARER_SECRET`) | `normalized_issue_payload` → transform per §5.2.1 |
 
-**When to use:** after [`story-normalizer.md`](./story-normalizer.md) has produced `normalized_issue_payload` AND `policy_gate_result.status = "approved"` AND Story Intake path is active (demo M2).
+**When to use:** after [`story-normalizer.md`](story-normalizer.md) has produced `normalized_issue_payload` AND `policy_gate_result.status = "approved"` AND Story Intake path is active (demo M2).
 
-**When NOT to use:** do not call both `/issues/draft` and `/intake/stories` for the same ingest. Treat them as separate tracks per [REQ-18](../docs/requirements/REQ-18-api-inbound-story-intake-and-gpt-handoff.md) §3.
+**When NOT to use:** do not call any deprecated Issue draft endpoint for story-intake ingest. Use `/intake/stories` as single runtime handoff path.
 
 #### 5.2.1 Transform: `normalized_issue_payload` → `StoryIntakeRequest`
 
@@ -281,7 +266,7 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
 
 | `StoryIntakeRequest` field | Source in `normalized_issue_payload` | Required | Decision |
 |---|---|---|---|
-| `schema_version` | Hard-coded: `"m2.story_intake_envelope.v1"` | Yes | REQ-18 §5 |
+| `schema_version` | Hard-coded: `"m2.story_intake_envelope.v1"` | Yes | Story Intake envelope contract |
 | `narrative.language` | `normalization_metadata.session_language` | Yes | D-03, D-05 |
 | `narrative.title_hint` | `canonical_payload.title[session_language]` | Yes | D-03, D-04 |
 | `narrative.original_text` | `canonical_payload.description[session_language]` | Yes | D-08 |
@@ -329,15 +314,15 @@ If all checks pass → proceed to HTTP call.
 
 ## 6. Request/Response Schemas
 
-**Primary Source:** [`story-api-methods-reference.md`](./story-api-methods-reference.md) and imported Actions contract.
+**Primary Source:** [`story-api-methods-reference.md`](story-api-methods-reference.md) and imported Actions contract (story-intake).
 
 ### 6.1 Schema Reference
 
-Issue request/response shapes are defined in the OpenAPI YAML and SSOT markdown above.
+Request/response shapes are defined in the imported Actions contract and SSOT markdown above.
 
-**Key schemas (Issue):**
+**Key schemas (Story Intake):**
 
-1. **Issue envelope / draft body** — see YAML `IssueDraftCreateRequest` / `IssueEnvelope` (names per published snapshot).
+1. **Story intake envelope / request body** — see imported Actions contract `StoryIntakeRequest` / `SuccessEnvelope_StoryIntake`.
 2. **Error Response** — Standard format:
    ```json
    {
@@ -349,21 +334,20 @@ Issue request/response shapes are defined in the OpenAPI YAML and SSOT markdown 
      "request_id": "req_1234567890"
    }
    ```
-3. **Success Response** — Per Issue OpenAPI (`IssueEnvelope`). Legacy donor example shape removed; see YAML for fields.
+3. **Success Response** — Per story intake OpenAPI (`SuccessEnvelope_StoryIntake`).
    ```json
    {
-     "success": true,
-     "issue": { /* Issue object per contract */ },
-     "upload_id": "…",
-     "upload_token": "…",
-     "expires_at": "…",
-     "request_id": "req_1234567890",
-     "timestamp": 1640995200
+    "data": {
+      "schema_version": "m2.story_intake_response.v1",
+      "story_id": "story_123",
+      "status": "received"
+    },
+    "trace_id": "trace_1234567890"
    }
    ```
 4. **Search Query / Response** — When implemented, per product OpenAPI only.
 
-**For complete Issue schemas, see:** [`story-api-methods-reference.md`](./story-api-methods-reference.md) and the imported Actions contract snapshot. Historical donor `api-methods-reference.md` was removed from runtime surface and is not SSOT.
+**For complete Issue schemas, see:** [`story-api-methods-reference.md`](story-api-methods-reference.md) and the imported Actions contract snapshot. Historical donor `api-methods-reference.md` was removed from runtime surface and is not SSOT.
 
 ---
 
@@ -373,8 +357,8 @@ Issue request/response shapes are defined in the OpenAPI YAML and SSOT markdown 
 
 ### 7.1 Authentication
 
-- **Normative:** [`../docs/gpt-actions-bot-api-auth-mapping.md`](../docs/gpt-actions-bot-api-auth-mapping.md) and [`story-api-methods-reference.md`](./story-api-methods-reference.md).
-- **Bearer** (`GPT_ACTIONS_BEARER_SECRET`) and header limits follow mapping doc — do not copy legacy handler prose from old commits into this file.
+- **Normative:** bearer constraints are defined by the imported Actions/OpenAPI security scheme and [`story-api-methods-reference.md`](story-api-methods-reference.md).
+- **Bearer** (`GPT_ACTIONS_BEARER_SECRET`) and header limits follow that contract — do not copy legacy handler prose from old commits into this file.
 - Bearer value is configured in Actions/OpenAPI security config and should not be described here as runtime user authorization.
 - If a product-level user-auth flow exists (for example, redirect to external IdP and return with user id), user identity must be handled as a separate input contract and must not be inferred from app-level bearer.
 
@@ -389,13 +373,13 @@ Issue request/response shapes are defined in the OpenAPI YAML and SSOT markdown 
 
 ### 7.4 Search / reference
 
-- No assumed legacy search endpoint. Wire search when **`issue-api-methods-reference`** + YAML list search (or product adds it with lockstep).
+- No assumed legacy search endpoint. Wire search when [`story-api-methods-reference.md`](story-api-methods-reference.md) + imported Actions contract list search operations.
 
 ### 7.5 Operator checklist
 
 - [ ] `normalized_issue_payload` present for strict Issue writes.
-- [ ] No YAML/SSOT edit without paired bump.
-- [ ] Keep acceptance boundaries explicit: Issues Actions (M1) checks stay separate from Story Intake (M2) checks per [REQ-18](../docs/requirements/REQ-18-api-inbound-story-intake-and-gpt-handoff.md) §3.
+- [ ] No Actions-contract/SSOT edit without paired bump.
+- [ ] Keep acceptance boundaries explicit: Issues Actions (M1) checks stay separate from Story Intake (M2) checks.
 - [ ] After edits: verify there are no legacy donor route assumptions in this file.
 
 ---
