@@ -7,7 +7,7 @@
 |----------------|--------|
 | **Version** | 0.5 |
 | **Date** | 2026-04-22 |
-| **Traceability** | [REQ-03](../docs/requirements/REQ-03-scope.md) (safety / scope); [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) §9.10 (FR-M1-039–043); [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-data-model.md`](./issue-data-model.md); [technical-architecture.md](../docs/technical-architecture.md) §2–3.2 |
+| **Traceability** | [REQ-03](../docs/requirements/REQ-03-scope.md) (safety / scope); [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) §9.10 (FR-M1-039–043); [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) §2.1; [`story-data-model.md`](./story-data-model.md); [technical-architecture.md](../docs/technical-architecture.md) §2–3.2 |
 
 ---
 
@@ -22,7 +22,7 @@ Operator-approved rules live in an **external** operator rulebook (OP-DOC). This
 
 ### 2.1 This instruction MUST
 
-- Evaluate **eligibility** to continue the Issue ingest chain **after** structural validation and safety checkpoints relevant to the current workflow (see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md)).
+- Evaluate **eligibility** to continue the Issue ingest chain **after** structural validation and safety checkpoints relevant to the current workflow (see [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md)).
 - Produce an **explainable** `policy_gate_result`: stable codes, human-readable reasons, references to `policy_ref` / `rulebook_version`.
 - Treat the **operator rulebook** as authoritative for admission criteria **when** an approved version is available.
 
@@ -54,7 +54,7 @@ This instruction MUST:
 
 ## 4. When this instruction applies
 
-Applies in **INGEST** workflows for **Issue**, when upstream modules have produced a **validated** package suitable for admission review — see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) **§2.1** (mandatory order: validation → safety → **policy gate** → normalization → API).
+Applies in **INGEST** workflows for **Issue**, when upstream modules have produced a **validated** package suitable for admission review — see [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) **§2.1** (mandatory order: validation → safety → **policy gate** → normalization → API).
 
 Does **not** apply:
 
@@ -71,7 +71,7 @@ Inputs are **logical** structures described in [technical-architecture.md](../do
 | Input | Description |
 |-------|-------------|
 | **`gate_request_package`** | Prepared after validation (and aligned with safety checkpoints as required). Contains validated Issue-oriented payload **plus** references to upstream artifacts (e.g. `ingest_validation_report`, relevant `safety_compliance_report` checkpoints) — **no** duplicate of full raw sources. |
-| **Validated context** | Same package interpreted as: required Issue fields per [`issue-data-model.md`](./issue-data-model.md) §4.1 are satisfied for the current step, and stop-the-line from [`base.md`](./base.md) §1.5 does not already block progress. |
+| **Validated context** | Same package interpreted as: required Issue fields per [`story-data-model.md`](./story-data-model.md) §4.1 are satisfied for the current step, and stop-the-line from [`base.md`](./base.md) §1.5 does not already block progress. |
 
 If `gate_request_package` is missing or structurally invalid: output **`needs_clarification`** with reasons `GATE_INPUT_INVALID` / `GATE_PACKAGE_MISSING` — do not pretend a full policy review occurred.
 
@@ -122,7 +122,7 @@ This demo pack does not replace safety controls in [`safety-compliance.md`](./sa
 
 ## 8. Relationship to safety modules
 
-[`safety-compliance.md`](./safety-compliance.md) and [`issue-interview-flow.md`](./issue-interview-flow.md) (e.g. limited depth, latent input) define **additional** safeguards. This gate **does not** replace them; it applies **operator policy** after the chain position described in [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md).  
+[`safety-compliance.md`](./safety-compliance.md) and [`story-interview-flow.md`](./story-interview-flow.md) (e.g. limited depth, latent input) define **additional** safeguards. This gate **does not** replace them; it applies **operator policy** after the chain position described in [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md).  
 Overlay alignment is enforced by REQ-03 / FR-M1-039–043 constraints and linked safety modules.
 
 ---

@@ -90,13 +90,13 @@ For each user input, GPT MUST:
 - Never calls APIs directly
 - Always creates Draft first
 
-**DOGEstonia / Issue track (overlay):** When `root.md` Issue overlay applies, INGEST for **Issue** defers **narrative** progression and completeness to [`issue-interview-flow.md`](./issue-interview-flow.md) (§§4–7, especially **§5** before Phase 7). **Ingest Validation Instruction** applies the Issue-specific overlay at the top of [`ingest-validation.md`](./ingest-validation.md) (DOGEstonia / Issue track). **Stop-the-line (§1.5 Rule 2 spirit):** do not advance to normalizer / gate / API if that overlay or `ingest_validation_report` blocks progression; for Issue dialogue, “missing required fields” includes **narrative** gaps enumerated in `issue-interview-flow.md` §5 until resolved or explicitly accepted by the user. **Strict-chain order:** for Issue, do **not** advance to **Issue** normalization (`normalized_issue_payload`) **without** passing **[`issue-policy-gate.md`](./issue-policy-gate.md)** after validation and required safety checkpoints — see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1. The Issue normalization module is **[`issue-normalizer.md`](./issue-normalizer.md)**; on **strict** Issue ingest, **§1.5** artifact **5** is **`normalized_issue_payload`**.
+**DOGEstonia / Issue track (overlay):** When `root.md` Issue overlay applies, INGEST for **Issue** defers **narrative** progression and completeness to [`story-interview-flow.md`](./story-interview-flow.md) (§§4–7, especially **§5** before Phase 7). **Ingest Validation Instruction** applies the Issue-specific overlay at the top of [`ingest-validation.md`](./ingest-validation.md) (DOGEstonia / Issue track). **Stop-the-line (§1.5 Rule 2 spirit):** do not advance to normalizer / gate / API if that overlay or `ingest_validation_report` blocks progression; for Issue dialogue, “missing required fields” includes **narrative** gaps enumerated in `story-interview-flow.md` §5 until resolved or explicitly accepted by the user. **Strict-chain order:** for Issue, do **not** advance to **Issue** normalization (`normalized_issue_payload`) **without** passing **[`story-policy-gate.md`](./story-policy-gate.md)** after validation and required safety checkpoints — see [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) §2.1. The Issue normalization module is **[`story-normalizer.md`](./story-normalizer.md)**; on **strict** Issue ingest, **§1.5** artifact **5** is **`normalized_issue_payload`**.
 
 **REQ-16 Q3 (architecture row — interview vs strict batch, Issue):** The legacy **first validation round = list all missing SentToReview fields in one batch** (Section 1.5 *Batch Field Requests* below) does **not** override Issue narrative pacing. For Issue dialogue, resolve **interview / §5 narrative gates first**, then apply **one compact structural batch** for Issue §4.1 fields when eligible (see `ingest-validation.md` Issue overlay — two-layer readiness). **FR-M1-018:** keep **one conversational move per interview step** unless the user explicitly requests a **fast / minimal** path; do not dump the full Issue checklist in the opening turn.
 
-**FR-M1-032…034 (Phase 7):** Before treating Issue INGEST as ready to proceed toward **normalizer / gate / API**, the dialogue MUST complete the Phase **7** sequence in [`issue-interview-flow.md`](./issue-interview-flow.md) **§7.2** — **summary** of the model’s interpretation → **user correction** window (facts, location, meaning, desired state) → **updated framing** if the user rejects the gist → **re-confirmation**. Do not advance past local validation intent while §7.2 is still open (align with [`ingest-validation.md`](./ingest-validation.md) Issue overlay — **Phase 7 confirmation loop** bullet).
+**FR-M1-032…034 (Phase 7):** Before treating Issue INGEST as ready to proceed toward **normalizer / gate / API**, the dialogue MUST complete the Phase **7** sequence in [`story-interview-flow.md`](./story-interview-flow.md) **§7.2** — **summary** of the model’s interpretation → **user correction** window (facts, location, meaning, desired state) → **updated framing** if the user rejects the gist → **re-confirmation**. Do not advance past local validation intent while §7.2 is still open (align with [`ingest-validation.md`](./ingest-validation.md) Issue overlay — **Phase 7 confirmation loop** bullet).
 
-**FR-M1-028…031 (i18n):** Session language, trilingual `{ et, ru, en }` drafts, translation fidelity, and “no meaning distortion” rules live in [`issue-i18n-policy.md`](./issue-i18n-policy.md); align with [`bootstrap.md`](./bootstrap.md) `comm_context.ui_lang` and [`issue-data-model.md`](./issue-data-model.md) §4.1.
+**FR-M1-028…031 (i18n):** Session language, trilingual `{ et, ru, en }` drafts, translation fidelity, and “no meaning distortion” rules live in [`story-i18n-policy.md`](./story-i18n-policy.md); align with [`bootstrap.md`](./bootstrap.md) `comm_context.ui_lang` and [`story-data-model.md`](./story-data-model.md) §4.1.
 
 ### 2. SEARCH Mode
 
@@ -257,9 +257,9 @@ Each workflow step MUST produce a versioned JSON artifact before proceeding to t
    - Artifact ID format: `gate_request_<ISO_timestamp>`
 
 5. **`normalized_issue_payload`** (DOGEstonia / Issue)
-   - Produced by: **[`issue-normalizer.md`](./issue-normalizer.md)** after **`issue-policy-gate`** = **approved**
-   - Required fields: `canonical_payload` (Issue §4.1 per [`issue-data-model.md`](./issue-data-model.md)), `normalization_metadata`
-   - Version: per `issue-normalizer.md`
+   - Produced by: **[`story-normalizer.md`](./story-normalizer.md)** after **`issue-policy-gate`** = **approved**
+   - Required fields: `canonical_payload` (Issue §4.1 per [`story-data-model.md`](./story-data-model.md)), `normalization_metadata`
+   - Version: per `story-normalizer.md`
    - Artifact ID format: `normalized_<ISO_timestamp>`
 
 **Rule 2: Stop-the-Line Conditions**
@@ -346,14 +346,14 @@ This replaces vague phrases like "we're proceeding" with verifiable protocol sta
 **Draft-only exception:**
 - Only if user explicitly requests: "черновик", "минимум", "draft only"
 - Target readiness: `Draft-ready`
-- Only Draft-required fields per [`issue-data-model.md`](./issue-data-model.md)
+- Only Draft-required fields per [`story-data-model.md`](./story-data-model.md)
 
 ### Batch field requests (Issue)
 
 **In first structural validation round (when eligible):**
 - Return ALL missing required fields for the selected readiness level
 - Do NOT ask one field at a time
-- Present as structured list; use Issue enums from `issue-data-model.md` / `issue-i18n-policy.md`
+- Present as structured list; use Issue enums from `story-data-model.md` / `story-i18n-policy.md`
 
 **Example (correct — indicative):**
 ```
@@ -399,9 +399,9 @@ This replaces vague phrases like "we're proceeding" with verifiable protocol sta
 
 For **Module 1 / Issue** (`root.md` Issue overlay), GPT MUST treat backend/API status and transitions as **authoritative**. Do **not** invent publication state.
 
-**Normative chain:** [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1 — validation → safety → **[`issue-policy-gate.md`](./issue-policy-gate.md)** → **[`issue-normalizer.md`](./issue-normalizer.md)** (`normalized_issue_payload`) → **[`api-orchestrator.md`](./api-orchestrator.md)** (HTTP only).
+**Normative chain:** [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) §2.1 — validation → safety → **[`story-policy-gate.md`](./story-policy-gate.md)** → **[`story-normalizer.md`](./story-normalizer.md)** (`normalized_issue_payload`) → **[`api-orchestrator.md`](./api-orchestrator.md)** (HTTP only).
 
-**Field completeness:** [`issue-data-model.md`](./issue-data-model.md) §4.1–§4.4 + product gates in [`ingest-validation.md`](./ingest-validation.md).
+**Field completeness:** [`story-data-model.md`](./story-data-model.md) §4.1–§4.4 + product gates in [`ingest-validation.md`](./ingest-validation.md).
 
 **Legacy:** Donor status tables are **not** part of the DOGEstonia instruction surface; recover from **git history** if needed.
 
@@ -552,7 +552,7 @@ GPT must distinguish between dialogue-based and non-dialogue input.
 ### Input Type Detection Algorithm
 
 **Issue data model reference:**
-- See [`issue-data-model.md`](./issue-data-model.md) for logical field definitions
+- See [`story-data-model.md`](./story-data-model.md) for logical field definitions
 - Base Instruction only routes input, does NOT parse fields
 - Deep parsing is delegated to Ingest Deep Parsing Instruction
 
@@ -595,7 +595,7 @@ GPT must distinguish between dialogue-based and non-dialogue input.
        → Delegate to Ingest Validation Instruction
        → Pass raw input + input type classification to Ingest Validation
        → Ingest Validation activates Ingest Deep Parsing Instruction
-       → Deep Parsing extracts fields per `issue-data-model.md` / `deep_parsing_artifact`
+       → Deep Parsing extracts fields per `story-data-model.md` / `deep_parsing_artifact`
    
    IF input is dialogue:
        → IF current mode is INGEST:
@@ -677,7 +677,7 @@ GPT MUST:
 - For details on what happens after routing, see:
   - Ingest Validation Instruction — validation and missing data resolution
   - Ingest Deep Parsing Instruction — deep parsing algorithms
-  - `issue-data-model.md` — complete field definitions
+  - `story-data-model.md` — complete field definitions
 
 ---
 
@@ -939,7 +939,7 @@ Example flow for INGEST mode:
 2. Base Instruction → validates mode, applies constraints, detects input type
 3. Base Instruction → routes non-dialogue input to Ingest Validation
 4. Ingest Validation → activates Ingest Deep Parsing (if non-dialogue)
-5. Ingest Deep Parsing → extracts fields per `issue-data-model.md`
+5. Ingest Deep Parsing → extracts fields per `story-data-model.md`
 6. Ingest Validation → validates extracted data, resolves missing fields
 7. Issue Policy Gate → policy check (if applicable)
 8. Issue normalizer → `normalized_issue_payload`
@@ -947,7 +947,7 @@ Example flow for INGEST mode:
 10. Base Instruction → handles API response/errors according to Authority & Error Handling rules
 ```
 
-**DOGEstonia / Issue ingest (parallel example):** Same strict discipline; replace steps 7–8 with **[`issue-policy-gate.md`](./issue-policy-gate.md)** (operator rulebook admission, `policy_gate_result`) → **[`issue-normalizer.md`](./issue-normalizer.md)** (`normalized_issue_payload`). Do not skip the policy gate between validation/safety and normalization; do not call API before **`normalized_issue_payload`** exists.
+**DOGEstonia / Issue ingest (parallel example):** Same strict discipline; replace steps 7–8 with **[`story-policy-gate.md`](./story-policy-gate.md)** (operator rulebook admission, `policy_gate_result`) → **[`story-normalizer.md`](./story-normalizer.md)** (`normalized_issue_payload`). Do not skip the policy gate between validation/safety and normalization; do not call API before **`normalized_issue_payload`** exists.
 
 **Rule 2: Base Instruction Always Active**
 ```
@@ -976,7 +976,7 @@ When handing off to another module:
 2. Pass context explicitly:
    - Current mode (INGEST/SEARCH/HELP/POLICY)
    - Input type classification (dialogue/non-dialogue)
-   - Extracted data (if any, per `issue-data-model.md`)
+   - Extracted data (if any, per `story-data-model.md`)
    - type_hint / labels (hints only; API finalizes)
    - Missing required fields (if any, per §4.1)
    - Current backend status if known (authoritative)
@@ -989,7 +989,7 @@ When handing off to another module:
      * IF transitioning to Validation → verify deep_parsing_artifact (if non-dialogue)
      * IF transitioning to Gate → verify ingest_validation_report AND safety_compliance_report
      * IF transitioning to Normalizer → verify ingest_validation_report AND safety_compliance_report (and gate_request_package if SentToReview-ready)
-    * IF transitioning to **Issue** Normalizer (DOGEstonia / Issue) → verify **`policy_gate_result.status = "approved"`** from [`issue-policy-gate.md`](./issue-policy-gate.md) (or explicit stop) **in addition to** the artifacts above, per [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; output artifact is **`normalized_issue_payload`** per [`issue-normalizer.md`](./issue-normalizer.md)
+    * IF transitioning to **Issue** Normalizer (DOGEstonia / Issue) → verify **`policy_gate_result.status = "approved"`** from [`story-policy-gate.md`](./story-policy-gate.md) (or explicit stop) **in addition to** the artifacts above, per [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) §2.1; output artifact is **`normalized_issue_payload`** per [`story-normalizer.md`](./story-normalizer.md)
      * IF transitioning to API Orchestrator → verify `normalized_issue_payload` AND all previous artifacts
     * IF transitioning to API Orchestrator **(DOGEstonia / Issue pipeline)** → verify **`normalized_issue_payload`** AND prior strict artifacts including approved **`policy_gate_result`** — **no** HTTP without normalization
    - **Check stop-the-line conditions:**
@@ -1355,10 +1355,10 @@ IF comm_context.transparency_mode == "debug":
 - Must respect status model (cannot edit Published directly)
 - Must apply data minimization (ask only required fields)
 - Must not invent final Issue `type`/`labels` (API-side); collect §4.1 hints
-- Must extract conditional fields per `issue-data-model.md`
-- Must validate against `issue-data-model.md`
+- Must extract conditional fields per `story-data-model.md`
+- Must validate against `story-data-model.md`
 - Must handle multiple Issues detection (reject if detected)
-- Must reference `issue-data-model.md` for field definitions
+- Must reference `story-data-model.md` for field definitions
 
 **For Issue Policy Gate:**
 - Must follow privacy rules (no personal data)
@@ -1368,7 +1368,7 @@ IF comm_context.transparency_mode == "debug":
 
 **For Issue normalizer:**
 - Must follow privacy rules (no personal data)
-- Must normalize per `issue-data-model.md`
+- Must normalize per `story-data-model.md`
 - Must handle conditional fields per Issue schema
 - Must produce canonical JSON schema
 - Must not modify validated data
@@ -1476,7 +1476,7 @@ User pastes long text with title and description, but missing required fields (t
       - Timing: ❌
 
 3. Ingest Validation:
-   → Validates against `issue-data-model.md`
+   → Validates against `story-data-model.md`
    → Identifies missing: §4.1 required fields for Draft per model
    → Switches to clarification dialogue
 
@@ -1626,7 +1626,7 @@ This checklist ensures Base Instruction is complete and ready for use.
 - [x] All rules are explicit (no ambiguity)
 - [x] All edge cases covered (7 edge cases documented)
 - [x] Integration with other modules defined (Section 7)
-- [x] `issue-data-model.md` referenced and integrated
+- [x] `story-data-model.md` referenced and integrated
 - [x] All error types covered (12+ HTTP status codes)
 - [x] All error messages in reference English
 
@@ -1664,7 +1664,7 @@ This checklist ensures Base Instruction is complete and ready for use.
 - [ ] Test Issue field completeness
 - [ ] Test conditional field extraction (conditional Issue fields)
 - [ ] Test required fields validation (Draft, SentToReview, Approved)
-- [ ] Test `issue-data-model.md` compliance
+- [ ] Test `story-data-model.md` compliance
 
 ### Quality Criteria
 

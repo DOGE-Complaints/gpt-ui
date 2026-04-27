@@ -1,12 +1,12 @@
 # Issue — i18n policy (Module 1, instruction layer)
 
 **Product:** DOGEstonia — Module 1 (GPT Interview → Issue)  
-**Purpose:** Normative **i18n** behavior for [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) **FR-M1-028…031** on top of [`issue-data-model.md`](./issue-data-model.md) §4.1 (`{ et, ru, en }` objects). This file does **not** replace REQ PDFs or node OpenAPI; if wire contracts diverge, **OpenAPI wins after publication** and gaps go to `REQ-16` / product backlog.
+**Purpose:** Normative **i18n** behavior for [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) **FR-M1-028…031** on top of [`story-data-model.md`](./story-data-model.md) §4.1 (`{ et, ru, en }` objects). This file does **not** replace REQ PDFs or node OpenAPI; if wire contracts diverge, **OpenAPI wins after publication** and gaps go to `REQ-16` / product backlog.
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3 |
-| **Date** | 2026-04-25 |
+| **Version** | 0.4 |
+| **Date** | 2026-04-27 |
 | **Traceability** | REQ-09 §9.7 (FR-M1-028…031), REQ-10 §10.5–10.6, REQ-15 item 4 (SPA field shape) |
 
 ---
@@ -15,13 +15,13 @@
 
 1. **Primary user-facing language** for questions, reflections, and Phase 7 summary text MUST follow the session language inferred from [`bootstrap.md`](./bootstrap.md) **`comm_context.ui_lang`** (or explicit `/lang` user command), defaulting to the language of the user’s substantive content when `ui_lang` is still `unknown` after first turn.
 2. Do **not** switch the interview surface language mid-session **without** an explicit user request or `/lang` update (avoid surprising bilingual flips).
-3. **Linked modules:** [`issue-interview-flow.md`](./issue-interview-flow.md) for dialogue phrasing; [`communication-presets-reference.md`](./communication-presets-reference.md) for tone (tone is orthogonal to language — see §5).
+3. **Linked modules:** [`story-interview-flow.md`](./story-interview-flow.md) for dialogue phrasing; [`communication-presets-reference.md`](./communication-presets-reference.md) for tone (tone is orthogonal to language — see §5).
 
 ---
 
 ## 2. Trilingual card fields (FR-M1-029)
 
-1. Draft **`title`**, **`description`**, optional **`summary`**, optional **`institution`** MUST use the logical shape **`{ et: string, ru: string, en: string }`** as in [`issue-data-model.md`](./issue-data-model.md) §4.1 — SPA mocks and UI expect all three keys.
+1. Draft **`title`**, **`description`**, optional **`summary`**, optional **`institution`** MUST use the logical shape **`{ et: string, ru: string, en: string }`** as in [`story-data-model.md`](./story-data-model.md) §4.1 — SPA mocks and UI expect all three keys.
 2. **Fill strategy (MVP instruction layer):**
    - **Primary slot:** the language matching **`ui_lang`** (map `et` / `ru` / `en`) receives the **richest** text copied or lightly edited from the agreed narrative / Phase 7 framing.
    - **Other slots:** **translation** or **explicit placeholder** (e.g. same string with trailing `" [TBC]"` only if product policy allows — prefer short honest stub over fabrication). Never invent facts in a secondary language.
@@ -54,7 +54,7 @@
 
 ## 6. Artifact: `session_language` in `normalized_issue_payload` (REQ-16 Q2)
 
-1. [`issue-normalizer.md`](./issue-normalizer.md) **MUST** emit **`normalization_metadata.session_language`** with value `et` \| `ru` \| `en`, matching the **primary** user-facing language from §1 (`comm_context.ui_lang` / substantive content default).
+1. [`story-normalizer.md`](./story-normalizer.md) **MUST** emit **`normalization_metadata.session_language`** with value `et` \| `ru` \| `en`, matching the **primary** user-facing language from §1 (`comm_context.ui_lang` / substantive content default).
 2. Downstream modules and backends **MUST NOT** infer primary slot only by longest string — use **`session_language`** as the explicit marker alongside trilingual `{ et, ru, en }` objects.
 3. This does **not** change OpenAPI request shapes until the node publishes a matching field; until then the key is **instruction-layer + logical handoff** truth.
 
@@ -72,6 +72,19 @@ Current runtime OpenAPI fields such as `narrative.original_text`, `narrative.tit
 
 ---
 
+## 6.2 Demo language allowlist (D-11)
+
+For demo M2 Story Intake submission, `session_language` MUST be one of: `et`, `ru`, `en`.
+
+- If `ui_lang` resolves to a language outside this set, the interview may proceed normally,
+  but the orchestrator MUST block `POST /intake/stories` and explain the limitation to the user.
+- This restriction applies only to the Story Intake submission step — the interview itself
+  may be held in any language supported by the model.
+- Post-demo: expand allowlist per product decision; do not hardcode additional languages here
+  without a lockstep update to the gateway allowlist.
+
+---
+
 ## 7. Version history
 
 | Version | Date | Change |
@@ -79,3 +92,4 @@ Current runtime OpenAPI fields such as `narrative.original_text`, `narrative.tit
 | 0.1 | 2026-04-10 | Initial policy (FR-M1-028…031); links to bootstrap, issue-data-model, interview flow, presets. |
 | 0.2 | 2026-04-20 | Added §6 `session_language` in `normalization_metadata`. |
 | 0.3 | 2026-04-25 | Added §6.1 runtime single-string bridge for GIM-74. |
+| 0.4 | 2026-04-27 | Added §6.2 demo language allowlist for M2 Story Intake (`et` \| `ru` \| `en`); aligns with [`api-orchestrator.md`](./api-orchestrator.md) §5.2.2 pre-flight (GIM-97). |

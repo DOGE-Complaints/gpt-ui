@@ -7,7 +7,7 @@
 |----------------|--------|
 | **Version** | 0.1.8 |
 | **Date** | 2026-04-26 |
-| **Traceability** | [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-035–037; [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5; [REQ-20](../docs/requirements/REQ-20-label-taxonomy-and-extraction-axes.md); [`issue-data-model.md`](./issue-data-model.md) §4.1; [`issue-label-taxonomy.md`](./issue-label-taxonomy.md); [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) §2.1; [`issue-policy-gate.md`](./issue-policy-gate.md); [technical-architecture.md](../docs/technical-architecture.md) §3.2, §7.2–7.4; strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | [REQ-09](../docs/requirements/REQ-09-functional-requirements.md) FR-M1-035–037; [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5; [REQ-20](../docs/requirements/REQ-20-label-taxonomy-and-extraction-axes.md); [`story-data-model.md`](./story-data-model.md) §4.1; [`story-label-taxonomy.md`](./story-label-taxonomy.md); [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](./story-policy-gate.md); [technical-architecture.md](../docs/technical-architecture.md) §3.2, §7.2–7.4; strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -22,11 +22,11 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 
 ### 2.1 This instruction MUST
 
-- Run **only after** [`issue-policy-gate.md`](./issue-policy-gate.md) has produced `policy_gate_result.status = "approved"` for the same ingest handoff (see [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) **§2.1**).
+- Run **only after** [`story-policy-gate.md`](./story-policy-gate.md) has produced `policy_gate_result.status = "approved"` for the same ingest handoff (see [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) **§2.1**).
 - Emit **`normalized_issue_payload`** with:
-  - **`canonical_payload`** — Issue fields aligned with [`issue-data-model.md`](./issue-data-model.md) **§4.1** (`type`, `labels`, `title`, `description`, optional `summary`, optional `institution`; trilingual objects `{ et, ru, en }` per that file and [`issue-i18n-policy.md`](./issue-i18n-policy.md)).
+  - **`canonical_payload`** — Issue fields aligned with [`story-data-model.md`](./story-data-model.md) **§4.1** (`type`, `labels`, `title`, `description`, optional `summary`, optional `institution`; trilingual objects `{ et, ru, en }` per that file and [`story-i18n-policy.md`](./story-i18n-policy.md)).
   - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
-- Preserve **conservative** typing: enums and label keys must match **Issue** SoT ([`issue-data-model.md`](./issue-data-model.md) §4–5 and [`issue-label-taxonomy.md`](./issue-label-taxonomy.md)).
+- Preserve **conservative** typing: enums and label keys must match **Issue** SoT ([`story-data-model.md`](./story-data-model.md) §4–5 and [`story-label-taxonomy.md`](./story-label-taxonomy.md)).
 
 ### 2.2 This instruction MUST NOT
 
@@ -35,13 +35,13 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 - **Ask the user** clarification or follow-up questions (same separation as the legacy normalizer reference: normalization is not a dialogue step). Missing data must have been resolved **upstream** (`ingest-validation`, interview flow, or gate **`needs_clarification`** loop), not here.
 - **Parse raw** multimodal input — belongs to ingest deep parsing / validation.
 - **Re-evaluate** structural completeness — belongs to [`ingest-validation.md`](./ingest-validation.md).
-- **Re-run** safety or policy — belongs to [`safety-compliance.md`](./safety-compliance.md) and [`issue-policy-gate.md`](./issue-policy-gate.md).
-- **Invent** `id`, `status`, `created_at`, `arweave_txid`, `image_txid`, `image_hash`, or any backend-issued field ([`issue-data-model.md`](./issue-data-model.md) §4.4). Omit them or set explicit placeholders only if the orchestrator contract requires keys (then mark as `null` / `"pending_backend"` per **M1-06** alignment — do not fabricate values).
+- **Re-run** safety or policy — belongs to [`safety-compliance.md`](./safety-compliance.md) and [`story-policy-gate.md`](./story-policy-gate.md).
+- **Invent** `id`, `status`, `created_at`, `arweave_txid`, `image_txid`, `image_hash`, or any backend-issued field ([`story-data-model.md`](./story-data-model.md) §4.4). Omit them or set explicit placeholders only if the orchestrator contract requires keys (then mark as `null` / `"pending_backend"` per **M1-06** alignment — do not fabricate values).
 
 ### 2.3 Source of truth for Issue shape
 
-- **Authoritative for Module 1 Issue normalization:** [`issue-data-model.md`](./issue-data-model.md).  
-- **Do not** use removed donor-era paths or donor schema names as SoT; this file + [`issue-data-model.md`](./issue-data-model.md) are authoritative for Issue normalization.
+- **Authoritative for Module 1 Issue normalization:** [`story-data-model.md`](./story-data-model.md).  
+- **Do not** use removed donor-era paths or donor schema names as SoT; this file + [`story-data-model.md`](./story-data-model.md) are authoritative for Issue normalization.
 
 ---
 
@@ -121,12 +121,12 @@ Omit `summary` if no validated short text exists. Omit `institution` from `canon
 
 ### 4.1 `canonical_payload`
 
-Must conform to [`issue-data-model.md`](./issue-data-model.md) **§4.1** (required logical fields) and **§4.2** (optional logical fields), using the **Issue** enums and trilingual rules documented there. System-only fields in **§4.4** are not filled by GPT as facts.
+Must conform to [`story-data-model.md`](./story-data-model.md) **§4.1** (required logical fields) and **§4.2** (optional logical fields), using the **Issue** enums and trilingual rules documented there. System-only fields in **§4.4** are not filled by GPT as facts.
 
 | Field | Rule |
 |-------|------|
 | `type` | One of `ISSUE_TYPE` values per issue-data-model / SPA SoT. |
-| `labels` | String array; keys must be `canonical` labels allowed by [`issue-label-taxonomy.md`](./issue-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. |
+| `labels` | String array; keys must be `canonical` labels allowed by [`story-label-taxonomy.md`](./story-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }`; if omitted, orchestrator/UI may fall back per REQ-10 / mock guide. |
 | `institution` | Optional `{ et, ru, en }` **only** when product scope allows; **demo default:** omit (REQ-16 Q5). |
@@ -139,7 +139,7 @@ Stable **references** to upstream work (opaque strings or objects — align with
 
 | Key | Purpose |
 |-----|---------|
-| `session_language` | **Required** for Issue ingest: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](./bootstrap.md) **`comm_context.ui_lang`** (see [`issue-i18n-policy.md`](./issue-i18n-policy.md) §1–2). Backend readers use this to know which `{ et, ru, en }` slot was primary-authored. |
+| `session_language` | **Required** for Issue ingest: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](./bootstrap.md) **`comm_context.ui_lang`** (see [`story-i18n-policy.md`](./story-i18n-policy.md) §1–2). Backend readers use this to know which `{ et, ru, en }` slot was primary-authored. |
 | `ingest_validation_report_ref` | Reference to the validation artifact used (id, hash, or short summary line). |
 | `safety_compliance_report_ref` | Reference to relevant safety checkpoint output for this handoff. |
 | `policy_gate_ref` | At minimum: `policy_ref`, `rulebook_version`, and `policy_gate_result.status` copy or stable id. |
@@ -172,11 +172,11 @@ When validation supplies label reasoning, keep it under `normalization_metadata.
 }
 ```
 
-Only candidates with `disposition = "canonical"` and keys allowed by [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, or `rejected` disposition remain in metadata only.
+Only candidates with `disposition = "canonical"` and keys allowed by [`story-label-taxonomy.md`](./story-label-taxonomy.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, or `rejected` disposition remain in metadata only.
 
 ### 4.3 `non_wire_metadata` (optional sidecar)
 
-`severity`, `impact_estimation`, and `problem_status` are resident-perceived subjective fields from [`issue-data-model.md`](./issue-data-model.md) **§4.3**. If collected and confirmed upstream, place them in optional `non_wire_metadata`; otherwise omit this sidecar.
+`severity`, `impact_estimation`, and `problem_status` are resident-perceived subjective fields from [`story-data-model.md`](./story-data-model.md) **§4.3**. If collected and confirmed upstream, place them in optional `non_wire_metadata`; otherwise omit this sidecar.
 
 `non_wire_metadata` is not a transport object. It must not be copied into current `StoryIntakeRequest`, `IssueCreateRequest`, or `IssueDraftCreateRequest` unless a separate OpenAPI/schema task explicitly adds those fields.
 
@@ -184,7 +184,7 @@ Only candidates with `disposition = "canonical"` and keys allowed by [`issue-lab
 
 ## 5. REQ-10 alignment (brief)
 
-Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summary` / `description` / `labels` / `type` — see [`issue-data-model.md`](./issue-data-model.md) §3. This module **projects** already validated material into the §4.1 card shape; it does not re-author the interview.
+Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summary` / `description` / `labels` / `type` — see [`story-data-model.md`](./story-data-model.md) §3. This module **projects** already validated material into the §4.1 card shape; it does not re-author the interview.
 
 ### 5.1 REQ-10 projection → Issue card fields
 
@@ -204,7 +204,7 @@ Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summa
 |--------|----------------|
 | [`ingest-validation.md`](./ingest-validation.md) | Upstream — completeness / batch rules. |
 | [`safety-compliance.md`](./safety-compliance.md) | Upstream — safety checkpoints before or beside gate per lifecycle. |
-| [`issue-policy-gate.md`](./issue-policy-gate.md) | Immediate upstream — **approval** required. |
+| [`story-policy-gate.md`](./story-policy-gate.md) | Immediate upstream — **approval** required. |
 | [`api-orchestrator.md`](./api-orchestrator.md) | Downstream — **only** module that performs HTTP and consumes `normalized_issue_payload`. |
 | [`base.md`](./base.md) | §1.5 — Issue strict chain uses **`normalized_issue_payload`** as the canonical normalization artifact. |
 
@@ -214,7 +214,7 @@ Narrative layers (REQ-10 §10.1–10.4) feed **content** inside `title` / `summa
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-04-10 | Initial scaffold: `normalized_issue_payload`, `canonical_payload`, `normalization_metadata`, Plain GPT, no API, no user questions; Issue SoT = `issue-data-model.md` §4.1. |
+| 0.1 | 2026-04-10 | Initial scaffold: `normalized_issue_payload`, `canonical_payload`, `normalization_metadata`, Plain GPT, no API, no user questions; Issue SoT = `story-data-model.md` §4.1. |
 | 0.1.1 | 2026-04-10 | Added §6 cross-link to `base.md` §1.5 Issue artifact alignment. |
 | 0.1.2 | 2026-04-10 | Added §5.1 concise REQ-10 projection table for `title` / `summary` / `description` / optional `institution`. |
 | 0.1.3 | 2026-04-20 | Added required `normalization_metadata.session_language`; optional subjective intake fields in `canonical_payload`; demo `institution` omit. |

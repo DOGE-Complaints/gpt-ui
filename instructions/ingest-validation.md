@@ -9,10 +9,10 @@ This is the active **Issue overlay** path; donor/Activity phrasing is non-runtim
 Its role is to:
 - receive structured hints from Ingest Deep Parsing (non-dialogue),
 - extract and validate Issue fields from dialogue (step-by-step),
-- validate structural completeness toward [`issue-data-model.md`](./issue-data-model.md),
+- validate structural completeness toward [`story-data-model.md`](./story-data-model.md),
 - identify missing required data,
 - resolve ambiguities and missing fields,
-- prepare validated material for **[`issue-policy-gate.md`](./issue-policy-gate.md)** and [`issue-normalizer.md`](./issue-normalizer.md) on strict chains.
+- prepare validated material for **[`story-policy-gate.md`](./story-policy-gate.md)** and [`story-normalizer.md`](./story-normalizer.md) on strict chains.
 
 This instruction **never performs raw extraction** (Ingest Deep Parsing does this for non-dialogue input),  
 **never publishes data**, **never calls backend APIs**,  
@@ -22,38 +22,38 @@ and **never makes policy or approval decisions**.
 
 ### DOGEstonia / Issue track (Module 1) — Interview & readiness overlay
 
-When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md)), the **Issue rules in this overlay take precedence** over any legacy wording elsewhere in this file:
+When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md)), the **Issue rules in this overlay take precedence** over any legacy wording elsewhere in this file:
 
 **Canonical references**
 
-- [`issue-interview-flow.md`](./issue-interview-flow.md) — civic interview phases 1–7 (REQ-08), four layers (REQ-06), **§5 seven-question completeness** before treating dialogue as ready for Phase 7 summary / draft Issue framing.
-- [`issue-data-model.md`](./issue-data-model.md) — §4.1 logical Issue fields (`type`, `labels`, trilingual `title` / `description`, optional `summary`, optional `institution`) for structural completeness toward the normalizer.
-- [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) — controlled label axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling.
+- [`story-interview-flow.md`](./story-interview-flow.md) — civic interview phases 1–7 (REQ-08), four layers (REQ-06), **§5 seven-question completeness** before treating dialogue as ready for Phase 7 summary / draft Issue framing.
+- [`story-data-model.md`](./story-data-model.md) — §4.1 logical Issue fields (`type`, `labels`, trilingual `title` / `description`, optional `summary`, optional `institution`) for structural completeness toward the normalizer.
+- [`story-label-taxonomy.md`](./story-label-taxonomy.md) — controlled label axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling.
 - [`issue-data-model-api-alignment-baseline.md`](../docs/analysis/issue-data-model-api-alignment-baseline.md) — GIM-78 baseline: logical/domain Issue model vs transport/API schemas.
-- [`issue-i18n-policy.md`](./issue-i18n-policy.md) — **FR-M1-028…031**: session language, `{ et, ru, en }` drafts, fidelity vs translation polish.
-- [`issue-api-methods-reference.md`](./issue-api-methods-reference.md) — HTTP SSOT (this module still **never** calls APIs).
-- [`issue-policy-gate.md`](./issue-policy-gate.md) — **policy admission** after validation + safety; consumes `gate_request_package`, emits `policy_gate_result`.
-- [`issue-normalizer.md`](./issue-normalizer.md) — after **`policy_gate_result.status = "approved"`**, emits **`normalized_issue_payload`**; strict-chain alignment with `base.md` and `issue-lifecycle-instructions.md`.
+- [`story-i18n-policy.md`](./story-i18n-policy.md) — **FR-M1-028…031**: session language, `{ et, ru, en }` drafts, fidelity vs translation polish.
+- [`story-api-methods-reference.md`](./story-api-methods-reference.md) — HTTP SSOT (this module still **never** calls APIs).
+- [`story-policy-gate.md`](./story-policy-gate.md) — **policy admission** after validation + safety; consumes `gate_request_package`, emits `policy_gate_result`.
+- [`story-normalizer.md`](./story-normalizer.md) — after **`policy_gate_result.status = "approved"`**, emits **`normalized_issue_payload`**; strict-chain alignment with `base.md` and `story-lifecycle-instructions.md`.
 
 **Two-layer readiness (Issue)**
 
-1. **Narrative completeness (REQ-07):** Do not treat the interview as ready for **final** Phase 7 summary (per `issue-interview-flow.md` §7) while **§5** has unresolved gaps, unless the user **explicitly** accepts the listed gaps. Until then, **block** “summary-as-complete” progression: continue phases 2–6 or list gaps plainly.
-2. **Phase 7 confirmation loop (FR-M1-032…034):** After §5 is satisfied (or gaps accepted), do **not** treat Issue dialogue as ready for **final** structural validation / normalizer handoff until **`issue-interview-flow.md` §7.2** is satisfied: **summary of interpretation** → **invitation to correct** facts/location/meaning/desired state → **revised framing** if the user disagrees with gist or emphasis → **explicit user affirmation** or accepted residual uncertainty. If this loop is incomplete, keep `stop_the_line.blocked = true` for progression to “structurally final” downstream steps. Even when §7.2 is complete, **do not** skip **[`issue-policy-gate.md`](./issue-policy-gate.md)** on a strict Issue chain — see **`issue-lifecycle-instructions.md`** §2.1.
+1. **Narrative completeness (REQ-07):** Do not treat the interview as ready for **final** Phase 7 summary (per `story-interview-flow.md` §7) while **§5** has unresolved gaps, unless the user **explicitly** accepts the listed gaps. Until then, **block** “summary-as-complete” progression: continue phases 2–6 or list gaps plainly.
+2. **Phase 7 confirmation loop (FR-M1-032…034):** After §5 is satisfied (or gaps accepted), do **not** treat Issue dialogue as ready for **final** structural validation / normalizer handoff until **`story-interview-flow.md` §7.2** is satisfied: **summary of interpretation** → **invitation to correct** facts/location/meaning/desired state → **revised framing** if the user disagrees with gist or emphasis → **explicit user affirmation** or accepted residual uncertainty. If this loop is incomplete, keep `stop_the_line.blocked = true` for progression to “structurally final” downstream steps. Even when §7.2 is complete, **do not** skip **[`story-policy-gate.md`](./story-policy-gate.md)** on a strict Issue chain — see **`story-lifecycle-instructions.md`** §2.1.
 3. **Structural / field completeness:** When §5 **and** §7.2 are satisfied, validate Issue §4.1 fields using the same **batch** discipline as §1.2 where applicable (list all missing Issue fields once, not one-by-one). The strict logical handoff gate is limited to: `type`, `labels`, `title`, `description`. `summary` and `institution` are optional; demo-omitted `institution` must not be treated as missing required.
 
-**Policy gate — chain position:** On the **strict** Issue ingest path, this module **prepares** validated material and, when applicable, the **`gate_request_package`** for **[`issue-policy-gate.md`](./issue-policy-gate.md)**. It **does not** emit `policy_gate_result` and **does not** authorize jumping **directly** to Issue normalization (`normalized_issue_payload`) or API. Order: validation → safety → **issue-policy-gate** → **[`issue-normalizer.md`](./issue-normalizer.md)** → API (same as `issue-lifecycle-instructions.md` §2.1).
+**Policy gate — chain position:** On the **strict** Issue ingest path, this module **prepares** validated material and, when applicable, the **`gate_request_package`** for **[`story-policy-gate.md`](./story-policy-gate.md)**. It **does not** emit `policy_gate_result` and **does not** authorize jumping **directly** to Issue normalization (`normalized_issue_payload`) or API. Order: validation → safety → **issue-policy-gate** → **[`story-normalizer.md`](./story-normalizer.md)** → API (same as `story-lifecycle-instructions.md` §2.1).
 
-**Post-gate handoff — Issue normalizer vs API:** After the gate returns **`approved`**, the **next** instruction module on a strict Issue chain is **[`issue-normalizer.md`](./issue-normalizer.md)** (emitting **`normalized_issue_payload`**). **Do not** skip normalization and **do not** invoke **[`api-orchestrator.md`](./api-orchestrator.md)** / HTTP until that envelope exists. “Continue to API” without `normalized_issue_payload` violates the Issue strict protocol ([`base.md`](./base.md) §1.5 Issue note).
+**Post-gate handoff — Issue normalizer vs API:** After the gate returns **`approved`**, the **next** instruction module on a strict Issue chain is **[`story-normalizer.md`](./story-normalizer.md)** (emitting **`normalized_issue_payload`**). **Do not** skip normalization and **do not** invoke **[`api-orchestrator.md`](./api-orchestrator.md)** / HTTP until that envelope exists. “Continue to API” without `normalized_issue_payload` violates the Issue strict protocol ([`base.md`](./base.md) §1.5 Issue note).
 
 **REQ-16 Q3 decision context:** Interview depth and structural batching are governed by REQ-16 open decisions and this file’s two-layer readiness rules. Use this section as the normative source for “batch missing fields” vs **§5** narrative completeness.
 
-**Issue `type` — provisional observation (REQ-15.3, FR-M1-025):** After **`issue-interview-flow.md` §5** and **§7.2** are satisfied, when assembling **draft** Issue material for structural validation: map **positive improvement ideas without stated clear harm** (no focal victim, no acute harm narrative) to proposed **`type` = `observation`**, per [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) working assumption **#3**, until product introduces a separate Issue type (REQ-16 / backlog). If substance clearly matches **complaint**, **absurdity**, or **system_bug** per **FR-M1-024**, prefer those instead. **Never** relabel articulated **harm** as **observation** to skip civic depth — **REQ-12**. Interview **still** defers locking `type` / `labels` until narrative maturity + **§7.2** per **§8** row 2; user corrections override hints from [`ingest-deep-parsing.md`](./ingest-deep-parsing.md). **FR-M1-026:** offer **labels** only in the structural batch / metadata, not as mid-interview interrogation. **FR-M1-027:** keep **surface topic**, **deep need**, and **institutional hypothesis** separable in validation notes without asserting real institution IDs.
+**Issue `type` — provisional observation (REQ-15.3, FR-M1-025):** After **`story-interview-flow.md` §5** and **§7.2** are satisfied, when assembling **draft** Issue material for structural validation: map **positive improvement ideas without stated clear harm** (no focal victim, no acute harm narrative) to proposed **`type` = `observation`**, per [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) working assumption **#3**, until product introduces a separate Issue type (REQ-16 / backlog). If substance clearly matches **complaint**, **absurdity**, or **system_bug** per **FR-M1-024**, prefer those instead. **Never** relabel articulated **harm** as **observation** to skip civic depth — **REQ-12**. Interview **still** defers locking `type` / `labels` until narrative maturity + **§7.2** per **§8** row 2; user corrections override hints from [`ingest-deep-parsing.md`](./ingest-deep-parsing.md). **FR-M1-026:** offer **labels** only in the structural batch / metadata, not as mid-interview interrogation. **FR-M1-027:** keep **surface topic**, **deep need**, and **institutional hypothesis** separable in validation notes without asserting real institution IDs.
 
 **REQ-16 Q5 — demo scope:** For the **current demo**, do **not** treat **`institution`** as a field to **extract or infer from dialogue** into draft Issue material for structural completion. Keep institutional hypotheses as **non-authoritative** notes only; **`institution`** in `canonical_payload` should remain **omitted** until product lifts this restriction.
 
 **GIM-79 validation boundary:** Subjective fields (`severity`, `impact_estimation`, `problem_status`) are non-wire metadata in the current runtime contract. They may be retained in validation/report notes if stated, but they are not required for `StoryIntake` or draft handoff and must not set `stop_the_line.blocked = true` by themselves. Donor-era structured minors fields must not be reintroduced as validation targets; minors handling stays in safety/risk logic and narrative/report obligations only.
 
-**GIM-88 label vocabulary guardrail:** Validate `labels` against [`issue-label-taxonomy.md`](./issue-label-taxonomy.md). Every value in `canonical_payload.labels[]` must be a canonical allowed key with story evidence and source/provenance. Unknown free-text labels, metadata-only candidates, internal-only safety/privacy labels, and low-confidence hypotheses must **not** enter canonical labels. Keep them in validation notes as `metadata_only`, `needs_clarification`, or `rejected`. If a user correction in Phase 7 rejects the framing that produced a label, remove that label or downgrade it before normalizer handoff.
+**GIM-88 label vocabulary guardrail:** Validate `labels` against [`story-label-taxonomy.md`](./story-label-taxonomy.md). Every value in `canonical_payload.labels[]` must be a canonical allowed key with story evidence and source/provenance. Unknown free-text labels, metadata-only candidates, internal-only safety/privacy labels, and low-confidence hypotheses must **not** enter canonical labels. Keep them in validation notes as `metadata_only`, `needs_clarification`, or `rejected`. If a user correction in Phase 7 rejects the framing that produced a label, remove that label or downgrade it before normalizer handoff.
 
 **Artifacts:** Keep emitting `ingest_validation_report` with `stop_the_line.blocked = true` when Issue §4.1 validation fails. For narrative incompleteness before Phase 7, set `stop_the_line.blocked = true` for progression to **final** summary/framing until §5 passes or gaps are accepted; likewise block while **§7.2** (FR-M1-032…034) is incomplete. Record gaps in `missing_required_fields[]` using clear synthetic keys (e.g. `issue_narrative:REQ07_Q3`) **or** a short free-text `narrative_completeness_notes` field inside the report body until M1-03 defines a schema.
 
@@ -63,20 +63,20 @@ When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`is
 
 ## 1. Scope of Responsibility
 
-This instruction is activated **only in INGEST mode** for **DOGEstonia Issue** ingest (per `root.md` and [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md)).
+This instruction is activated **only in INGEST mode** for **DOGEstonia Issue** ingest (per `root.md` and [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md)).
 
 It handles:
 
 - validation of structured hints from [`ingest-deep-parsing.md`](./ingest-deep-parsing.md) (non-dialogue),
 - extraction and validation of Issue fields from dialogue (step-by-step),
-- structural completeness toward [`issue-data-model.md`](./issue-data-model.md) §4.1,
-- preparing material for [`issue-policy-gate.md`](./issue-policy-gate.md) and then [`issue-normalizer.md`](./issue-normalizer.md) on strict chains.
+- structural completeness toward [`story-data-model.md`](./story-data-model.md) §4.1,
+- preparing material for [`story-policy-gate.md`](./story-policy-gate.md) and then [`story-normalizer.md`](./story-normalizer.md) on strict chains.
 
 It does NOT:
 
 - perform raw multimodal extraction (Ingest Deep Parsing does this),
 - emit `policy_gate_result` (Issue Policy Gate does),
-- normalize to `normalized_issue_payload` ([`issue-normalizer.md`](./issue-normalizer.md) does after gate approval),
+- normalize to `normalized_issue_payload` ([`story-normalizer.md`](./story-normalizer.md) does after gate approval),
 - call backend APIs ([`api-orchestrator.md`](./api-orchestrator.md) does),
 - process multiple unrelated Issues in one input without user clarification (Base Instruction / §1.3).
 
@@ -107,7 +107,7 @@ For **structural** missing Issue fields (after `issue-interview-flow` §5 / §7.
 
 **One Issue per input:** If Deep Parsing signals multiple distinct civic issues, stop and ask the user to split input (see `ingest-deep-parsing.md` §6).
 
-**Issue Data Model reference:** Validate hints against [`issue-data-model.md`](./issue-data-model.md) §4.1–§4.3 and keep §4.4 system-only fields out of GPT-filled facts — not legacy donor schemas.
+**Issue Data Model reference:** Validate hints against [`story-data-model.md`](./story-data-model.md) §4.1–§4.3 and keep §4.4 system-only fields out of GPT-filled facts — not legacy donor schemas.
 
 ---
 
@@ -150,47 +150,47 @@ For the **workflow** of how Deep Parsing is activated, see Section 11.1.
 
 ## 3. Issue field validation (DOGEstonia Module 1)
 
-For **Issue** ingest (per `root.md` and the Issue overlay at the top of this file), structural validation targets [`issue-data-model.md`](./issue-data-model.md) **§4.1** (required logical fields) and **§4.2–§4.3** as applicable. The required logical fields are exactly `type`, `labels`, `title`, and `description`; `summary` / `institution` are optional, and §4.3 subjective fields are non-wire metadata. System-only fields in **§4.4** are not GPT-filled facts. Legacy donor event/service rules have been **removed** from this instruction version.
+For **Issue** ingest (per `root.md` and the Issue overlay at the top of this file), structural validation targets [`story-data-model.md`](./story-data-model.md) **§4.1** (required logical fields) and **§4.2–§4.3** as applicable. The required logical fields are exactly `type`, `labels`, `title`, and `description`; `summary` / `institution` are optional, and §4.3 subjective fields are non-wire metadata. System-only fields in **§4.4** are not GPT-filled facts. Legacy donor event/service rules have been **removed** from this instruction version.
 
 ### 3.1 Non-dialogue path (`deep_parsing_artifact`)
 
 - Read **`extracted_data`** and **`metadata`** from [`ingest-deep-parsing.md`](./ingest-deep-parsing.md).
-- Validate that hints do **not** assert final `ISSUE_STATUS` or backend-only fields (`id`, `created_at`, … — see `issue-data-model.md` §4.4).
-- Validate `labels_hints[]` against [`issue-label-taxonomy.md`](./issue-label-taxonomy.md); unsupported hints stay metadata-only or require clarification.
+- Validate that hints do **not** assert final `ISSUE_STATUS` or backend-only fields (`id`, `created_at`, … — see `story-data-model.md` §4.4).
+- Validate `labels_hints[]` against [`story-label-taxonomy.md`](./story-label-taxonomy.md); unsupported hints stay metadata-only or require clarification.
 - Map gaps in Issue §4.1 into `missing_required_fields[]` for batch user questions; use `metadata.ambiguities` for clarification batches.
 - **Provisional `type` / labels:** follow the Issue overlay (REQ-15.3, FR-M1-024…027).
 
 ### 3.2 Dialogue path
 
-- Follow [`issue-interview-flow.md`](./issue-interview-flow.md) for narrative completeness (**§5**, **§7.2**) before treating material as structurally final.
+- Follow [`story-interview-flow.md`](./story-interview-flow.md) for narrative completeness (**§5**, **§7.2**) before treating material as structurally final.
 
 ### 3.3 Readiness (Issue)
 
-- Readiness is driven by **narrative completeness** and **§4.1 field completeness** toward [`issue-normalizer.md`](./issue-normalizer.md). Use `readiness_level` and `stop_the_line` in `ingest_validation_report` per the Issue overlay in §2.
+- Readiness is driven by **narrative completeness** and **§4.1 field completeness** toward [`story-normalizer.md`](./story-normalizer.md). Use `readiness_level` and `stop_the_line` in `ingest_validation_report` per the Issue overlay in §2.
 
 ### 3.4 Missing data resolution (Issue)
 
-- Batch missing required fields once; group trilingual slots for required `title` / `description` per [`issue-i18n-policy.md`](./issue-i18n-policy.md). Optional `summary` can be requested only as a quality improvement, not as a blocking requirement.
+- Batch missing required fields once; group trilingual slots for required `title` / `description` per [`story-i18n-policy.md`](./story-i18n-policy.md). Optional `summary` can be requested only as a quality improvement, not as a blocking requirement.
 - Do **not** request legacy donor-only fields (`delivery_mode`, `event_*`, `service_*`) or donor-era structured minors fields.
 
 ---
 
 ## 4. Validation levels (Issue-only summary)
 
-Legacy donor Draft / SentToReview / Approved matrices are **removed**. For Issue, use **§3** above and the Issue overlay at the top of this file. Downstream: [`issue-policy-gate.md`](./issue-policy-gate.md) then [`issue-normalizer.md`](./issue-normalizer.md) on strict chains.
+Legacy donor Draft / SentToReview / Approved matrices are **removed**. For Issue, use **§3** above and the Issue overlay at the top of this file. Downstream: [`story-policy-gate.md`](./story-policy-gate.md) then [`story-normalizer.md`](./story-normalizer.md) on strict chains.
 
 ---
 
 ## 5. Conditional fields (Issue)
 
-Optional and subjective fields per [`issue-data-model.md`](./issue-data-model.md) §4.2–§4.3 (e.g. demo scope for `institution`, subjective intake notes). `summary` and `institution` must not appear in `missing_required_fields[]`; `institution` remains omitted/null in demo unless product scope changes. Subjective fields (`severity`, `impact_estimation`, `problem_status`) can be preserved as non-wire validation/report metadata but must not block `StoryIntake` / draft handoff as wire-required fields. Safety can still restrict or block minors-related content, but it does not add structured minors fields to `canonical_payload`. No legacy donor event_/service_ branches.
+Optional and subjective fields per [`story-data-model.md`](./story-data-model.md) §4.2–§4.3 (e.g. demo scope for `institution`, subjective intake notes). `summary` and `institution` must not appear in `missing_required_fields[]`; `institution` remains omitted/null in demo unless product scope changes. Subjective fields (`severity`, `impact_estimation`, `problem_status`) can be preserved as non-wire validation/report metadata but must not block `StoryIntake` / draft handoff as wire-required fields. Safety can still restrict or block minors-related content, but it does not add structured minors fields to `canonical_payload`. No legacy donor event_/service_ branches.
 
 ---
 
 ## 6. Enum validation (Issue)
 
-- **`type`:** `ISSUE_TYPE` per [`issue-data-model.md`](./issue-data-model.md) §5 / `spa-app` types.
-- **`labels`:** controlled keys per [`issue-label-taxonomy.md`](./issue-label-taxonomy.md). Do not invent labels, do not pass metadata-only/internal labels as canonical labels, and do not invent Issue `type` enum values.
+- **`type`:** `ISSUE_TYPE` per [`story-data-model.md`](./story-data-model.md) §5 / `spa-app` types.
+- **`labels`:** controlled keys per [`story-label-taxonomy.md`](./story-label-taxonomy.md). Do not invent labels, do not pass metadata-only/internal labels as canonical labels, and do not invent Issue `type` enum values.
 
 ### 6.1 Label validation checklist
 
@@ -269,7 +269,7 @@ This integration applies **only for non-dialogue input**.
 7. Ingest Validation:
    - Receives `deep_parsing_artifact` from Deep Parsing
    - **MUST NOT ask questions until artifact is received**
-   - Validates extracted hints against [`issue-data-model.md`](./issue-data-model.md) §4.1–§4.3 and excludes §4.4 system-only fields
+   - Validates extracted hints against [`story-data-model.md`](./story-data-model.md) §4.1–§4.3 and excludes §4.4 system-only fields
    - Processes confidence scores, ambiguities, missing fields
    - **MUST convert ambiguities to user questions (batch mode)**
    - **MUST request ALL missing required fields in one batch (not one-by-one)**
@@ -360,7 +360,7 @@ For the **structure** of input data, see Section 2.1.
    - If ALLOW → continue to Normalizer
 ```
 
-**DOGEstonia / Issue track:** After **Validated Data Check** → ALLOW, the next step on a strict Issue chain is **not** direct normalization — it is **[`issue-policy-gate.md`](./issue-policy-gate.md)** (after any remaining safety checkpoints product requires), per **`issue-lifecycle-instructions.md`** §2.1. Any legacy wording about “continue to Normalizer” must be interpreted for Issue as “continue the **safety → gate → normalization** sequence,” never “skip gate.”
+**DOGEstonia / Issue track:** After **Validated Data Check** → ALLOW, the next step on a strict Issue chain is **not** direct normalization — it is **[`story-policy-gate.md`](./story-policy-gate.md)** (after any remaining safety checkpoints product requires), per **`story-lifecycle-instructions.md`** §2.1. Any legacy wording about “continue to Normalizer” must be interpreted for Issue as “continue the **safety → gate → normalization** sequence,” never “skip gate.”
 
 **Processing Safety & Compliance result:**
 ```
@@ -381,7 +381,7 @@ For the **structure** of input data, see Section 2.1.
 
 ### 11.3 Integration with Issue normalizer
 
-**DOGEstonia / Issue:** After validation + safety + **[`issue-policy-gate.md`](./issue-policy-gate.md)** (**approved**), hand off to **[`issue-normalizer.md`](./issue-normalizer.md)** for **`normalized_issue_payload`** — not “straight to API.” See Issue overlay at the top of this file (**Post-gate handoff**).
+**DOGEstonia / Issue:** After validation + safety + **[`story-policy-gate.md`](./story-policy-gate.md)** (**approved**), hand off to **[`story-normalizer.md`](./story-normalizer.md)** for **`normalized_issue_payload`** — not “straight to API.” See Issue overlay at the top of this file (**Post-gate handoff**).
 
 **Handoff protocol:**
 ```
@@ -392,12 +392,12 @@ For the **structure** of input data, see Section 2.1.
    - Emits normalized_issue_payload for downstream API orchestration when required
 ```
 
-**Output shape for normalizer prep** (logical; exact schema per `issue-normalizer.md`):
+**Output shape for normalizer prep** (logical; exact schema per `story-normalizer.md`):
 
 ```json
 {
   "validated_data": {
-    "//": "Logical Issue fields per issue-data-model.md §4.1 toward canonical_payload"
+    "//": "Logical Issue fields per story-data-model.md §4.1 toward canonical_payload"
   },
   "validation_metadata": {
     "validation_status": "Draft-ready" | "SentToReview-ready" | "Approved-ready",
@@ -438,7 +438,7 @@ Ingest Validation MUST produce `ingest_validation_report` as output artifact:
   - Pass `ingest_validation_report`
   - Pass validated_payload
 
-- **DOGEstonia / Issue — after policy gate:** strict Issue chain requires **`issue-policy-gate`** **approved**, then **[`issue-normalizer.md`](./issue-normalizer.md)** → **`normalized_issue_payload`**, then (if product requires) Safety **Point 4** at `check_point: "normalized"`, then **`api-orchestrator.md`**.
+- **DOGEstonia / Issue — after policy gate:** strict Issue chain requires **`issue-policy-gate`** **approved**, then **[`story-normalizer.md`](./story-normalizer.md)** → **`normalized_issue_payload`**, then (if product requires) Safety **Point 4** at `check_point: "normalized"`, then **`api-orchestrator.md`**.
 
 **Reference:** Base Instruction Section 1.5 (Rule 1: Mandatory Artifacts + DOGEstonia / Issue normalization artifact note)
 
@@ -446,11 +446,11 @@ Ingest Validation MUST produce `ingest_validation_report` as output artifact:
 
 The output of this instruction MUST be:
 
-- a structured intermediate representation of the **Issue** (logical fields per [`issue-data-model.md`](./issue-data-model.md)),
+- a structured intermediate representation of the **Issue** (logical fields per [`story-data-model.md`](./story-data-model.md)),
 - identified missing fields, ambiguities, and safety flags as applicable,
 - `ingest_validation_report` per Base Instruction / Issue overlay.
 
-**Output structure MUST align with [`issue-data-model.md`](./issue-data-model.md)** and downstream [`issue-normalizer.md`](./issue-normalizer.md) — not legacy donor schemas.
+**Output structure MUST align with [`story-data-model.md`](./story-data-model.md)** and downstream [`story-normalizer.md`](./story-normalizer.md) — not legacy donor schemas.
 
 **Cross-references:** §3–§10 above for Issue validation; §11.1 for `deep_parsing_artifact` ambiguities.
 
@@ -474,7 +474,7 @@ The output of this instruction MUST be:
 }
 ```
 
-**Next consumer:** Safety & Compliance → **[`issue-policy-gate.md`](./issue-policy-gate.md)** → **[`issue-normalizer.md`](./issue-normalizer.md)** on strict Issue chains.
+**Next consumer:** Safety & Compliance → **[`story-policy-gate.md`](./story-policy-gate.md)** → **[`story-normalizer.md`](./story-normalizer.md)** on strict Issue chains.
 
 ---
 
@@ -538,7 +538,7 @@ The output of this instruction MUST be:
 
 ### 14.1 Pre-flight
 
-- [ ] `issue-data-model.md` §4.1 understood for the current archetype path
+- [ ] `story-data-model.md` §4.1 understood for the current archetype path
 - [ ] Integration with Ingest Deep Parsing (`deep_parsing_artifact`) aligned on field names (`extracted_data`, metadata)
 - [ ] Integration with Safety & Compliance and **issue-policy-gate** understood
 - [ ] Routing to **issue-normalizer** only after policy gate on strict chains

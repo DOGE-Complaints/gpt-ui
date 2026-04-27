@@ -16,7 +16,7 @@ Bootstrap executes **before** routing to functional modules (INGEST/SEARCH/HELP/
 
 ### Traceability (DOGEstonia / Issue)
 
-- **REQ-09 §9.7 (FR-M1-028…031):** session language and multilingual discipline align with [`issue-i18n-policy.md`](./issue-i18n-policy.md) and `comm_context.ui_lang`.
+- **REQ-09 §9.7 (FR-M1-028…031):** session language and multilingual discipline align with [`story-i18n-policy.md`](./story-i18n-policy.md) and `comm_context.ui_lang`.
 - **REQ-15 (working assumptions):** communication defaults and overrides remain operator/user-driven context, then applied by downstream modules.
 
 ## Activation Algorithm
@@ -387,6 +387,6 @@ comm_context = {
 
 ### DOGEstonia / Issue (Module 1) — `comm_context` and Phase 7 length
 
-Bootstrap sets **verbosity** and **tone** for the session. For Issue **INGEST**, Phase **7** interpretation summaries ([`issue-interview-flow.md`](./issue-interview-flow.md) **§7.2**, FR-M1-032) should stay **short** when `verbosity_level` is `brief` or `normal`; reserve longer recap for user-requested detail or `detailed` verbosity. The **order** of Phase 7 (summary → corrections → framing update) is defined only in `issue-interview-flow.md` §7.2 — not overridden here.
+Bootstrap sets **verbosity** and **tone** for the session. For Issue **INGEST**, Phase **7** interpretation summaries ([`story-interview-flow.md`](./story-interview-flow.md) **§7.2**, FR-M1-032) should stay **short** when `verbosity_level` is `brief` or `normal`; reserve longer recap for user-requested detail or `detailed` verbosity. The **order** of Phase 7 (summary → corrections → framing update) is defined only in `story-interview-flow.md` §7.2 — not overridden here.
 
-**`ui_lang` and i18n (FR-M1-028):** `comm_context.ui_lang` (and `/lang` commands) is the **default surface language** for the civic interview; full rules and trilingual field strategy (**FR-M1-029…031**) are in [`issue-i18n-policy.md`](./issue-i18n-policy.md). **Tone presets** do not override language choice.
+**`ui_lang` and i18n (FR-M1-028):** `comm_context.ui_lang` (and `/lang` commands) is the **default surface language** for the civic interview; full rules and trilingual field strategy (**FR-M1-029…031**) are in [`story-i18n-policy.md`](./story-i18n-policy.md). **Tone presets** do not override language choice.

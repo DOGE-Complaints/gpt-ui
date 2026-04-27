@@ -7,7 +7,7 @@
 |----------------|--------|
 | **Version** | 0.11 |
 | **Date** | 2026-04-26 |
-| **Traceability** | [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5–10.6, [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §4–6, [REQ-20](../docs/requirements/REQ-20-label-taxonomy-and-extraction-axes.md); [`issue-label-taxonomy.md`](./issue-label-taxonomy.md); [`issue-i18n-policy.md`](./issue-i18n-policy.md) (FR-M1-028…031); [`issue-normalizer.md`](./issue-normalizer.md); SPA: [`spa-app/docs/mock-layer-issues-guide.md`](../../spa-app/docs/mock-layer-issues-guide.md), [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) |
+| **Traceability** | [REQ-10](../docs/requirements/REQ-10-output-content-model.md) §10.5–10.6, [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §4–6, [REQ-20](../docs/requirements/REQ-20-label-taxonomy-and-extraction-axes.md); [`story-label-taxonomy.md`](./story-label-taxonomy.md); [`story-i18n-policy.md`](./story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](./story-normalizer.md); SPA: [`spa-app/docs/mock-layer-issues-guide.md`](../../spa-app/docs/mock-layer-issues-guide.md), [`spa-app/src/domain/types.js`](../../spa-app/src/domain/types.js) |
 
 ---
 
@@ -54,8 +54,8 @@ Below is the **target display contract** for `spa-app` (mocks and UI). Enum type
 | Field | Type (logical) | Rule |
 |-------|----------------|------|
 | `type` | string enum | One of `ISSUE_TYPE`: `complaint`, `observation`, `absurdity`, `system_bug`. |
-| `labels` | `string[]` | Controlled tag keys from [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) with disposition `canonical`. Unknown, free-text, internal-only, low-confidence, or metadata-only candidates must not enter `canonical_payload.labels[]`. |
-| `title` | `{ et: string, ru: string, en: string }` | Draft title; all three keys filled meaningfully or explicitly flagged “needs translation” in validator report — see [`issue-i18n-policy.md`](./issue-i18n-policy.md). |
+| `labels` | `string[]` | Controlled tag keys from [`story-label-taxonomy.md`](./story-label-taxonomy.md) with disposition `canonical`. Unknown, free-text, internal-only, low-confidence, or metadata-only candidates must not enter `canonical_payload.labels[]`. |
+| `title` | `{ et: string, ru: string, en: string }` | Draft title; all three keys filled meaningfully or explicitly flagged “needs translation” in validator report — see [`story-i18n-policy.md`](./story-i18n-policy.md). |
 | `description` | `{ et, ru, en }` | Full detail-page text. |
 | `summary` | `{ et, ru, en }` (optional) | Short card text; if absent, UI may use `title` ([mock-layer-issues-guide](../../spa-app/docs/mock-layer-issues-guide.md)). |
 
@@ -92,7 +92,7 @@ These should live in an explicit non-wire artifact (for example `ingest_validati
 
 - **Types and statuses:** `spa-app/src/domain/types.js` — `ISSUE_TYPE`, `ISSUE_STATUS`.
 - **Sample objects and i18n:** `spa-app/docs/mock-layer-issues-guide.md`.
-- **Labels:** [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) — controlled axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling.
+- **Labels:** [`story-label-taxonomy.md`](./story-label-taxonomy.md) — controlled axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling.
 
 If JSDoc in `types.js` disagrees with mock-guide on `title`/`summary` shape (string vs `{ et, ru, en }`), for **Module 1 and GPT→SPA** priority is **mock-guide** and §4.1 (trilingual objects).
 
@@ -108,11 +108,11 @@ Follow [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5: do not 
 
 | Module | Link to Issue |
 |--------|----------------|
-| [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md) | Ingest phase order and strict-chain artifacts **in instruction terms** (not UI statuses). |
-| [`issue-policy-gate.md`](./issue-policy-gate.md) | Policy admission; `policy_gate_result` / `review_metadata` alignment; no API. |
-| [`issue-label-taxonomy.md`](./issue-label-taxonomy.md) | Controlled source of truth for `labels` and label extraction metadata boundaries. |
+| [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md) | Ingest phase order and strict-chain artifacts **in instruction terms** (not UI statuses). |
+| [`story-policy-gate.md`](./story-policy-gate.md) | Policy admission; `policy_gate_result` / `review_metadata` alignment; no API. |
+| [`story-label-taxonomy.md`](./story-label-taxonomy.md) | Controlled source of truth for `labels` and label extraction metadata boundaries. |
 | `ingest-validation.md` | §4.1 completeness, batch follow-ups. |
-| [`issue-normalizer.md`](./issue-normalizer.md) | Canonical JSON for orchestrator / **`normalized_issue_payload`**. |
+| [`story-normalizer.md`](./story-normalizer.md) | Canonical JSON for orchestrator / **`normalized_issue_payload`**. |
 | `api-orchestrator.md` | Only HTTP entrypoint; response interpretation is authoritative. |
 | `root.md` | Forbid false claims about backend/Gate/status. |
 
@@ -123,11 +123,11 @@ Follow [REQ-15](../docs/requirements/REQ-15-working-assumptions.md) §5: do not 
 | Version | Date | Change |
 |---------|------|--------|
 | 0.1 | 2026-04-10 | First draft; REQ-10/REQ-15 and SPA mock-guide alignment. |
-| 0.2 | 2026-04-10 | Link to [`issue-lifecycle-instructions.md`](./issue-lifecycle-instructions.md). |
+| 0.2 | 2026-04-10 | Link to [`story-lifecycle-instructions.md`](./story-lifecycle-instructions.md). |
 | 0.3 | 2026-04-10 | **English-only** instruction text (repo policy). |
-| 0.4 | 2026-04-10 | Added §4.1 `title` row link to [`issue-i18n-policy.md`](./issue-i18n-policy.md). |
-| 0.5 | 2026-04-10 | Added §7 link to [`issue-policy-gate.md`](./issue-policy-gate.md) (`policy_gate_result`). |
-| 0.6 | 2026-04-10 | Added §7 link to [`issue-normalizer.md`](./issue-normalizer.md) (`normalized_issue_payload` scaffold). |
+| 0.4 | 2026-04-10 | Added §4.1 `title` row link to [`story-i18n-policy.md`](./story-i18n-policy.md). |
+| 0.5 | 2026-04-10 | Added §7 link to [`story-policy-gate.md`](./story-policy-gate.md) (`policy_gate_result`). |
+| 0.6 | 2026-04-10 | Added §7 link to [`story-normalizer.md`](./story-normalizer.md) (`normalized_issue_payload` scaffold). |
 | 0.7 | 2026-04-20 | Added §4.3 subjective intake fields; added demo `institution` scope rule; kept `spa-app` path updates. |
 | 0.8 | 2026-04-22 | Added donor-era structured minors metadata and temporarily moved the system-only block (GIM-65). |
 | 0.9 | 2026-04-25 | Removed donor-era minors metadata from active Issue model; restored system-only block to §4.4 (GIM-72). |

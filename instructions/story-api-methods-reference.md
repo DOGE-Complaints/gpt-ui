@@ -26,7 +26,7 @@ Additional operations (submit, search, reference) — add when node contract exi
 
 ### 1.1 `IssueDraftCreateRequest` field lock
 
-`IssueDraftCreateRequest` is aligned with `issue-data-model.md` logical Issue draft fields and GIM-81 orchestrator transform:
+`IssueDraftCreateRequest` is aligned with `story-data-model.md` logical Issue draft fields and GIM-81 orchestrator transform:
 
 | Field | Required | Source |
 |---|---:|---|
@@ -80,7 +80,7 @@ The request must not contain label extraction metadata, subjective non-wire fiel
 When contract fields change, update **both** artifacts in one change set:
 
 1. OpenAPI import artifact (`custom-gpt-issues-reference.openapi.yaml`) → `info.version`
-2. this file (`issue-api-methods-reference.md`) → `Version`
+2. this file (`story-api-methods-reference.md`) → `Version`
 3. changelog rows in both artifacts
 
 Contract fields that require version bump:
@@ -106,5 +106,5 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 | 0.5 | 2026-04-21 | Runtime decoupled from local YAML filename; lock source/version updated to 0.1.3 and Actions contract parity rule clarified. |
 | 0.6 | 2026-04-22 | **GIM-59:** link to `openapi-lock-snapshot-GIM-59.md` as tracking doc until live `GET /openapi.json` exists for Issues routes. |
 | 0.7 | 2026-04-23 | **GIM-46:** linked executable SSOT governance playbook and formalized one-changeset operational flow for contract updates. |
-| 0.8 | 2026-04-26 | **GIM-82:** aligned `IssueDraftCreateRequest` field lock with `issue-data-model.md`, YAML `0.1.4`, and GIM-81 transform; kept PUT semantics as GIM-60 follow-up. |
+| 0.8 | 2026-04-26 | **GIM-82:** aligned `IssueDraftCreateRequest` field lock with `story-data-model.md`, YAML `0.1.4`, and GIM-81 transform; kept PUT semantics as GIM-60 follow-up. |
 | 0.9 | 2026-04-26 | **GIM-90:** clarified labels must be taxonomy/validation-approved and label extraction metadata is not part of `IssueDraftCreateRequest`. |

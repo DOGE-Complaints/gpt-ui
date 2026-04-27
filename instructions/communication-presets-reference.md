@@ -6,9 +6,9 @@
 
 ### DOGEstonia / Issue (Module 1) — i18n hooks (FR-M1-028…031)
 
-- **`ui_lang`** from Bootstrap / `comm_context` drives the **primary language** of interview surface text (**FR-M1-028**); see [`issue-interview-flow.md`](./issue-interview-flow.md) and [`issue-i18n-policy.md`](./issue-i18n-policy.md) §1.
-- **Trilingual Issue fields** (`title`, `summary`, `description`, optional `institution` as `{ et, ru, en }`) follow [`issue-data-model.md`](./issue-data-model.md) §4.1; generation, translation, and “no meaning distortion” rules: [`issue-i18n-policy.md`](./issue-i18n-policy.md) §§2–4.
-- **Presets** (`tone_preset`, `verbosity_level`, etc.) shape tone and length; they MUST **not** silently change interview language (see `issue-i18n-policy.md` §5).
+- **`ui_lang`** from Bootstrap / `comm_context` drives the **primary language** of interview surface text (**FR-M1-028**); see [`story-interview-flow.md`](./story-interview-flow.md) and [`story-i18n-policy.md`](./story-i18n-policy.md) §1.
+- **Trilingual Issue fields** (`title`, `summary`, `description`, optional `institution` as `{ et, ru, en }`) follow [`story-data-model.md`](./story-data-model.md) §4.1; generation, translation, and “no meaning distortion” rules: [`story-i18n-policy.md`](./story-i18n-policy.md) §§2–4.
+- **Presets** (`tone_preset`, `verbosity_level`, etc.) shape tone and length; they MUST **not** silently change interview language (see `story-i18n-policy.md` §5).
 
 ---
 
