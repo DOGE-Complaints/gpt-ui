@@ -50,7 +50,7 @@ Do not promote all technical metadata into public Issue card fields. Most of it 
 
 ### Current strengths
 
-- `issue-interview-flow.md` requires movement beyond facts into meaning and deep need.
+- `story-interview-flow.md` requires movement beyond facts into meaning and deep need.
 - Phase 7 forces user correction before final framing.
 - Safety and limited-depth rules prevent pseudo-therapy.
 
@@ -75,7 +75,7 @@ Avoid clinical categories, psychological diagnosis, or over-specific affect labe
 
 - The seven completeness questions cover what happened, where, who is affected, why it matters, desired state, and recurrence.
 - `narrative.location_query` exists in current runtime OpenAPI.
-- `issue-data-model.md` already supports title/description/summary as logical card fields.
+- `story-data-model.md` already supports title/description/summary as logical card fields.
 
 ### Gaps to consider later
 

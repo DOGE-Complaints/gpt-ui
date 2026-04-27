@@ -4,7 +4,7 @@
 
 **Purpose:** This document extracts the **technical architecture** of the GPT UI instruction system so it can be reproduced in another project. Same technical task—dialog-driven data collection, validation, normalization, and submission to an external API—with a **different data model and business context**. It also provides a **theoretical base for Custom GPT Actions**: what Actions are, what OpenAPI must contain, production limits, authentication modes, and how that layer fits **on top of** the instruction stack (§11–§16).
 
-**Source:** Derived from `GPT UI/instructions/` (root, base, bootstrap, instruction-modules-index, ingest-validation, ingest-deep-parsing, **issue-normalizer**, api-orchestrator, safety-compliance, **issue-policy-gate**) and reference docs (**issue-data-model**, **issue-api-methods-reference**, communication-presets-reference). Donor legacy materials were removed from active runtime surface. **Actions/OpenAPI theory** is aligned with [openai-custom-gpt-actions-official-guide.md](./openai-custom-gpt-actions-official-guide.md) (official URLs and limits) and [gpt-actions-bot-api-auth-mapping.md](./gpt-actions-bot-api-auth-mapping.md). In this project the canonical **Issue** model and HTTP SSOT live in `issue-data-model.md` + `issue-api-methods-reference.md` + Issues OpenAPI YAML.
+**Source:** Derived from `GPT UI/instructions/` (root, base, bootstrap, instruction-modules-index, ingest-validation, ingest-deep-parsing, **issue-normalizer**, api-orchestrator, safety-compliance, **issue-policy-gate**) and reference docs (**issue-data-model**, **issue-api-methods-reference**, communication-presets-reference). Donor legacy materials were removed from active runtime surface. **Actions/OpenAPI theory** is aligned with [openai-custom-gpt-actions-official-guide.md](./openai-custom-gpt-actions-official-guide.md) (official URLs and limits) and [gpt-actions-bot-api-auth-mapping.md](./gpt-actions-bot-api-auth-mapping.md). In this project the canonical **Issue** model and HTTP SSOT live in `story-data-model.md` + `story-api-methods-reference.md` + Issues OpenAPI YAML.
 
 **Audience:** Teams building a Custom GPT that collects structured data via dialogue, validates it, normalizes it to a canonical schema, and sends it to an external API.
 
@@ -191,7 +191,7 @@ A **Policy Gate** sits between “validated + safe” and “normalize + API” 
 - **Input:** Normalized payload (or search query from Search Dialogue).
 - **Responsibilities:** Map to API methods, handle errors, retries, and translate system errors to user-facing messages.
 - **Does not:** Parse input, validate, normalize, or decide policy.
-- **Source of truth:** [`issue-api-methods-reference.md`](../instructions/issue-api-methods-reference.md) + imported Actions contract (from [`custom-gpt-issues-reference.openapi.yaml`](./custom-gpt-issues-reference.openapi.yaml)).
+- **Source of truth:** [`story-api-methods-reference.md`](../instructions/story-api-methods-reference.md) + imported Actions contract (from [`custom-gpt-issues-reference.openapi.yaml`](./custom-gpt-issues-reference.openapi.yaml)).
 
 **Replication:** One API Orchestrator instruction; one api-methods-reference (or equivalent) as single source of truth. Same principle: “backend response is truth; report it verbatim.”
 
@@ -226,7 +226,7 @@ Suggested instruction file set for the other project:
 | **policy-gate.md** | (Optional) When activated, input package, policy doc reference, output result |
 | **search flow contract** | (Optional) Query construction/handoff only when search operations exist in OpenAPI |
 | **entity-data-model.md** | Canonical entity schema (your “activity-data-model”) |
-| **issue-api-methods-reference.md** | Issue HTTP SSOT for orchestrator behavior; keep in lockstep with Issues OpenAPI YAML |
+| **story-api-methods-reference.md** | Issue HTTP SSOT for orchestrator behavior; keep in lockstep with Issues OpenAPI YAML |
 
 Keep **Root** small (principle + references); put algorithms in **Base** and in each module file.
 
@@ -283,7 +283,7 @@ Typical constraints documented by OpenAI (see [openai-custom-gpt-actions-officia
 
 - Declare **`components.securitySchemes`** (e.g. `type: http`, `scheme: bearer` for **API Key → Bearer** in the GPT UI).  
 - Apply **`security`** on **every operation** that must send the credential. Omitting `security` on a protected operation causes **401** even if Authentication is configured in GPT UI, because the client may treat the operation as unsecured.  
-- For DOGEstonia Issue Actions, keep operation-level security consistent between OpenAPI YAML and `issue-api-methods-reference.md`; bearer policy details are in [gpt-actions-bot-api-auth-mapping.md](./gpt-actions-bot-api-auth-mapping.md).
+- For DOGEstonia Issue Actions, keep operation-level security consistent between OpenAPI YAML and `story-api-methods-reference.md`; bearer policy details are in [gpt-actions-bot-api-auth-mapping.md](./gpt-actions-bot-api-auth-mapping.md).
 
 ### 12.4 Extension: `x-openai-isConsequential`
 
@@ -331,7 +331,7 @@ OpenAI documents **encryption at rest** for stored API keys / client secrets; **
 When moving from “instructions only” to **live calls** against DOGEstonia Issue endpoints:
 
 1. **Public HTTPS** base URL for the FastAPI app (staging, tunnel, or reverse proxy). Hosted Actions cannot target `http://127.0.0.1` on a laptop without a tunnel.  
-2. **OpenAPI artifact:** import **`GET /openapi.json`** from the running app, then reconcile and lock it with [`custom-gpt-issues-reference.openapi.yaml`](./custom-gpt-issues-reference.openapi.yaml) and [`../instructions/issue-api-methods-reference.md`](../instructions/issue-api-methods-reference.md).  
+2. **OpenAPI artifact:** import **`GET /openapi.json`** from the running app, then reconcile and lock it with [`custom-gpt-issues-reference.openapi.yaml`](./custom-gpt-issues-reference.openapi.yaml) and [`../instructions/story-api-methods-reference.md`](../instructions/story-api-methods-reference.md).  
 3. **Authentication:** **API Key → Bearer** = **`GPT_ACTIONS_BEARER_SECRET`** for protected Issue routes. Follow [gpt-actions-bot-api-auth-mapping.md](./gpt-actions-bot-api-auth-mapping.md); do not reuse unrelated backend secrets.  
 4. **Identity headers:** do not rely on arbitrary custom headers from Actions client; design endpoint contracts to work with supported auth/parameters.  
 5. **Operator discipline:** keep YAML ↔ SSOT markdown ↔ orchestrator in lockstep before production import.
@@ -381,7 +381,7 @@ Using this, you can reproduce the same **technical architecture** (dialog → va
 |--------|--------|
 | Official OpenAI compilation (URLs, limits, auth, production) | [openai-custom-gpt-actions-official-guide.md](./openai-custom-gpt-actions-official-guide.md) |
 | DOGEstonia: GPT UI auth ↔ backend zones | [gpt-actions-bot-api-auth-mapping.md](./gpt-actions-bot-api-auth-mapping.md) |
-| Issue API SSOT (instructions) | [issue-api-methods-reference.md](../instructions/issue-api-methods-reference.md) |
+| Issue API SSOT (instructions) | [story-api-methods-reference.md](../instructions/story-api-methods-reference.md) |
 | Issues OpenAPI YAML (build/import artifact) | [custom-gpt-issues-reference.openapi.yaml](./custom-gpt-issues-reference.openapi.yaml) |
 
 **Version:** 1.2 · **Updated:** 2026-04-21 — aligned artifacts and Actions practice to DOGEstonia Issue chain (`normalized_issue_payload`, `policy_gate_result`, Issue SSOT/OpenAPI lockstep).

@@ -81,7 +81,7 @@
 |------|-------------------|
 | Story intake envelope и handoff | [REQ-18](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md) |
 | Входной контракт intake (`submitter.*`) | [Gateway API Reference](../../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) |
-| M1 Actions bearer boundary | `GPT UI/instructions/api-orchestrator.md`, `GPT UI/instructions/issue-api-methods-reference.md` |
+| M1 Actions bearer boundary | `GPT UI/instructions/api-orchestrator.md`, `GPT UI/instructions/story-api-methods-reference.md` |
 
 ---
 

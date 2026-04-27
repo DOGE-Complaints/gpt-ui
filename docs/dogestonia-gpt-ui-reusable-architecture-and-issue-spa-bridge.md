@@ -8,7 +8,7 @@
 ## TODO: Точки трансформации под DOGEstonia
 
 - [x] Таблица §1.1–1.2 обновлена по мере очистки (**2026-04-20**): рабочие модули — `issue-*`, `issue-policy-gate`; `activity-*` — stub.
-- [x] Канон полей Issue — `issue-data-model.md`; legacy `activity-data-model.md` удалён из active runtime surface.
+- [x] Канон полей Issue — `story-data-model.md`; legacy `activity-data-model.md` удалён из active runtime surface.
 - [ ] Когда появится operator rulebook — добавить `policy_ref`, версию документа и связь с будущим `issue-policy-gate` вместо отсылок к Kоны Рода как к SoT эталона.
 - [ ] После фиксации OpenAPI ноды DOGEstonia — обновить §1.5 и индекс связанных файлов (в т.ч. отдельный YAML для Issues).
 
@@ -45,9 +45,9 @@
 | Безопасность | `safety-compliance.md` | Контрольные точки: raw → extracted → validated → normalized; возможность HALT всего потока. |
 | Парсинг | `ingest-deep-parsing.md` | Мультимодальное извлечение во внутренние артефакты без валидации и без API. |
 | Валидация структуры | `ingest-validation.md` | Полнота полей, батч-уточнений, `stop_the_line`; без policy gate и без API. |
-| Policy gate | `issue-policy-gate.md` | Допуск по внешнему operator rulebook; `policy_gate_result`; без API. |
-| Нормализация | `issue-normalizer.md` | `normalized_issue_payload` под схему Issue / ноды. |
-| Вызовы API | `api-orchestrator.md` | Единственный модуль HTTP; SSOT **`issue-api-methods-reference.md`** + Issues OpenAPI YAML. |
+| Policy gate | `story-policy-gate.md` | Допуск по внешнему operator rulebook; `policy_gate_result`; без API. |
+| Нормализация | `story-normalizer.md` | `normalized_issue_payload` под схему Issue / ноды. |
+| Вызовы API | `api-orchestrator.md` | Единственный модуль HTTP; SSOT **`story-api-methods-reference.md`** + Issues OpenAPI YAML. |
 | Поиск | SEARCH-mode handoff (`base.md` + `api-orchestrator.md`) | Включается только после появления Issue search в OpenAPI. |
 
 **Артефактный handoff (универсально):** между шагами передаются явные отчёты/ссылки на артефакты (как в эталоне: validation report, policy_gate_result, normalized payload ref). Имена полей в DOGEstonia могут отличаться; паттерн «один шаг — один контрактный выход» сохраняется.
@@ -56,9 +56,9 @@
 
 | Компонент | Статус |
 |-----------|--------|
-| `activity-data-model.md` / `activity-normalizer.md` | Legacy files removed from active runtime surface; канон → `issue-data-model.md`, `issue-normalizer.md`. |
-| legacy gate module | Legacy file removed from active runtime surface; DOGEstonia использует `issue-policy-gate.md` как актуальный gate-модуль. |
-| `api-methods-reference.md` | Legacy donor routes removed from active runtime surface; SSOT Issue → `issue-api-methods-reference.md` + Issues OpenAPI artifact. |
+| `activity-data-model.md` / `activity-normalizer.md` | Legacy files removed from active runtime surface; канон → `story-data-model.md`, `story-normalizer.md`. |
+| legacy gate module | Legacy file removed from active runtime surface; DOGEstonia использует `story-policy-gate.md` как актуальный gate-модуль. |
+| `api-methods-reference.md` | Legacy donor routes removed from active runtime surface; SSOT Issue → `story-api-methods-reference.md` + Issues OpenAPI artifact. |
 
 **Инфра-скелет** (режимы, safety, parse → validate → gate → normalize → API) сохранён; доменные тексты переведены на Issue.
 
@@ -136,9 +136,9 @@ GPT (инструкции Issue-домена)
 
 ### 2.3. Следующие шаги в репозитории (после ответов оператора)
 
-1. Поддерживать `issue-data-model.md` и `issue-normalizer.md` как канон strict chain.  
-2. Развивать **issue-policy-gate.md** (OP-DOC-01 / demo baseline profile).  
-3. Поддерживать `issue-api-methods-reference.md` + OpenAPI artifact под create/update Issue.  
+1. Поддерживать `story-data-model.md` и `story-normalizer.md` как канон strict chain.  
+2. Развивать **story-policy-gate.md** (OP-DOC-01 / demo baseline profile).  
+3. Поддерживать `story-api-methods-reference.md` + OpenAPI artifact под create/update Issue.  
 4. Документ маппинга **GPT JSON → `Issue`**, проверка против `isIssue()` / при необходимости расширение типов согласованно с `spa-app`.  
 5. Синхронизация `docs/DOGEstonia.md` §2.2–2.3 с принятыми решениями.
 

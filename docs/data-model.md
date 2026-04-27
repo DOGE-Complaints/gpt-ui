@@ -2,7 +2,7 @@
 
 ## Status
 
-Рабочий канон модели данных для GPT-контура расположен в `GPT UI/instructions/issue-data-model.md`.
+Рабочий канон модели данных для GPT-контура расположен в `GPT UI/instructions/story-data-model.md`.
 
 ## Purpose of this file
 
@@ -10,6 +10,6 @@
 
 ## Rules
 
-- Для полей и enum использовать только `issue-data-model.md`.
-- Для API-форм использовать `issue-api-methods-reference.md` и Issues OpenAPI artifact.
+- Для полей и enum использовать только `story-data-model.md`.
+- Для API-форм использовать `story-api-methods-reference.md` и Issues OpenAPI artifact.
 - Любые расширения модели сначала фиксировать в `docs/requirements`, затем синхронизировать в инструкции.

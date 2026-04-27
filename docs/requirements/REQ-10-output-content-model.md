@@ -9,8 +9,8 @@
 
 ## Интеграция с инструкциями и API (актуально)
 
-- Канон логической карточки Issue в инструкциях: `GPT UI/instructions/issue-data-model.md`.
-- Строгий артефакт перед HTTP (Module 1 Issues): `normalized_issue_payload` → см. `issue-normalizer.md`, `api-orchestrator.md`.
+- Канон логической карточки Issue в инструкциях: `GPT UI/instructions/story-data-model.md`.
+- Строгий артефакт перед HTTP (Module 1 Issues): `normalized_issue_payload` → см. `story-normalizer.md`, `api-orchestrator.md`.
 - **Полный handoff к API приёма историй (Module 2)** — поля, принципы, транспорт: **REQ-18** и авторитетный **`doge-complaints-gateway/.../19-inbound-api-gpt-preprocessing-and-spa-issue-contracts.md`**.
 - Логическая content-модель ниже остаётся **не transport schema**; transport для intake — **`StoryIntakeEnvelope`** (REQ-18 / §19).
 

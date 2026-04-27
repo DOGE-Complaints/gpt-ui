@@ -5,7 +5,7 @@
 > **Статус:** active draft. Это требования к GPT instruction layer и logical Issue draft, **не transport/API schema**.
 
 **Версия:** 0.1 · 2026-04-26  
-**Связанные документы:** [REQ-09](./REQ-09-functional-requirements.md), [REQ-10](./REQ-10-output-content-model.md), [REQ-12](./REQ-12-anti-patterns.md), [REQ-15](./REQ-15-working-assumptions.md), [REQ-16](./REQ-16-open-decisions.md), [REQ-18](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md), [`issue-data-model.md`](../../instructions/issue-data-model.md), [`issue-interview-flow.md`](../../instructions/issue-interview-flow.md), [`issue-normalizer.md`](../../instructions/issue-normalizer.md).
+**Связанные документы:** [REQ-09](./REQ-09-functional-requirements.md), [REQ-10](./REQ-10-output-content-model.md), [REQ-12](./REQ-12-anti-patterns.md), [REQ-15](./REQ-15-working-assumptions.md), [REQ-16](./REQ-16-open-decisions.md), [REQ-18](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md), [`story-data-model.md`](../../instructions/story-data-model.md), [`story-interview-flow.md`](../../instructions/story-interview-flow.md), [`story-normalizer.md`](../../instructions/story-normalizer.md).
 
 ---
 
@@ -20,7 +20,7 @@ However:
 - GPT must not treat labels as backend truth, publication status, official routing, or institution acceptance.
 - GPT must keep `labels` as logical Issue / draft metadata until the relevant transport/API schema explicitly accepts them.
 
-For the current GPT logical model, `labels` remain a required logical Issue field after interview maturity and validation (`issue-data-model.md` §4.1), but the label extraction process should be multi-axis rather than only "topic matching".
+For the current GPT logical model, `labels` remain a required logical Issue field after interview maturity and validation (`story-data-model.md` §4.1), but the label extraction process should be multi-axis rather than only "topic matching".
 
 ---
 
@@ -34,7 +34,7 @@ Existing requirements already imply multiple label sources:
 | REQ-09 §9.6 | GPT distinguishes `complaint`, `observation`, `absurdity`, `system_bug`; proposes labels from agreed vocabulary. | Labels must support classification but not collapse into `type`. |
 | REQ-10 §10.3 | Civic framing includes public significance, repeatability, private vs stable pattern. | Labels should capture systemic/civic signal, not only object/topic. |
 | REQ-10 §10.5 | Issue Projection includes probable `type` and preliminary `labels`. | Labels are part of Issue projection, but should carry confidence/provenance. |
-| `issue-interview-flow.md` §4–§7 | Interview moves from episode to emotion, deep need, desired state, civic generalization. | Label extraction should happen after narrative maturity, using the full story. |
+| `story-interview-flow.md` §4–§7 | Interview moves from episode to emotion, deep need, desired state, civic generalization. | Label extraction should happen after narrative maturity, using the full story. |
 
 ---
 
@@ -133,7 +133,7 @@ At requirements level, GPT should conceptually produce two layers:
 |---|---|
 | Final controlled vocabulary for `canonical_payload.labels[]`. | Current requirements require labels but do not define a complete approved dictionary inside GPT docs. |
 | Whether label axes become namespaced keys (`topic:transport`) or flat keys (`transport`). | Depends on SPA/backend vocabulary and product UX. |
-| Whether `label_extraction_metadata` becomes a formal normalizer artifact. | Current `issue-normalizer.md` has `normalization_metadata` and optional sidecars, but no formal label metadata schema yet. |
+| Whether `label_extraction_metadata` becomes a formal normalizer artifact. | Current `story-normalizer.md` has `normalization_metadata` and optional sidecars, but no formal label metadata schema yet. |
 | Which safety/privacy labels can ever be visible publicly. | Requires policy/operator decision. |
 
 ---
@@ -144,9 +144,9 @@ At requirements level, GPT should conceptually produce two layers:
 |---|---|
 | Multi-axis labels | REQ-09 §9.5, §9.6; REQ-10 §10.1–10.5 |
 | Do not ask user for labels upfront | REQ-09 FR-M1-007 |
-| Do not classify too early | REQ-12 anti-pattern #2; `issue-interview-flow.md` §8 |
-| Type vocabulary | REQ-09 FR-M1-024; `issue-data-model.md` §4.1 |
-| Labels in logical Issue model | REQ-09 FR-M1-026, FR-M1-037; REQ-10 §10.5; `issue-data-model.md` §4.1 |
+| Do not classify too early | REQ-12 anti-pattern #2; `story-interview-flow.md` §8 |
+| Type vocabulary | REQ-09 FR-M1-024; `story-data-model.md` §4.1 |
+| Labels in logical Issue model | REQ-09 FR-M1-026, FR-M1-037; REQ-10 §10.5; `story-data-model.md` §4.1 |
 | No false backend/status claims | REQ-09 FR-M1-038; REQ-15 item 6 |
 
 ---

@@ -5,7 +5,7 @@
 #
 # STATUS: CONTRACT CANDIDATE — lock paths and schemas to the node’s GET /openapi.json when available (EPIC-M1-06).
 # Pilot lock tracking: GPT UI/docs/analysis/tasks/task-pilot-readiness-openapi-contract-candidate-live-lock/openapi-lock-snapshot-GIM-59.md (GIM-59).
-# SSOT companion: GPT UI/instructions/issue-api-methods-reference.md
+# SSOT companion: GPT UI/instructions/story-api-methods-reference.md
 # Template lineage: custom-gpt-actions-activities-reference.openapi.yaml
 # Skill: strong operationId + narrow operations — .cursor/skills/openai-custom-gpt-builder/SKILL.md
 #
@@ -16,7 +16,7 @@ info:
   description: >
     Minimal subset for GPT Actions targeting Issue ingest. All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Replace servers.url and reconcile components with the live FastAPI OpenAPI before production.
-    Lockstep: operationId/method/path/request/response/auth/version parity with issue-api-methods-reference.md.
+    Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
 
 servers:
   - url: https://dogestonia-tallinn-demo.up.railway.app
@@ -66,7 +66,7 @@ components:
         institution:
           $ref: "#/components/schemas/LocalizedString"
       description: >
-        Draft payload after instruction normalizer, aligned with issue-data-model.md logical fields:
+        Draft payload after instruction normalizer, aligned with story-data-model.md logical fields:
         required type, labels, title, description; optional summary and institution.
         Do not include subjective non-wire metadata, donor-era minors fields, or backend-issued fields.
         Server assigns id, status, timestamps (FR-M1-038 — GPT must not invent).

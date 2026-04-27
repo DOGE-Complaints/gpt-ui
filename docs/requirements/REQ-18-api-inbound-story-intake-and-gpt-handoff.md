@@ -119,7 +119,7 @@
 - **`id` / `status`** на черновике могут быть переопределены сервером; не считать финальными без ответа API.
 - **Запрещены** фиктивные **`arweave_txid` / `image_txid`** (только реальные интеграционные значения).
 
-**Связь с Module 1:** логические поля карточки согласованы с `GPT UI/instructions/issue-data-model.md` §4.1 и нормализатором (`normalized_issue_payload.canonical_payload`); расширенный **envelope** §19 добавляет narrative, авторство, гео/время, гос-hints — вне минимального Issues OpenAPI.
+**Связь с Module 1:** логические поля карточки согласованы с `GPT UI/instructions/story-data-model.md` §4.1 и нормализатором (`normalized_issue_payload.canonical_payload`); расширенный **envelope** §19 добавляет narrative, авторство, гео/время, гос-hints — вне минимального Issues OpenAPI.
 
 ---
 

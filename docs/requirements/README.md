@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (20 файлов)
+## Оглавление REQ (21 файлов)
 
 | № | Файл |
 |---|------|
@@ -31,5 +31,6 @@
 | 18 | [REQ-18-api-inbound-story-intake-and-gpt-handoff.md](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md) |
 | 19 | [REQ-19-security-auth-boundaries-and-user-identity-flow.md](./REQ-19-security-auth-boundaries-and-user-identity-flow.md) |
 | 20 | [REQ-20-label-taxonomy-and-extraction-axes.md](./REQ-20-label-taxonomy-and-extraction-axes.md) |
+| 21 | [REQ-21-post-demo-privacy-pii-and-web3-vault-policy.md](./REQ-21-post-demo-privacy-pii-and-web3-vault-policy.md) |
 
-**Версия:** 0.5 · 2026-04-26 (добавлен REQ-20 по multi-axis label extraction для GPT Issue projection).
+**Версия:** 0.6 · 2026-04-26 (добавлен REQ-21 post-demo: privacy/PII governance и защищённый web3 vault слой).

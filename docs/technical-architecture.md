@@ -1,7 +1,7 @@
 # Экстракция технической архитектуры: инструкции GPT UI → JSON по диалогу → web2 API
 
 **Назначение:** зафиксировать **переиспользуемый технический паттерн** текущего Issue-контура из `GPT UI/instructions/*.md`: как пошагово формируются структуры данных в процессе диалога, **кто имеет право** инициировать вызовы backend и **как** это стыкуется с web2 (REST + Custom GPT Actions).  
-**SoT по коду инструкций:** файлы в `GPT UI/instructions/`; для **DOGEstonia Issue** контракт HTTP — **`GPT UI/instructions/issue-api-methods-reference.md`** и импортированный Actions contract (build/import artifact: `GPT UI/docs/custom-gpt-issues-reference.openapi.yaml`).  
+**SoT по коду инструкций:** файлы в `GPT UI/instructions/`; для **DOGEstonia Issue** контракт HTTP — **`GPT UI/instructions/story-api-methods-reference.md`** и импортированный Actions contract (build/import artifact: `GPT UI/docs/custom-gpt-issues-reference.openapi.yaml`).  
 **Метод:** `@analysis.mdc` — только проверяемые факты из актуальных секций; legacy donor тела вырезаны (**2026-04-20**, strategy **C**).
 
 **Версия:** 0.3 · 2026-04-20
@@ -30,10 +30,10 @@
 3. **Ingest Deep Parsing** — для немультимодального/сложного ввода: извлечение → `deep_parsing_artifact`; без валидации и без API.
 4. **Ingest Validation** — полнота полей, отчёт `ingest_validation_report`, при необходимости пакет для Gate `gate_request_package`; **без API**.
 5. **`issue-policy-gate`** (DOGEstonia) — допуск / отказ / needs_clarification; **без API**; `policy_gate_result`.
-6. **`issue-normalizer.md`** — `normalized_issue_payload` (strict); **без API**.
-7. **API Orchestrator** — HTTP по **`issue-api-methods-reference.md`** / Issues OpenAPI для Issue; legacy donor роуты не являются рабочим контуром DOGEstonia.
+6. **`story-normalizer.md`** — `normalized_issue_payload` (strict); **без API**.
+7. **API Orchestrator** — HTTP по **`story-api-methods-reference.md`** / Issues OpenAPI для Issue; legacy donor роуты не являются рабочим контуром DOGEstonia.
 
-**Normalizer ↔ Validation:** нормализатор **не** опрашивает пользователя напрямую — только через Validation ([`issue-normalizer.md`](../instructions/issue-normalizer.md) границы).
+**Normalizer ↔ Validation:** нормализатор **не** опрашивает пользователя напрямую — только через Validation ([`story-normalizer.md`](../instructions/story-normalizer.md) границы).
 
 ---
 
@@ -64,7 +64,7 @@
 - Вход orchestrator для INGEST (Issue): **`normalized_issue_payload`** и контракт из Issues OpenAPI.
 - Перед вызовом orchestrator проверяет минимальный input contract и **не** подменяет ответ backend.
 
-Соответствие **типа операции** ↔ **HTTP** задаётся в `issue-api-methods-reference.md` (например `POST /issues/draft`).
+Соответствие **типа операции** ↔ **HTTP** задаётся в `story-api-methods-reference.md` (например `POST /issues/draft`).
 
 ### 3.4. SEARCH-поток (кратко)
 
@@ -76,7 +76,7 @@
 
 ### 4.1. SSOT по HTTP
 
-- **`issue-api-methods-reference.md`** + imported Actions contract (`custom-gpt-issues-reference.openapi.yaml`) — SSOT Issue для Actions.
+- **`story-api-methods-reference.md`** + imported Actions contract (`custom-gpt-issues-reference.openapi.yaml`) — SSOT Issue для Actions.
 
 ### 4.2. Механизм вызова (Custom GPT)
 
@@ -109,10 +109,10 @@
 | Описание модулей | `GPT UI/instructions/instruction-modules-index.md` |
 | Validation + отчёт | `GPT UI/instructions/ingest-validation.md` |
 | Deep parsing | `GPT UI/instructions/ingest-deep-parsing.md` |
-| Gate (DOGEstonia) | `GPT UI/instructions/issue-policy-gate.md` |
-| Normalizer | `GPT UI/instructions/issue-normalizer.md` |
+| Gate (DOGEstonia) | `GPT UI/instructions/story-policy-gate.md` |
+| Normalizer | `GPT UI/instructions/story-normalizer.md` |
 | HTTP / операции | `GPT UI/instructions/api-orchestrator.md` |
-| Контракт API (Issue) | `GPT UI/instructions/issue-api-methods-reference.md` |
+| Контракт API (Issue) | `GPT UI/instructions/story-api-methods-reference.md` |
 | Safety | `GPT UI/instructions/safety-compliance.md` |
 | Search | SEARCH-mode handoff in `base.md` + `api-orchestrator.md` (when search endpoints exist) |
 | OpenAPI для Actions (Issue) | `GPT UI/docs/custom-gpt-issues-reference.openapi.yaml` |
@@ -142,9 +142,9 @@
 
 | Эталон (legacy donor) | Кандидат (DOGEstonia) | Примечание |
 |------------------|----------------------|------------|
-| `activity-normalizer.md` | `issue-normalizer.md` | Канонизация под Issue + `normalized_issue_payload` в strict-цепочке |
-| `activity-data-model.md` | `issue-data-model.md` | Поля SPA + narrative layers |
-| legacy gate module | `issue-policy-gate.md` | SoT = operator rulebook / demo policy profile |
+| `activity-normalizer.md` | `story-normalizer.md` | Канонизация под Issue + `normalized_issue_payload` в strict-цепочке |
+| `activity-data-model.md` | `story-data-model.md` | Поля SPA + narrative layers |
+| legacy gate module | `story-policy-gate.md` | SoT = operator rulebook / demo policy profile |
 | `custom-gpt-actions-activities-reference.openapi.yaml` | `custom-gpt-issues-reference.openapi.yaml` | OpenAPI build/import artifact под ноду Issue |
 
 Файлы **`root.md`**, **`base.md`**, **`ingest-validation.md`**, **`ingest-deep-parsing.md`**, **`safety-compliance.md`**, **`api-orchestrator.md`** можно **не** переименовывать на первом шаге, но внутри — массово заменить термины и ссылки на `issue-*` / `Issue`.
@@ -155,15 +155,15 @@
 
 | Новый файл (кандидат) | Содержание |
 |----------------------|------------|
-| `issue-interview-flow.md` | Фазы 1–7, допустимые формулировки входа, reframe, запрет ранней классификации (синхрон с `REQ-08`, `REQ-12`) |
+| `story-interview-flow.md` | Фазы 1–7, допустимые формулировки входа, reframe, запрет ранней классификации (синхрон с `REQ-08`, `REQ-12`) |
 | `issue-interview-extraction.md` | Детализация блоков из FR-M1-019 (`raw_story`, `deep_need`, …) и связь с `REQ-10` |
-| `issue-i18n-policy.md` | FR-M1-028–031: политика `{ et, ru, en }`, fallback, запрет искажения смысла |
+| `story-i18n-policy.md` | FR-M1-028–031: политика `{ et, ru, en }`, fallback, запрет искажения смысла |
 
 Подключение: из **`base.md`** / **`ingest-validation.md`** — явная ссылка «при INGEST Interview активировать …» по правилам иерархии из `root.md`.
 
 ### 7.4. Порядок работ (минимальный, без поломки ссылок)
 
-1. Зафиксировать **issue-data-model.md** и целевой OpenAPI ноды (или черновик).  
+1. Зафиксировать **story-data-model.md** и целевой OpenAPI ноды (или черновик).  
 2. **Скопировать** эталонные файлы в ветку/префикс `dogestonia/` *или* править на месте — по выбору команды; при правке на месте — один коммит = один крупный блок (gate → normalizer → orchestrator).  
 3. Переименовать файлы из §7.2 **одним** изменением + `grep` по `GPT UI/instructions` и `GPT UI/docs` на старые имена.  
 4. Обновить **`instruction-modules-index.md`** и упоминания в **`root.md`**.  
