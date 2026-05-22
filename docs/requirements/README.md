@@ -32,5 +32,6 @@
 | 19 | [REQ-19-security-auth-boundaries-and-user-identity-flow.md](./REQ-19-security-auth-boundaries-and-user-identity-flow.md) |
 | 20 | [REQ-20-label-taxonomy-and-extraction-axes.md](./REQ-20-label-taxonomy-and-extraction-axes.md) |
 | 21 | [REQ-21-post-demo-privacy-pii-and-web3-vault-policy.md](./REQ-21-post-demo-privacy-pii-and-web3-vault-policy.md) |
+| 22 | [REQ-22-story-intake-wire-contract-v2-alignment.md](./REQ-22-story-intake-wire-contract-v2-alignment.md) |
 
-**Версия:** 0.6 · 2026-04-26 (добавлен REQ-21 post-demo: privacy/PII governance и защищённый web3 vault слой).
+**Версия:** 0.7 · 2026-05-21 (добавлен REQ-22 P0 wire contract v2 alignment; парный серверный REQ-33 в `doge-complaints-gateway/docs/requirements/`).
