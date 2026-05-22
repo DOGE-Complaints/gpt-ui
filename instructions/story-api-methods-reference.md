@@ -1,12 +1,12 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.0 · 2026-04-27  
+**Version:** 1.1 · 2026-05-22  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
 This file is the **HTTP source of truth for story intake runtime** inside the instruction bundle. Import the deployed story intake OpenAPI into GPT Actions (or equivalent) and treat that imported contract as authoritative for `operationId`, paths, schemas, and security. Until the node publishes canonical OpenAPI, paths below are **candidates**; before production, reconcile with `GET /openapi.json` on the deployed API.
 
-**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.2.0** at current instruction alignment). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.3.0** at current instruction alignment — REQ-22 wire v2). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
 
 ---
 
@@ -14,7 +14,7 @@ This file is the **HTTP source of truth for story intake runtime** inside the in
 
 | operationId | Method | Path | Request contract | Success envelope | Purpose |
 |-------------|--------|------|------------------|------------------|---------|
-| `postStoryIntake` | POST | `/intake/stories` | `StoryIntakeRequest` | `SuccessEnvelope_StoryIntake` (`200`) | Submit story intake payload to runtime. |
+| `postStoryIntake` | POST | `/intake/stories` | `StoryIntakeRequest` | `SuccessEnvelope_StoryIntake` (`202`) | Submit story intake payload to runtime. |
 
 Additional operations (search/reference/update) — add only when runtime contract exists; mirror in this table and in imported Actions contract with one-to-one method/path lock.
 
@@ -24,11 +24,15 @@ Additional operations (search/reference/update) — add only when runtime contra
 
 | Field | Required | Source |
 |---|---:|---|
-| `schema_version` | yes | hard-coded `m2.story_intake_envelope.v1` |
+| `schema_version` | yes | hard-coded `m2.story_intake_envelope.v2` |
 | `submitter.external_user_id` | yes | session/user context configured for runtime |
-| `narrative.original_text` | yes | normalized narrative text for `session_language` |
-| `narrative.language` | yes | `normalization_metadata.session_language` |
-| `narrative.title_hint` | yes | normalized title for `session_language` |
+| `submitter.identity_issuer` | yes | hard-coded `dogestonia.gpt.v1` (REQ-22 demo) |
+| `narrative.original_text` | yes | `canonical_payload.description[session_language]` |
+| `narrative.language` | yes | `normalization_metadata.detected_input_language` |
+| `narrative.session_language` | yes | `normalization_metadata.session_language` |
+| `narrative.title` | yes | `canonical_payload.title` object `{et, ru, en}` |
+| `narrative.description` | yes | `canonical_payload.description` object `{et, ru, en}` |
+| `narrative.summary` | no | `canonical_payload.summary` when present; omit empty keys |
 | `narrative.location_query` | no | optional, when available |
 | `narrative.canonical_type` | no | deferred by runtime policy |
 | `narrative.canonical_labels` | no | deferred by runtime policy |
@@ -94,6 +98,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.1 | 2026-05-22 | **REQ-22 / GIM-102–103:** wire v2 field lock — `identity_issuer`, `session_language`, `title`/`description` i18n objects; remove `title_hint*`; success HTTP `202`; lock `info.version` **0.3.0**. |
 | 1.0 | 2026-04-27 | Story-first runtime cutover: SSOT switched from `/issues/*` to `/intake/stories` (`postStoryIntake`) and `StoryIntakeRequest`/`SuccessEnvelope_StoryIntake`. |
 | 0.1 | 2026-04-10 | First draft + initial Actions contract snapshot 0.1.0 (STORY-M6-01). |
 | 0.2 | 2026-04-10 | **English-only** instruction text (repo policy). |

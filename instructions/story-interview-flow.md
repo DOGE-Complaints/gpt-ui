@@ -143,13 +143,12 @@ Sources: **FR-M1-032**, **FR-M1-033**, **FR-M1-034**. This subsection is the **n
 
 4. **Completion rule:** Do **not** treat Phase 7 as finished while a substantive correction from step **2–3** is still unresolved. Do **not** present Issue text as “locked” until step **3** yields user affirmation or explicit acceptance of residual gaps.
 
-5. **`title_hint` generation (D-04 / demo M2):** After user affirms the interpretation in step 3 (or explicitly accepts residual uncertainty), compose a concise single-line title in the **session primary language** from the confirmed framing.
+5. **Session title generation (D-04 / demo M2):** After user affirms the interpretation in step 3 (or explicitly accepts residual uncertainty), compose a concise single-line title in the **session primary language** from the confirmed framing.
    - Source: the confirmed Phase 7 summary or Phase 5 desired-state framing.
    - Length: aim for under 80 characters; no trailing punctuation.
    - Language: must match `normalization_metadata.session_language` (`et` | `ru` | `en`).
    - Do **not** ask the user to name or approve the title separately — derive it from the already-confirmed narrative. If the user asks to change it, accept in-place.
-   - This value becomes `narrative.title_hint` in the M2 Story Intake envelope (see [`api-orchestrator.md`](api-orchestrator.md) §5.2).
-   - Store as `canonical_payload.title[session_language]` in the logical package before handoff to [`story-normalizer.md`](story-normalizer.md).
+   - Store in `canonical_payload.title[session_language]` and populate trilingual `canonical_payload.title.{et,ru,en}` before handoff to [`story-normalizer.md`](story-normalizer.md). Wire v2 maps the full `title` object via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1 (no `title_hint*` fields).
 
 **Distinction from §7.1:** §7.1 templates are for **phases 3–4** micro-checks; §7.2 is the **final** Phase 7 block before structural validation / normalizer prep.
 

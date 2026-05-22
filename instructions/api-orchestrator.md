@@ -250,29 +250,57 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
 
 ```json
 {
-  "schema_version": "m2.story_intake_envelope.v1",
-  "narrative": {
-    "language": "<normalization_metadata.session_language>",
-    "title_hint": "<canonical_payload.title[session_language]>",
-    "original_text": "<canonical_payload.description[session_language]>"
-  },
+  "schema_version": "m2.story_intake_envelope.v2",
   "submitter": {
-    "external_user_id": "<wallet address from session context — demo mock>"
+    "external_user_id": "<wallet address from session context — demo mock>",
+    "identity_issuer": "dogestonia.gpt.v1"
+  },
+  "narrative": {
+    "original_text": "<canonical_payload.description[session_language]>",
+    "language": "<normalization_metadata.detected_input_language>",
+    "session_language": "<normalization_metadata.session_language>",
+    "title": {
+      "et": "<canonical_payload.title.et>",
+      "ru": "<canonical_payload.title.ru>",
+      "en": "<canonical_payload.title.en>"
+    },
+    "description": {
+      "et": "<canonical_payload.description.et>",
+      "ru": "<canonical_payload.description.ru>",
+      "en": "<canonical_payload.description.en>"
+    },
+    "summary": {
+      "et": "<canonical_payload.summary.et — omit key if empty>",
+      "ru": "<canonical_payload.summary.ru — omit key if empty>",
+      "en": "<canonical_payload.summary.en — omit key if empty>"
+    }
+  },
+  "origin": {
+    "source": "openai_gpt_action",
+    "conversation_id": "<active conversation id>",
+    "tool_call_id": "<tool call id if this submit is tool-driven; else omit>"
   }
 }
 ```
 
-**Field mapping table (D-03…D-08):**
+**Field mapping table (REQ-22 / D-03…D-08):**
 
 | `StoryIntakeRequest` field | Source in `normalized_issue_payload` | Required | Decision |
 |---|---|---|---|
-| `schema_version` | Hard-coded: `"m2.story_intake_envelope.v1"` | Yes | Story Intake envelope contract |
-| `narrative.language` | `normalization_metadata.session_language` | Yes | D-03, D-05 |
-| `narrative.title_hint` | `canonical_payload.title[session_language]` | Yes | D-03, D-04 |
-| `narrative.original_text` | `canonical_payload.description[session_language]` | Yes | D-08 |
+| `schema_version` | Hard-coded: `"m2.story_intake_envelope.v2"` | Yes | Story Intake envelope contract (`contracts.py`) |
 | `submitter.external_user_id` | Wallet from session context (demo mock) | Yes | D-06 |
+| `submitter.identity_issuer` | Hard-coded: `"dogestonia.gpt.v1"` | Yes | REQ-22 GAP-W-02 |
+| `narrative.language` | `normalization_metadata.detected_input_language` | Yes | REQ-22 GAP-W-05; language of user narrative input |
+| `narrative.session_language` | `normalization_metadata.session_language` | Yes | REQ-22 GAP-W-03 |
+| `narrative.title` | `canonical_payload.title` (`{et, ru, en}`) | Yes | REQ-22 GAP-W-04; direct object mapping |
+| `narrative.description` | `canonical_payload.description` (`{et, ru, en}`) | Yes | REQ-22 GAP-W-04 |
+| `narrative.original_text` | `canonical_payload.description[session_language]` | Yes | REQ-22 §2; primary-slot narrative for runtime |
 | `narrative.canonical_type` | `canonical_payload.type` | Deferred | OP-01 |
 | `narrative.canonical_labels` | `canonical_payload.labels[]` | Deferred | OP-02 |
+| `narrative.summary` | `canonical_payload.summary` object (`et`/`ru`/`en` strings) | No | Omit empty keys; closes GAP-03 |
+| `origin.source` | Fixed: `openai_gpt_action` (or product-agreed string) | No | Traceability; closes GAP-04 when set |
+| `origin.conversation_id` | Session / thread id available to the orchestrator | No | |
+| `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
 
 **Do NOT include in `StoryIntakeRequest`:**
 
@@ -288,24 +316,27 @@ Run before every `POST /intake/stories` call:
    If **not** — **STOP**. Do not call HTTP. Tell the user:  
    *«The session language detected ([lang]) is not supported for demo submission. Supported languages: Estonian (et), Russian (ru), English (en). Please restart the session in a supported language.»*
 
-2. `canonical_payload.title[session_language]` is **non-empty**.  
-   If empty — STOP. `title_hint` is missing. Return to Phase 7 step 5 to generate it.
+2. `canonical_payload.title[session_language]` is **non-empty** and all `canonical_payload.title.{et,ru,en}` slots required by runtime are non-empty.  
+   If empty — STOP. Primary title slot is missing. Return to Phase 7 step 5 to generate it.
 
-3. `canonical_payload.description[session_language]` is **non-empty**.  
-   If empty — STOP. `narrative.original_text` cannot be empty.
+3. `canonical_payload.description[session_language]` is **non-empty** and `canonical_payload.description.{et,ru,en}` are populated for wire v2.  
+   If empty — STOP. `narrative.original_text` and `narrative.description` cannot be empty.
 
-4. `normalization_metadata.policy_gate_ref.status = "approved"`.  
+4. `normalization_metadata.detected_input_language` ∈ `{et, ru, en}`.  
+   If missing — STOP. Normalizer must emit `detected_input_language` before HTTP ([`story-normalizer.md`](story-normalizer.md) §4.2).
+
+5. `normalization_metadata.policy_gate_ref.status = "approved"`.  
    If not — STOP. Normalization on a non-approved gate violates the strict chain.
 
-5. `normalization_metadata.session_language` matches `normalization_metadata.normalizer_module` ref.  
+6. `normalization_metadata.session_language` matches `normalization_metadata.normalizer_module` ref.  
    Informational check only; log mismatch in trace_notes.
 
 If all checks pass → proceed to HTTP call.
 
 #### 5.2.3 Story Intake response handling
 
-- **HTTP 200/201:** report `story_id` and `status` from response body to user. Do not interpret status beyond what the response states. Do not claim publication or clustering.
-- **HTTP 400:** likely missing `language` or `title_hint`. Check pre-flight again; do not retry without fixing the input.
+- **HTTP 202:** report `story_id` and `status` from response `data` envelope to user. Story is accepted; clustering is deferred. Do not retry on 202.
+- **HTTP 400:** likely missing/invalid v2 fields (`schema_version`, `identity_issuer`, `session_language`, `title`, `description`, `language`). Check pre-flight again; do not retry without fixing the input.
 - **HTTP 401/403:** bearer issue; surface error to user without inventing auth state.
 - **HTTP 422:** schema validation failure on gateway side; log `detail` field if present; do not fabricate correction.
 - **HTTP 5xx:** gateway error; report uncertainty to user; do not retry automatically.

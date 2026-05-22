@@ -52,7 +52,7 @@ For **DOGEstonia / Issue** ingest when using the **strict** artifact discipline 
 
 This lifecycle describes **Module 1** execution only: strict Issue chain ending in `normalized_issue_payload` and Issues Actions/OpenAPI calls.
 
-For **Module 2** Story Intake (`StoryIntakeEnvelope`), follow [`api-orchestrator.md`](api-orchestrator.md) §5.2 and the Story Intake envelope rules there. Do not treat M1 API success as M2 intake success, and do not merge their acceptance checks into one step.
+For **Module 2** Story Intake (`StoryIntakeRequest`, wire `m2.story_intake_envelope.v2`), follow [`api-orchestrator.md`](api-orchestrator.md) §5.2.1 and [`story-api-methods-reference.md`](story-api-methods-reference.md). Runtime handoff is **`POST /intake/stories`** only — not Issue draft routes. Do not treat M1 Issue API success as M2 story-intake success, and do not merge their acceptance checks into one step.
 
 ---
 

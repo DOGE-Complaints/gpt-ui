@@ -60,14 +60,18 @@
 
 ---
 
-## 6.1 Runtime single-string bridge (GIM-74)
+## 6.1 Story Intake wire v2 (REQ-22)
 
-Current runtime OpenAPI fields such as `narrative.original_text`, `narrative.title_hint`, and `IssueCreateRequest.title` are **strings**, not `{ et, ru, en }` objects. When a runtime request is built from logical Issue text:
+For demo M2 **`POST /intake/stories`** (`m2.story_intake_envelope.v2`), the runtime contract requires:
 
-1. Select the **primary slot** from `normalization_metadata.session_language` / `comm_context.ui_lang`.
-2. Use the primary-language user-confirmed testimony for `narrative.original_text`.
-3. Use the primary-language title as `narrative.title_hint` or `IssueCreateRequest.title` when those fields are in scope.
-4. Keep secondary-language variants in logical/non-wire artifacts; do not claim current runtime accepts trilingual objects.
+1. `narrative.title` and `narrative.description` as **`{ et, ru, en }` objects** — map directly from `canonical_payload.title` / `.description` ([`api-orchestrator.md`](api-orchestrator.md) §5.2.1).
+2. `narrative.original_text` — primary-slot string from `canonical_payload.description[session_language]`.
+3. `narrative.session_language` — from `normalization_metadata.session_language`.
+4. `narrative.language` — from `normalization_metadata.detected_input_language` (not a substitute for `session_language`).
+
+Legacy `title_hint*` wire fields are **superseded** — do not emit them in Story Intake requests.
+
+Issue draft routes (`IssueCreateRequest.title` as a single string) remain out of scope for this REQ; see Module 1 vs Module 2 boundary in [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.2.
 
 ---
 

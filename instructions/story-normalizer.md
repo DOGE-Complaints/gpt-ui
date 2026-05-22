@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.1.8 |
-| **Date** | 2026-04-26 |
+| **Version** | 0.1.9 |
+| **Date** | 2026-05-22 |
 | **Traceability** | FR-M1-035–037; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
@@ -87,6 +87,7 @@ Single final envelope:
     },
     "normalization_metadata": {
       "session_language": "et",
+      "detected_input_language": "et",
       "ingest_validation_report_ref": "validation_<id>",
       "safety_compliance_report_ref": "safety_<id>",
       "policy_gate_ref": {
@@ -139,7 +140,8 @@ Stable **references** to upstream work (opaque strings or objects — align with
 
 | Key | Purpose |
 |-----|---------|
-| `session_language` | **Required** for Issue ingest: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](bootstrap.md) **`comm_context.ui_lang`** (see [`story-i18n-policy.md`](story-i18n-policy.md) §1–2). Backend readers use this to know which `{ et, ru, en }` slot was primary-authored. |
+| `session_language` | **Required** for story-intake handoff: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](bootstrap.md) **`comm_context.ui_lang`** (see [`story-i18n-policy.md`](story-i18n-policy.md) §1–2). Maps to `StoryIntakeRequest.narrative.session_language`. |
+| `detected_input_language` | **Required** for wire v2: `et` \| `ru` \| `en` — auto-detected language of the user’s narrative text from deep parsing / validation (may differ from `session_language`). Maps to `StoryIntakeRequest.narrative.language` per REQ-22. Do not substitute `session_language` when the detected language differs. |
 | `ingest_validation_report_ref` | Reference to the validation artifact used (id, hash, or short summary line). |
 | `safety_compliance_report_ref` | Reference to relevant safety checkpoint output for this handoff. |
 | `policy_gate_ref` | At minimum: `policy_ref`, `rulebook_version`, and `policy_gate_result.status` copy or stable id. |
@@ -223,3 +225,4 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.1.6 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |
 | 0.1.7 | 2026-04-26 | Locked final `normalized_issue_payload` shape, optional `non_wire_metadata` sidecar, and no-direct-transport rule (GIM-80). |
 | 0.1.8 | 2026-04-26 | Added label extraction metadata and canonical label disposition rules (GIM-89). |
+| 0.1.9 | 2026-05-22 | **REQ-22 / GIM-104:** required `normalization_metadata.detected_input_language` for `narrative.language` wire mapping. |

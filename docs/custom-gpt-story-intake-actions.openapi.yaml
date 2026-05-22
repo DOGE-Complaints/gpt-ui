@@ -5,13 +5,14 @@
 #
 # STATUS: CONTRACT CANDIDATE — lock paths/schemas to node GET /openapi.json when available.
 # SSOT companion: GPT UI/instructions/story-api-methods-reference.md
+# Lockstep: doge-complaints-gateway/src/core/intake/contracts.py (m2.story_intake_envelope.v2)
 #
-openapi: 3.0.3
+openapi: 3.1.0
 info:
   title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
-  version: "0.2.0"
+  version: "0.3.0"
   description: >
-    Minimal subset for GPT Actions targeting story intake runtime.
+    Minimal subset for GPT Actions targeting story intake runtime (wire contract v2).
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Replace servers.url and reconcile components with the live FastAPI OpenAPI before production.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
@@ -34,27 +35,53 @@ components:
         Current model is app-level integration bearer (no per-user OAuth identity claims in this schema).
 
   schemas:
+    I18nText:
+      type: object
+      required: [et, ru, en]
+      properties:
+        et:
+          type: string
+        ru:
+          type: string
+        en:
+          type: string
+
     Submitter:
       type: object
-      required: [external_user_id]
+      required: [external_user_id, identity_issuer]
       properties:
         external_user_id:
           type: string
         identity_issuer:
           type: string
-          nullable: true
+          description: >
+            Namespace of submitter identity source. Demo GPT: dogestonia.gpt.v1 (REQ-22).
 
     Narrative:
       type: object
-      required: [original_text, language, title_hint]
+      required:
+        - original_text
+        - language
+        - session_language
+        - title
+        - description
       properties:
         original_text:
           type: string
         language:
           type: string
           enum: [et, ru, en]
-        title_hint:
+          description: Auto-detected language of user narrative input (detected_input_language).
+        session_language:
           type: string
+          enum: [et, ru, en]
+          description: Primary session / UI language from normalization_metadata.session_language.
+        title:
+          $ref: "#/components/schemas/I18nText"
+        description:
+          $ref: "#/components/schemas/I18nText"
+        summary:
+          $ref: "#/components/schemas/I18nText"
         location_query:
           type: string
           nullable: true
@@ -102,7 +129,7 @@ components:
       properties:
         schema_version:
           type: string
-          enum: [m2.story_intake_envelope.v1]
+          enum: [m2.story_intake_envelope.v2]
         submitter:
           $ref: "#/components/schemas/Submitter"
         narrative:
@@ -161,7 +188,7 @@ paths:
       operationId: postStoryIntake
       summary: Submit story intake payload
       description: >
-        Story-first primary submission path for runtime intake.
+        Story-first primary submission path for runtime intake (wire contract v2).
       x-openai-isConsequential: true
       security:
         - GptActionsBearer: []
@@ -172,8 +199,8 @@ paths:
             schema:
               $ref: "#/components/schemas/StoryIntakeRequest"
       responses:
-        "200":
-          description: Story intake success envelope
+        "202":
+          description: Story intake accepted (clustering deferred)
           content:
             application/json:
               schema:
@@ -186,6 +213,12 @@ paths:
                 $ref: "#/components/schemas/ErrorEnvelope"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorEnvelope"
+        "422":
+          description: Schema or geo-scope validation error
           content:
             application/json:
               schema:
