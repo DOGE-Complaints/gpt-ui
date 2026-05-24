@@ -1,12 +1,12 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.2 · 2026-05-24  
+**Version:** 1.3 · 2026-05-24  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
 This file is the **HTTP source of truth for story intake runtime** inside the instruction bundle. Import the deployed story intake OpenAPI into GPT Actions (or equivalent) and treat that imported contract as authoritative for `operationId`, paths, schemas, and security. Until the node publishes canonical OpenAPI, paths below are **candidates**; before production, reconcile with `GET /openapi.json` on the deployed API.
 
-**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.3.0** at current instruction alignment — REQ-22 wire v2). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.4.0** at current instruction alignment — REQ-23 behavioral extensions on REQ-22 wire v2). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
 
 ---
 
@@ -32,13 +32,20 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.session_language` | yes | `normalization_metadata.session_language` |
 | `narrative.title` | yes | `canonical_payload.title` object `{et, ru, en}` |
 | `narrative.description` | yes | `canonical_payload.description` object `{et, ru, en}` |
-| `narrative.summary` | no | REQ-25: include only when **all** `et`/`ru`/`en` slots non-empty; otherwise omit entire `summary` object |
+| `narrative.summary` | no | `canonical_payload.summary`; omit entire block if any `et`/`ru`/`en` slot empty (REQ-25) |
 | `narrative.location_query` | no | optional, when available |
-| `narrative.canonical_type` | no | REQ-25: `canonical_payload.type` when present (`complaint`, `observation`, `system_bug`, `absurdity`); omit if absent |
-| `narrative.canonical_labels` | no | REQ-25: canonical disposition labels from `canonical_payload.labels[]`; omit if empty |
-| `origin` / `privacy` / `live_story_context` | no | optional sidecar blocks when contract and context support them |
+| `narrative.canonical_type` | no | `canonical_payload.type`; `complaint` / `system_bug` → issue promotion gate (REQ-25) |
+| `narrative.canonical_labels` | no | `canonical_payload.labels[]`; canonical disposition only per `story-label-taxonomy.md` (REQ-25) |
+| `narrative.institution` | no | `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / REQ-43) |
+| `privacy.contains_pii` | no | `normalization_metadata.contains_pii` after §5.2.0 flow (REQ-23 §A) |
+| `privacy.redaction_requested` | no | user choice in api-orchestrator §5.2.0 |
+| `gpt_signals.severity` | no | `non_wire_metadata.severity` (REQ-42 enums) |
+| `gpt_signals.impact_estimation` | no | `non_wire_metadata.impact_estimation` |
+| `gpt_signals.problem_status` | no | `non_wire_metadata.problem_status` |
+| `live_story_context.consistency_notes` | no | normalizer §4.5; omit if null |
+| `origin` | no | traceability sidecar |
 
-The request must not contain backend-issued fields (`id`, `status`, timestamps, txids) or instruction-internal metadata not accepted by runtime schema.
+The request must not contain backend-issued fields (`id`, `status`, timestamps, txids), raw `non_wire_metadata`, or other instruction-internal metadata not accepted by runtime schema.
 
 ---
 
@@ -98,7 +105,8 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
-| 1.2 | 2026-05-24 | **REQ-25:** activate `canonical_type` / `canonical_labels` wire; `summary` omit-entire-block when any i18n slot empty (align with [`api-orchestrator.md`](api-orchestrator.md) §5.2.1). |
+| 1.3 | 2026-05-24 | **REQ-25 / GIM-116–117:** activate `canonical_type` / `canonical_labels` wire; summary omit entire block if any slot empty. |
+| 1.2 | 2026-05-24 | **REQ-23 / GIM-107–111:** `gpt_signals`, `narrative.institution`, `privacy.*`, `live_story_context.consistency_notes`; lock `info.version` **0.4.0**. |
 | 1.1 | 2026-05-22 | **REQ-22 / GIM-102–103:** wire v2 field lock — `identity_issuer`, `session_language`, `title`/`description` i18n objects; remove `title_hint*`; success HTTP `202`; lock `info.version` **0.3.0**. |
 | 1.0 | 2026-04-27 | Story-first runtime cutover: SSOT switched from `/issues/*` to `/intake/stories` (`postStoryIntake`) and `StoryIntakeRequest`/`SuccessEnvelope_StoryIntake`. |
 | 0.1 | 2026-04-10 | First draft + initial Actions contract snapshot 0.1.0 (STORY-M6-01). |

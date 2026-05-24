@@ -194,7 +194,7 @@ Operational **DO NOT** in Issue interview:
 
 **Civic-outcomes alignment:** do not imply guaranteed government or institutional outcomes; civic signal ≠ promise of action.
 
-**Demo `institution` rule:** Do **not** ask the user to name a government agency solely to fill Issue **`institution`**, and do **not** project **`institution`** from dialogue into draft Issue material — see [`story-data-model.md`](story-data-model.md) §4.2 and [`ingest-validation.md`](ingest-validation.md) (Issue overlay).
+**`institution` rule (REQ-23 §2.5):** Do **not** ask the user to name a government agency solely to fill Issue **`institution`**. Include **`institution`** in draft/canonical material only when trilingual `{et, ru, en}` institution text is available; otherwise omit — see [`story-data-model.md`](story-data-model.md) §4.2 and [`ingest-validation.md`](ingest-validation.md).
 
 ---
 

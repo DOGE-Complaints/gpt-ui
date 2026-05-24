@@ -5,7 +5,7 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.1.9 |
+| **Version** | 0.2.0 |
 | **Date** | 2026-05-22 |
 | **Traceability** | FR-M1-035–037; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
@@ -118,7 +118,7 @@ Single final envelope:
 }
 ```
 
-Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` in demo scope unless product explicitly lifts the demo restriction on `institution`. Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream.
+Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` unless all three slots `{et, ru, en}` are non-empty (REQ-23 §2.5). Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream. Omit `live_story_context` when no narrative contradiction was detected (REQ-23 §3).
 
 ### 4.1 `canonical_payload`
 
@@ -130,7 +130,7 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 | `labels` | String array; keys must be `canonical` labels allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }`; if omitted, orchestrator/UI may use short-field fallbacks per product/UI conventions. |
-| `institution` | Optional `{ et, ru, en }` **only** when product scope allows; **demo default:** omit until scope lifts. |
+| `institution` | Optional `{ et, ru, en }` when interview/validation produced full trilingual institution text; **omit** if any slot is empty (REQ-23 §2.5). |
 
 Do not add donor-era, legacy-only, Search-only, or backend-issued fields to `canonical_payload`.
 
@@ -142,6 +142,7 @@ Stable **references** to upstream work (opaque strings or objects — align with
 |-----|---------|
 | `session_language` | **Required** for story-intake handoff: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](bootstrap.md) **`comm_context.ui_lang`** (see [`story-i18n-policy.md`](story-i18n-policy.md) §1–2). Maps to `StoryIntakeRequest.narrative.session_language`. |
 | `detected_input_language` | **Required** for wire v2: `et` \| `ru` \| `en` — auto-detected language of the user’s narrative text from deep parsing / validation (may differ from `session_language`). Maps to `StoryIntakeRequest.narrative.language` per REQ-22. Do not substitute `session_language` when the detected language differs. |
+| `contains_pii` | **Required** for REQ-23 handoff: boolean — conservative PII scan on `original_text` / `description.*` (see §4.4). Read by [`api-orchestrator.md`](api-orchestrator.md) §5.2.0. |
 | `ingest_validation_report_ref` | Reference to the validation artifact used (id, hash, or short summary line). |
 | `safety_compliance_report_ref` | Reference to relevant safety checkpoint output for this handoff. |
 | `policy_gate_ref` | At minimum: `policy_ref`, `rulebook_version`, and `policy_gate_result.status` copy or stable id. |
@@ -180,7 +181,60 @@ Only candidates with `disposition = "canonical"` and keys allowed by [`story-lab
 
 `severity`, `impact_estimation`, and `problem_status` are resident-perceived subjective fields from [`story-data-model.md`](story-data-model.md) **§4.3**. If collected and confirmed upstream, place them in optional `non_wire_metadata`; otherwise omit this sidecar.
 
-`non_wire_metadata` is not a transport object. It must not be copied into current `StoryIntakeRequest`, `IssueCreateRequest`, or `IssueDraftCreateRequest` unless a separate OpenAPI/schema task explicitly adds those fields.
+`non_wire_metadata` is an **internal** sidecar only. [`api-orchestrator.md`](api-orchestrator.md) maps these three fields to wire `gpt_signals` (REQ-23 §2). Do **not** copy the `non_wire_metadata` object into `StoryIntakeRequest`.
+
+Allowed enum values (must match REQ-42 when mapped to wire):
+
+| Field | Values |
+|-------|--------|
+| `severity` | `LOW`, `MEDIUM`, `HIGH`, `CRITICAL` |
+| `impact_estimation` | `LOCAL`, `DISTRICT`, `CITY`, `NATIONAL` |
+| `problem_status` | `ONGOING`, `RESOLVED`, `RECURRING`, `UNKNOWN` |
+
+If unsure about a value, prefer `UNKNOWN` for `problem_status` or omit that field from `non_wire_metadata`.
+
+### 4.4 PII detection (REQ-23 §1.2)
+
+Scan `canonical_payload.description.*` and narrative text used for `original_text` mapping for personally identifiable information:
+
+| PII type | Examples |
+|----------|----------|
+| Person name | «Иван Петров», «Mari Tamm» |
+| Address | «Liivalaia 10-5», street + number |
+| Phone | `+372…`, national formats |
+| Email | `name@domain` |
+| Personal identifier | ID-card, passport, national ID numbers |
+
+**Rules:**
+
+- If **high confidence** that any type is present → set `normalization_metadata.contains_pii = true`.
+- If **low confidence** → still set `contains_pii = true` (conservative).
+- If no PII detected → `contains_pii = false`.
+
+Do **not** perform the user interaction here; [`api-orchestrator.md`](api-orchestrator.md) §5.2.0 runs the two-step edit flow before HTTP.
+
+### 4.5 Consistency notes (REQ-23 §3.2)
+
+When the narrative contains contradictions worth documenting for operators, add a top-level sidecar on `normalized_issue_payload` (sibling to `canonical_payload`):
+
+```json
+"live_story_context": {
+  "consistency_notes": "One or two sentences describing the contradiction only."
+}
+```
+
+Set `consistency_notes` when any of these apply:
+
+| Situation | Example |
+|-----------|---------|
+| Temporal contradiction | Problem stated as years ago vs «last week» |
+| Geographic contradiction | Two different districts/addresses for one issue |
+| Responsibility unclear | City vs state agency ambiguous |
+| Problem status ambiguous | Both «resolved» and «still happening» |
+
+**Format:** free text, 1–2 sentences, language = `session_language` or `en`; describe the **contradiction**, not the complaint summary.
+
+**Omit rule:** if no contradiction → do **not** add `live_story_context`; never emit empty string.
 
 ---
 
@@ -226,3 +280,4 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.1.7 | 2026-04-26 | Locked final `normalized_issue_payload` shape, optional `non_wire_metadata` sidecar, and no-direct-transport rule (GIM-80). |
 | 0.1.8 | 2026-04-26 | Added label extraction metadata and canonical label disposition rules (GIM-89). |
 | 0.1.9 | 2026-05-22 | **REQ-22 / GIM-104:** required `normalization_metadata.detected_input_language` for `narrative.language` wire mapping. |
+| 0.2.0 | 2026-05-22 | **REQ-23 / GIM-108–111:** §4.4 PII (`contains_pii`); §4.5 `live_story_context.consistency_notes`; §4.3 → `gpt_signals` wire via orchestrator; institution emit when full i18n. |

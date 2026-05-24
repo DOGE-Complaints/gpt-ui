@@ -160,7 +160,7 @@ This instruction is activated when:
 }
 ```
 
-Optional keys (`summary`, `institution`, `non_wire_metadata`) may be absent. Demo scope keeps `canonical_payload.institution` absent/null unless product explicitly allows it.
+Optional keys (`summary`, `institution`, `non_wire_metadata`, `live_story_context`) may be absent. Include `canonical_payload.institution` only when all `{et, ru, en}` are non-empty (REQ-23 §2.5).
 
 ### 4.1a Deterministic transform to `StoryIntakeRequest`
 
@@ -275,19 +275,36 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
       "et": "<canonical_payload.summary.et>",
       "ru": "<canonical_payload.summary.ru>",
       "en": "<canonical_payload.summary.en>"
+    },
+    "institution": {
+      "et": "<canonical_payload.institution.et — include only when all et/ru/en non-empty>",
+      "ru": "<canonical_payload.institution.ru>",
+      "en": "<canonical_payload.institution.en>"
     }
   },
   "origin": {
     "source": "openai_gpt_action",
     "conversation_id": "<active conversation id>",
     "tool_call_id": "<tool call id if this submit is tool-driven; else omit>"
+  },
+  "privacy": {
+    "contains_pii": true,
+    "redaction_requested": true
+  },
+  "gpt_signals": {
+    "severity": "HIGH",
+    "impact_estimation": "DISTRICT",
+    "problem_status": "ONGOING"
+  },
+  "live_story_context": {
+    "consistency_notes": "User mentioned two different addresses for the same problem."
   }
 }
 ```
 
-Omit optional blocks when not applicable: `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys).
+Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (incomplete i18n), `live_story_context` (no contradiction), `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string.
 
-**Field mapping table (REQ-22 / REQ-25 / D-03…D-08):**
+**Field mapping table (REQ-22 / REQ-23 / REQ-25 / D-03…D-08):**
 
 | `StoryIntakeRequest` field | Source in `normalized_issue_payload` | Required | Decision |
 |---|---|---|---|
@@ -305,12 +322,34 @@ Omit optional blocks when not applicable: `canonical_type` / `canonical_labels` 
 | `origin.source` | Fixed: `openai_gpt_action` (or product-agreed string) | No | Traceability; closes GAP-04 when set |
 | `origin.conversation_id` | Session / thread id available to the orchestrator | No | |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
+| `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | REQ-23 §2.5; omit if any slot empty |
+| `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A; omit entire `privacy` block when false/absent |
+| `privacy.redaction_requested` | User choice in §5.2.0 two-step flow | No | `true` only if user agreed to edit |
+| `gpt_signals.severity` | `non_wire_metadata.severity` | No | REQ-23 §B / REQ-42; omit block if sidecar absent |
+| `gpt_signals.impact_estimation` | `non_wire_metadata.impact_estimation` | No | Enum per REQ-42; use `UNKNOWN` or omit field if unsure |
+| `gpt_signals.problem_status` | `non_wire_metadata.problem_status` | No | Enum per REQ-42 |
+| `live_story_context.consistency_notes` | `normalized_issue_payload.live_story_context.consistency_notes` | No | REQ-23 §C; omit block when null |
+
+**Wire transform (`non_wire_metadata` → `gpt_signals`):** map the three classification fields to root `gpt_signals` per REQ-23 §2.2–2.4. Do **not** copy the `non_wire_metadata` object itself into the HTTP body.
 
 **Do NOT include in `StoryIntakeRequest`:**
 
-- `non_wire_metadata` fields (`severity`, `impact_estimation`, `problem_status`)
-- `normalization_metadata` internals (refs, `label_extraction_metadata`)
+- Raw `non_wire_metadata` object (use `gpt_signals` instead)
+- `normalization_metadata` internals (refs, `label_extraction_metadata`, `contains_pii` except via `privacy`)
 - Backend-issued fields: `id`, `status`, `created_at`, `arweave_txid`
+
+#### 5.2.0 PII pre-send check (REQ-23 §1.3)
+
+Run **after** building the draft `StoryIntakeRequest` mapping and **before** §5.2.2 pre-flight / HTTP.
+
+If `normalization_metadata.contains_pii` is `true`:
+
+1. **Inform the user** which PII type(s) were detected in `original_text` / `description.*` and ask whether they want to remove them before submission.
+2. **If the user agrees to edit:** help edit the narrative, re-run [`story-normalizer.md`](story-normalizer.md) on the edited text, then set `privacy.contains_pii = true` and `privacy.redaction_requested = true`.
+3. **If the user declines:** set `privacy.contains_pii = true` and `privacy.redaction_requested = false`.
+4. Proceed to §5.2.2 pre-flight.
+
+If `contains_pii` is `false` or absent: **omit** the entire `privacy` block; proceed directly to §5.2.2.
 
 #### 5.2.2 Story Intake pre-flight checks (before HTTP)
 
@@ -335,8 +374,17 @@ Run before every `POST /intake/stories` call:
 6. `normalization_metadata.session_language` matches `normalization_metadata.normalizer_module` ref.  
    Informational check only; log mismatch in trace_notes.
 
-7. If `narrative.summary` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
-   If any slot is empty — remove `summary` from `narrative` (do not send partial i18n). REQ-25 §2.
+7. If `narrative.institution` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
+   If any slot is empty — remove `institution` from `narrative` (do not send partial i18n).
+
+8. If `live_story_context.consistency_notes` is present: must be non-empty trimmed text; language should match `session_language` (or `en`).  
+   If empty after trim — omit entire `live_story_context` block.
+
+9. If `gpt_signals` is included: each present field must match REQ-42 enums.  
+   Omit unknown values or use `UNKNOWN` for `problem_status` only.
+
+10. If `narrative.summary` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
+    If any slot is empty — remove `summary` from `narrative` (do not send partial i18n). REQ-25 §2.
 
 If all checks pass → proceed to HTTP call.
 
