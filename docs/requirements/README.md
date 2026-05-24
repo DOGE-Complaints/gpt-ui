@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (21 файлов)
+## Оглавление REQ (23 файла)
 
 | № | Файл |
 |---|------|
@@ -33,5 +33,6 @@
 | 20 | [REQ-20-label-taxonomy-and-extraction-axes.md](./REQ-20-label-taxonomy-and-extraction-axes.md) |
 | 21 | [REQ-21-post-demo-privacy-pii-and-web3-vault-policy.md](./REQ-21-post-demo-privacy-pii-and-web3-vault-policy.md) |
 | 22 | [REQ-22-story-intake-wire-contract-v2-alignment.md](./REQ-22-story-intake-wire-contract-v2-alignment.md) |
+| 23 | [REQ-24-gpt-orchestrator-response-contract-corrections.md](./REQ-24-gpt-orchestrator-response-contract-corrections.md) |
 
-**Версия:** 0.7 · 2026-05-21 (добавлен REQ-22 P0 wire contract v2 alignment; парный серверный REQ-33 в `doge-complaints-gateway/docs/requirements/`).
+**Версия:** 0.9 · 2026-05-24 (добавлен REQ-24 orchestrator response contract corrections; lockstep API_REFERENCE §4, §6.5–6.7).
