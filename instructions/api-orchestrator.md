@@ -335,11 +335,16 @@ If all checks pass → proceed to HTTP call.
 
 #### 5.2.3 Story Intake response handling
 
-- **HTTP 202:** report `story_id` and `status` from response `data` envelope to user. Story is accepted; clustering is deferred. Do not retry on 202.
-- **HTTP 400:** likely missing/invalid v2 fields (`schema_version`, `identity_issuer`, `session_language`, `title`, `description`, `language`). Check pre-flight again; do not retry without fixing the input.
-- **HTTP 401/403:** bearer issue; surface error to user without inventing auth state.
-- **HTTP 422:** schema validation failure on gateway side; log `detail` field if present; do not fabricate correction.
+- **HTTP 202:** story accepted. Report `story_id` and `status` from response `data` envelope to the user. Do not retry on 202.
+  - `status = "ready_for_profile"`: story will enter clustering and may become a public issue.
+  - `status = "partial_ready"`: story is saved but **not** clustered — narrative is incomplete (empty `title`, `description`, or a language slot). Tell the user the story is saved but needs completion before publication.
+  - If the request included `gpt_signals`: a failure to persist signals on the server does **not** change HTTP 202. The story is still accepted; `gpt_signals` may be missing from `story_signals` when the DB write fails — the server logs this and does not fail intake.
+- **HTTP 400:** likely missing/invalid v2 fields (`schema_version`, `identity_issuer`, `session_language`, `title`, `description`, `language`) or other `DOMAIN_ERROR` / domain validation from the gateway. Check pre-flight again; do not retry without fixing the input. Schema and field validation map to **400** (`error.code` typically `DOMAIN_ERROR`), not 422.
+- **HTTP 401/403:** bearer issue; surface `error.code` / `error.message` from the envelope to the user without inventing auth state.
+- **HTTP 422 (`GEO_SCOPE_MISMATCH`):** `location_query` resolved outside the server geo scope (for demo: Estonia / Tallinn). Ask the user to clarify location within the supported region. Do not treat this as a schema error — schema/field problems are **400** (`DOMAIN_ERROR`).
 - **HTTP 5xx:** gateway error; report uncertainty to user; do not retry automatically.
+
+On any error response, read `error` as an object `{code, type, message, details}` and top-level `trace_id` (see §6.1). Do not expect `success`, `timestamp`, or `request_id` fields.
 
 ---
 
@@ -354,28 +359,33 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 **Key schemas (Story Intake):**
 
 1. **Story intake envelope / request body** — see imported Actions contract `StoryIntakeRequest` / `SuccessEnvelope_StoryIntake`.
-2. **Error Response** — Standard format:
+2. **Error Response** — Gateway envelope (lockstep [`API_REFERENCE.md`](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) §4):
    ```json
    {
-     "success": false,
-     "error": "error_code",
-     "message": "Human-readable message",
-     "details": [...],
-     "timestamp": 1640995200,
-     "request_id": "req_1234567890"
+     "error": {
+       "code": "DOMAIN_ERROR",
+       "type": "domain",
+       "message": "Missing or invalid root.submitter.",
+       "details": {}
+     },
+     "trace_id": "abc123"
    }
    ```
-3. **Success Response** — Per story intake OpenAPI (`SuccessEnvelope_StoryIntake`).
+   - `error` is always an object `{code, type, message, details}`; parse `error.message` for user-facing text.
+   - `trace_id` is always at the top level (not `request_id` or `timestamp`).
+   - Story intake validation failures (`IntakeValidationError`) map to `code = "DOMAIN_ERROR"`, `type = "domain"` (not `VALIDATION_ERROR`). Full code table: API_REFERENCE §4.1.
+3. **Success Response** — Story intake (`SuccessEnvelope_StoryIntake`; API_REFERENCE §6.6):
    ```json
    {
-    "data": {
-      "schema_version": "m2.story_intake_response.v1",
-      "story_id": "story_123",
-      "status": "received"
-    },
-    "trace_id": "trace_1234567890"
+     "data": {
+       "schema_version": "m2.story_intake_response.v1",
+       "story_id": "550e8400-e29b-41d4-a716-446655440000",
+       "status": "ready_for_profile"
+     },
+     "trace_id": "abc123"
    }
    ```
+   - `status` is `"ready_for_profile"` or `"partial_ready"` only (server never returns `"received"`). Lifecycle semantics: §5.2.3.
 4. **Search Query / Response** — When implemented, per product OpenAPI only.
 
 **For complete Issue schemas, see:** [`story-api-methods-reference.md`](story-api-methods-reference.md) and the imported Actions contract snapshot. Historical donor `api-methods-reference.md` was removed from runtime surface and is not SSOT.
