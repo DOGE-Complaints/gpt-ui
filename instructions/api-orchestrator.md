@@ -280,7 +280,8 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
       "et": "<canonical_payload.institution.et — include only when all et/ru/en non-empty>",
       "ru": "<canonical_payload.institution.ru>",
       "en": "<canonical_payload.institution.en>"
-    }
+    },
+    "location_query": "<normalized_issue_payload.location_query — omit if absent>"
   },
   "origin": {
     "source": "openai_gpt_action",
@@ -302,9 +303,9 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
 }
 ```
 
-Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (incomplete i18n), `live_story_context` (no contradiction), `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string.
+Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (incomplete i18n), `narrative.location_query` (absent or empty in normalizer output), `live_story_context` (no contradiction), `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string.
 
-**Field mapping table (REQ-22 / REQ-23 / REQ-25 / D-03…D-08):**
+**Field mapping table (REQ-22 / REQ-23 / REQ-25 / REQ-26 / D-03…D-08):**
 
 | `StoryIntakeRequest` field | Source in `normalized_issue_payload` | Required | Decision |
 |---|---|---|---|
@@ -319,6 +320,7 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `narrative.canonical_type` | `canonical_payload.type` | No | REQ-25: `complaint`, `observation`, `system_bug`, `absurdity`; only `complaint` / `system_bug` pass issue promotion gate ([`API_REFERENCE.md`](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) §6.3); omit if absent |
 | `narrative.canonical_labels` | `canonical_payload.labels[]` | No | REQ-25: only canonical disposition labels from [`story-label-taxonomy.md`](story-label-taxonomy.md); exclude metadata-only / low-confidence; omit if empty |
 | `narrative.summary` | `canonical_payload.summary` (`{et, ru, en}`) | No | REQ-25: include only when **all three** slots are non-empty; if any slot empty — omit entire `summary` block (server `parse_required_i18n_dict` → HTTP 400 on partial) |
+| `narrative.location_query` | `normalized_issue_payload.location_query` (top-level) | No | REQ-26: freeform location string; server `geo_service.resolve_for_story()`; omit if absent, null, or empty after trim |
 | `origin.source` | Fixed: `openai_gpt_action` (or product-agreed string) | No | Traceability; closes GAP-04 when set |
 | `origin.conversation_id` | Session / thread id available to the orchestrator | No | |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
@@ -385,6 +387,8 @@ Run before every `POST /intake/stories` call:
 
 10. If `narrative.summary` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
     If any slot is empty — remove `summary` from `narrative` (do not send partial i18n). REQ-25 §2.
+
+11. If `narrative.institution` is present but `narrative.location_query` is omitted while validation/`canonical_payload` narrative still contains an explicit address the user confirmed — add an informational line to `trace_notes` (not stop-the-line). REQ-26 §2.3.
 
 If all checks pass → proceed to HTTP call.
 

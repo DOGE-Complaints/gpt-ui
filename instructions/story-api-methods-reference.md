@@ -1,6 +1,6 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.3 · 2026-05-24  
+**Version:** 1.4 · 2026-05-24  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
@@ -33,7 +33,7 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.title` | yes | `canonical_payload.title` object `{et, ru, en}` |
 | `narrative.description` | yes | `canonical_payload.description` object `{et, ru, en}` |
 | `narrative.summary` | no | `canonical_payload.summary`; omit entire block if any `et`/`ru`/`en` slot empty (REQ-25) |
-| `narrative.location_query` | no | optional, when available |
+| `narrative.location_query` | no | `normalized_issue_payload.location_query` when user confirmed location (REQ-26); omit if absent |
 | `narrative.canonical_type` | no | `canonical_payload.type`; `complaint` / `system_bug` → issue promotion gate (REQ-25) |
 | `narrative.canonical_labels` | no | `canonical_payload.labels[]`; canonical disposition only per `story-label-taxonomy.md` (REQ-25) |
 | `narrative.institution` | no | `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / REQ-43) |
@@ -105,6 +105,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.4 | 2026-05-24 | **REQ-26 / GIM-120:** `narrative.location_query` source = top-level normalizer `location_query`. |
 | 1.3 | 2026-05-24 | **REQ-25 / GIM-116–117:** activate `canonical_type` / `canonical_labels` wire; summary omit entire block if any slot empty. |
 | 1.2 | 2026-05-24 | **REQ-23 / GIM-107–111:** `gpt_signals`, `narrative.institution`, `privacy.*`, `live_story_context.consistency_notes`; lock `info.version` **0.4.0**. |
 | 1.1 | 2026-05-22 | **REQ-22 / GIM-102–103:** wire v2 field lock — `identity_issuer`, `session_language`, `title`/`description` i18n objects; remove `title_hint*`; success HTTP `202`; lock `info.version` **0.3.0**. |

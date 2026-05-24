@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.0 |
-| **Date** | 2026-05-22 |
+| **Version** | 0.2.1 |
+| **Date** | 2026-05-24 |
 | **Traceability** | FR-M1-035–037; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
@@ -113,12 +113,13 @@ Single final envelope:
       "severity": null,
       "impact_estimation": null,
       "problem_status": null
-    }
+    },
+    "location_query": "Tartu mnt 80, Tallinn"
   }
 }
 ```
 
-Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` unless all three slots `{et, ru, en}` are non-empty (REQ-23 §2.5). Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream. Omit `live_story_context` when no narrative contradiction was detected (REQ-23 §3).
+Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` unless all three slots `{et, ru, en}` are non-empty (REQ-23 §2.5). Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream. Omit `live_story_context` when no narrative contradiction was detected (REQ-23 §3). Omit top-level `location_query` when location was not confirmed or string would be empty (REQ-26 §4.6).
 
 ### 4.1 `canonical_payload`
 
@@ -236,6 +237,22 @@ Set `consistency_notes` when any of these apply:
 
 **Omit rule:** if no contradiction → do **not** add `live_story_context`; never emit empty string.
 
+### 4.6 `location_query` (REQ-26)
+
+Optional **top-level** string on `normalized_issue_payload` (sibling to `canonical_payload`, not inside it). Maps to `StoryIntakeRequest.narrative.location_query` via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. Server resolves non-empty values to geo ([`API_REFERENCE.md`](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) §6.3).
+
+**Source data:** `location.freeform` from the ingest validation artifact ([`ingest-validation.md`](ingest-validation.md) report shape) after the user **confirmed** location in interview Phases 2–3 and [`story-interview-flow.md`](story-interview-flow.md) §7.2 affirmation.
+
+**Formation rules:**
+
+1. Include **only** when the user explicitly named or confirmed a location in the interview.
+2. **Format:** freeform string, preferably `<street/place>, <city>` or `<district>, Tallinn`.
+3. If the user mentioned **multiple** locations without a single clear primary — pick the most specific / complaint-relevant one (D-02). Reflect ambiguity in `live_story_context.consistency_notes` (§4.5) when useful.
+4. If location was **not** confirmed or remains ambiguous after §7.2 — **omit** `location_query` (do not send null or `""`).
+5. Never emit a blank or whitespace-only string.
+
+**Do not** place `location_query` inside `canonical_payload` or `normalization_metadata`.
+
 ---
 
 ## 5. Narrative layers alignment (brief)
@@ -280,4 +297,5 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.1.7 | 2026-04-26 | Locked final `normalized_issue_payload` shape, optional `non_wire_metadata` sidecar, and no-direct-transport rule (GIM-80). |
 | 0.1.8 | 2026-04-26 | Added label extraction metadata and canonical label disposition rules (GIM-89). |
 | 0.1.9 | 2026-05-22 | **REQ-22 / GIM-104:** required `normalization_metadata.detected_input_language` for `narrative.language` wire mapping. |
+| 0.2.1 | 2026-05-24 | **REQ-26 / GIM-119:** §4.6 top-level `location_query` from confirmed `location.freeform`; omit when unconfirmed or empty. |
 | 0.2.0 | 2026-05-22 | **REQ-23 / GIM-108–111:** §4.4 PII (`contains_pii`); §4.5 `live_story_context.consistency_notes`; §4.3 → `gpt_signals` wire via orchestrator; institution emit when full i18n. |
