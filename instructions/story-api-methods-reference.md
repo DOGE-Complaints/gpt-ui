@@ -1,6 +1,6 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.1 · 2026-05-22  
+**Version:** 1.2 · 2026-05-24  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
@@ -32,10 +32,10 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.session_language` | yes | `normalization_metadata.session_language` |
 | `narrative.title` | yes | `canonical_payload.title` object `{et, ru, en}` |
 | `narrative.description` | yes | `canonical_payload.description` object `{et, ru, en}` |
-| `narrative.summary` | no | `canonical_payload.summary` when present; omit empty keys |
+| `narrative.summary` | no | REQ-25: include only when **all** `et`/`ru`/`en` slots non-empty; otherwise omit entire `summary` object |
 | `narrative.location_query` | no | optional, when available |
-| `narrative.canonical_type` | no | deferred by runtime policy |
-| `narrative.canonical_labels` | no | deferred by runtime policy |
+| `narrative.canonical_type` | no | REQ-25: `canonical_payload.type` when present (`complaint`, `observation`, `system_bug`, `absurdity`); omit if absent |
+| `narrative.canonical_labels` | no | REQ-25: canonical disposition labels from `canonical_payload.labels[]`; omit if empty |
 | `origin` / `privacy` / `live_story_context` | no | optional sidecar blocks when contract and context support them |
 
 The request must not contain backend-issued fields (`id`, `status`, timestamps, txids) or instruction-internal metadata not accepted by runtime schema.
@@ -98,6 +98,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.2 | 2026-05-24 | **REQ-25:** activate `canonical_type` / `canonical_labels` wire; `summary` omit-entire-block when any i18n slot empty (align with [`api-orchestrator.md`](api-orchestrator.md) §5.2.1). |
 | 1.1 | 2026-05-22 | **REQ-22 / GIM-102–103:** wire v2 field lock — `identity_issuer`, `session_language`, `title`/`description` i18n objects; remove `title_hint*`; success HTTP `202`; lock `info.version` **0.3.0**. |
 | 1.0 | 2026-04-27 | Story-first runtime cutover: SSOT switched from `/issues/*` to `/intake/stories` (`postStoryIntake`) and `StoryIntakeRequest`/`SuccessEnvelope_StoryIntake`. |
 | 0.1 | 2026-04-10 | First draft + initial Actions contract snapshot 0.1.0 (STORY-M6-01). |

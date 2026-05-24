@@ -269,10 +269,12 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
       "ru": "<canonical_payload.description.ru>",
       "en": "<canonical_payload.description.en>"
     },
+    "canonical_type": "<canonical_payload.type — include only when normalizer produced a value>",
+    "canonical_labels": ["<canonical taxonomy label keys from canonical_payload.labels[]>"],
     "summary": {
-      "et": "<canonical_payload.summary.et — omit key if empty>",
-      "ru": "<canonical_payload.summary.ru — omit key if empty>",
-      "en": "<canonical_payload.summary.en — omit key if empty>"
+      "et": "<canonical_payload.summary.et>",
+      "ru": "<canonical_payload.summary.ru>",
+      "en": "<canonical_payload.summary.en>"
     }
   },
   "origin": {
@@ -283,7 +285,9 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
 }
 ```
 
-**Field mapping table (REQ-22 / D-03…D-08):**
+Omit optional blocks when not applicable: `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys).
+
+**Field mapping table (REQ-22 / REQ-25 / D-03…D-08):**
 
 | `StoryIntakeRequest` field | Source in `normalized_issue_payload` | Required | Decision |
 |---|---|---|---|
@@ -295,9 +299,9 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
 | `narrative.title` | `canonical_payload.title` (`{et, ru, en}`) | Yes | REQ-22 GAP-W-04; direct object mapping |
 | `narrative.description` | `canonical_payload.description` (`{et, ru, en}`) | Yes | REQ-22 GAP-W-04 |
 | `narrative.original_text` | `canonical_payload.description[session_language]` | Yes | REQ-22 §2; primary-slot narrative for runtime |
-| `narrative.canonical_type` | `canonical_payload.type` | Deferred | OP-01 |
-| `narrative.canonical_labels` | `canonical_payload.labels[]` | Deferred | OP-02 |
-| `narrative.summary` | `canonical_payload.summary` object (`et`/`ru`/`en` strings) | No | Omit empty keys; closes GAP-03 |
+| `narrative.canonical_type` | `canonical_payload.type` | No | REQ-25: `complaint`, `observation`, `system_bug`, `absurdity`; only `complaint` / `system_bug` pass issue promotion gate ([`API_REFERENCE.md`](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) §6.3); omit if absent |
+| `narrative.canonical_labels` | `canonical_payload.labels[]` | No | REQ-25: only canonical disposition labels from [`story-label-taxonomy.md`](story-label-taxonomy.md); exclude metadata-only / low-confidence; omit if empty |
+| `narrative.summary` | `canonical_payload.summary` (`{et, ru, en}`) | No | REQ-25: include only when **all three** slots are non-empty; if any slot empty — omit entire `summary` block (server `parse_required_i18n_dict` → HTTP 400 on partial) |
 | `origin.source` | Fixed: `openai_gpt_action` (or product-agreed string) | No | Traceability; closes GAP-04 when set |
 | `origin.conversation_id` | Session / thread id available to the orchestrator | No | |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
@@ -330,6 +334,9 @@ Run before every `POST /intake/stories` call:
 
 6. `normalization_metadata.session_language` matches `normalization_metadata.normalizer_module` ref.  
    Informational check only; log mismatch in trace_notes.
+
+7. If `narrative.summary` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
+   If any slot is empty — remove `summary` from `narrative` (do not send partial i18n). REQ-25 §2.
 
 If all checks pass → proceed to HTTP call.
 
