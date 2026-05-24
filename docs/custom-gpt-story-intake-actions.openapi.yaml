@@ -152,6 +152,9 @@ components:
           type: string
         status:
           type: string
+          enum: [ready_for_profile, partial_ready]
+          description: >
+            Intake lifecycle status (API_REFERENCE §6.5–6.6). Server never returns "received".
 
     SuccessEnvelope_StoryIntake:
       type: object
@@ -200,7 +203,9 @@ paths:
               $ref: "#/components/schemas/StoryIntakeRequest"
       responses:
         "202":
-          description: Story intake accepted (clustering deferred)
+          description: >
+            Story intake accepted. data.status is ready_for_profile (clustering) or
+            partial_ready (saved, not clustered until narrative complete).
           content:
             application/json:
               schema:
@@ -218,7 +223,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorEnvelope"
         "422":
-          description: Schema or geo-scope validation error
+          description: >
+            Geo scope mismatch (GEO_SCOPE_MISMATCH) — location_query outside configured
+            region. Schema/domain validation errors use HTTP 400, not 422.
           content:
             application/json:
               schema:
