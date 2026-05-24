@@ -5,14 +5,14 @@
 #
 # STATUS: CONTRACT CANDIDATE — lock paths/schemas to node GET /openapi.json when available.
 # SSOT companion: GPT UI/instructions/story-api-methods-reference.md
-# Lockstep: doge-complaints-gateway/src/core/intake/contracts.py (m2.story_intake_envelope.v2)
+# Lockstep: doge-complaints-gateway/src/core/intake/contracts.py (m2.story_intake_envelope.v2 + REQ-42/43 behavioral blocks)
 #
 openapi: 3.1.0
 info:
   title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
-  version: "0.3.0"
+  version: "0.4.0"
   description: >
-    Minimal subset for GPT Actions targeting story intake runtime (wire contract v2).
+    Minimal subset for GPT Actions targeting story intake runtime (wire contract v2 + REQ-23 behavioral extensions).
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Replace servers.url and reconcile components with the live FastAPI OpenAPI before production.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
@@ -92,6 +92,24 @@ components:
           type: array
           items:
             type: string
+        institution:
+          $ref: "#/components/schemas/I18nText"
+          description: >
+            Optional institution/agency i18n. When present, et/ru/en are all required (REQ-43).
+
+    GptSignals:
+      type: object
+      description: GPT classification signals (REQ-42 / REQ-23 §2).
+      properties:
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        impact_estimation:
+          type: string
+          enum: [LOCAL, DISTRICT, CITY, NATIONAL]
+        problem_status:
+          type: string
+          enum: [ONGOING, RESOLVED, RECURRING, UNKNOWN]
 
     Origin:
       type: object
@@ -140,6 +158,8 @@ components:
           $ref: "#/components/schemas/Privacy"
         live_story_context:
           $ref: "#/components/schemas/LiveStoryContext"
+        gpt_signals:
+          $ref: "#/components/schemas/GptSignals"
 
     StoryIntakeResponseData:
       type: object
