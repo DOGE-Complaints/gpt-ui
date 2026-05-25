@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (27 файлов)
+## Оглавление REQ (28 файлов)
 
 | № | Файл |
 |---|------|
@@ -38,5 +38,6 @@
 | 25 | [REQ-25-canonical-type-labels-and-summary-wire-activation.md](./REQ-25-canonical-type-labels-and-summary-wire-activation.md) |
 | 26 | [REQ-26-location-query-normalizer-to-wire.md](./REQ-26-location-query-normalizer-to-wire.md) |
 | 27 | [REQ-27-gpt-signals-enum-sync-and-data-model-update.md](./REQ-27-gpt-signals-enum-sync-and-data-model-update.md) |
+| 28 | [REQ-28-institution-demo-constraint-gate.md](./REQ-28-institution-demo-constraint-gate.md) |
 
-**Версия:** 1.1 · 2026-05-25 (REQ-27: gpt_signals enum sync — `story-data-model.md` ↔ `contracts.py` frozensets; orchestrator `impact_estimation` hint fix; follow-up REQ-23 wire activation).
+**Версия:** 1.2 · 2026-05-25 (REQ-28: institution demo-constraint gate — `story-normalizer.md` §4.1/§4.3 + `api-orchestrator.md` §5.2 pre-flight instruction-layer enforcement; follow-up REQ-23 §2.5 institution policy; FINDING-03 closure).
