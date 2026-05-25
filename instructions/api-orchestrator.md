@@ -328,7 +328,7 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A; omit entire `privacy` block when false/absent |
 | `privacy.redaction_requested` | User choice in §5.2.0 two-step flow | No | `true` only if user agreed to edit |
 | `gpt_signals.severity` | `non_wire_metadata.severity` | No | REQ-23 §B / REQ-42; omit block if sidecar absent |
-| `gpt_signals.impact_estimation` | `non_wire_metadata.impact_estimation` | No | Enum per REQ-42; use `UNKNOWN` or omit field if unsure |
+| `gpt_signals.impact_estimation` | `non_wire_metadata.impact_estimation` | No | Enum per REQ-42: `LOCAL`, `DISTRICT`, `CITY`, `NATIONAL`; omit field if unsure (no `UNKNOWN` fallback for this field — server frozenset [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L62 rejects with HTTP 400) |
 | `gpt_signals.problem_status` | `non_wire_metadata.problem_status` | No | Enum per REQ-42 |
 | `live_story_context.consistency_notes` | `normalized_issue_payload.live_story_context.consistency_notes` | No | REQ-23 §C; omit block when null |
 

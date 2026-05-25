@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.11 |
-| **Date** | 2026-04-26 |
+| **Version** | 0.12 |
+| **Date** | 2026-05-25 |
 | **Traceability** | [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md) |
 
 ---
@@ -65,17 +65,17 @@ Below is the **target display contract** for the product UI (mocks and dashboard
 |-------|------|------|
 | `institution` | `{ et, ru, en }` | Agency / institution **if** product scope allows inferring it from interview. **Demo scope:** do **not** populate from dialogue; keep field **absent** / null in `canonical_payload` until integration matures. |
 
-### 4.3 Subjective intake extensions (resident-perceived, non-wire)
+### 4.3 Subjective intake extensions (resident-perceived → wire `gpt_signals`)
 
-Optional fields using subjective enums **`SEVERITY`**, **`IMPACT_ESTIMATION`**, **`PROBLEM_STATUS`**. Values are **subjective** (how the resident experiences impact), not an objective audit. These fields are **non-wire metadata** for the current runtime contract and must not be sent as `StoryIntakeRequest` fields until HTTP/OpenAPI explicitly includes them.
+Optional fields using subjective enums **`SEVERITY`**, **`IMPACT_ESTIMATION`**, **`PROBLEM_STATUS`**. Values are **subjective** (how the resident experiences impact), not an objective audit. Enum values **must** be uppercase and match the server frozensets in [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L61–65 verbatim; the server normalises `.upper()` and rejects unknown values with HTTP 400 (`_parse_gpt_signal_enum`, L128–148).
 
 | Field | Type (logical) | Rule |
 |-------|------------------|------|
-| `severity` | `low` \| `medium` \| `high` \| `critical` | Resident-perceived seriousness; optional until interview collects it without leading the user. |
-| `impact_estimation` | `personal` \| `city/town` \| `state` \| `country` \| `Earth` | Self-reported perceived scope of impact. |
-| `problem_status` | `ongoing` \| `resolved` \| `worsened` | How the resident frames change over time, if stated. |
+| `severity` | `LOW` \| `MEDIUM` \| `HIGH` \| `CRITICAL` | Resident-perceived seriousness. Optional; collect only if stated without leading the user. |
+| `impact_estimation` | `LOCAL` \| `DISTRICT` \| `CITY` \| `NATIONAL` | Administrative scope of perceived impact (Estonia scale). Omit if unsure — **no `UNKNOWN` fallback for this field**. |
+| `problem_status` | `ONGOING` \| `RESOLVED` \| `RECURRING` \| `UNKNOWN` | How the resident frames the current state of the problem. `UNKNOWN` is valid **only** for this field; use when status was not clarified. |
 
-These should live in an explicit non-wire artifact (for example `ingest_validation_report`, mapping appendix, or a logical sidecar) until HTTP/OpenAPI lockstep explicitly includes them (imported Actions contract + SSOT updates in lockstep). They are not required for §4.1 completeness and must not block StoryIntake handoff.
+These fields are sent via the **`gpt_signals`** block in `StoryIntakeRequest` (REQ-23 §2 / REQ-42, wire since OpenAPI v0.4.0 — `components.schemas.GptSignals` in [`custom-gpt-story-intake-actions.openapi.yaml`](../docs/custom-gpt-story-intake-actions.openapi.yaml)). Normalizer placement: `non_wire_metadata` sidecar in [`story-normalizer.md`](story-normalizer.md) §4.3 → orchestrator maps to root `gpt_signals` per [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. They are not required for §4.1 completeness; omit any field (or the whole `gpt_signals` block) when the value is absent or unclear.
 
 ### 4.4 Not filled by GPT as facts without backend
 
@@ -132,3 +132,4 @@ Do not collect PII by default; do not store personal data in Issue content beyon
 | 0.9 | 2026-04-25 | Removed donor-era minors metadata from active Issue model; restored system-only block to §4.4 (GIM-72). |
 | 0.10 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |
 | 0.11 | 2026-04-26 | Linked `labels` to controlled label taxonomy and forbade unknown/free-text/internal label values in canonical payload (GIM-86). |
+| 0.12 | 2026-05-25 | REQ-27: synced §4.3 subjective enums (`severity`, `impact_estimation`, `problem_status`) to server frozensets in [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L61–65 (uppercase `LOW/MEDIUM/HIGH/CRITICAL`, `LOCAL/DISTRICT/CITY/NATIONAL`, `ONGOING/RESOLVED/RECURRING/UNKNOWN`); removed stale «non-wire metadata / must not be sent» wording — REQ-23/REQ-42 already activated the wire `gpt_signals` block (OpenAPI v0.4.0) (GIM-122). |
