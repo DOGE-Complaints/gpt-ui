@@ -160,7 +160,7 @@ This instruction is activated when:
 }
 ```
 
-Optional keys (`summary`, `institution`, `non_wire_metadata`, `live_story_context`) may be absent. Include `canonical_payload.institution` only when all `{et, ru, en}` are non-empty (REQ-23 §2.5).
+Optional keys (`summary`, `institution`, `non_wire_metadata`, `live_story_context`) may be absent. **Demo scope:** omit `narrative.institution` always (REQ-28 pre-flight #7). Post-demo: include `canonical_payload.institution` only when all `{et, ru, en}` are non-empty (REQ-23 §2.5).
 
 ### 4.1a Deterministic transform to `StoryIntakeRequest`
 
@@ -276,11 +276,7 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
       "ru": "<canonical_payload.summary.ru>",
       "en": "<canonical_payload.summary.en>"
     },
-    "institution": {
-      "et": "<canonical_payload.institution.et — include only when all et/ru/en non-empty>",
-      "ru": "<canonical_payload.institution.ru>",
-      "en": "<canonical_payload.institution.en>"
-    },
+    // "institution": omitted in current demo scope (REQ-28 pre-flight #7; post-demo: include only when all et/ru/en non-empty)
     "location_query": "<normalized_issue_payload.location_query — omit if absent>"
   },
   "origin": {
@@ -303,7 +299,7 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
 }
 ```
 
-Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (incomplete i18n), `narrative.location_query` (absent or empty in normalizer output), `live_story_context` (no contradiction), `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string.
+Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (always omit in demo scope per REQ-28; post-demo: omit if incomplete i18n), `narrative.location_query` (absent or empty in normalizer output), `live_story_context` (no contradiction), `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string.
 
 **Field mapping table (REQ-22 / REQ-23 / REQ-25 / REQ-26 / D-03…D-08):**
 
@@ -324,7 +320,7 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `origin.source` | Fixed: `openai_gpt_action` (or product-agreed string) | No | Traceability; closes GAP-04 when set |
 | `origin.conversation_id` | Session / thread id available to the orchestrator | No | |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
-| `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | REQ-23 §2.5; omit if any slot empty |
+| `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | **Always omit in current demo scope (REQ-28)** — §5.2.2 pre-flight #7 institution demo-gate drops this field regardless of `canonical_payload` content; normalizer-layer enforcement in [`story-normalizer.md`](story-normalizer.md) §4.1. Post-demo (REQ-43 lifted): omit only if any i18n slot empty (REQ-23 §2.5 secondary directive — pre-flight #8). |
 | `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A; omit entire `privacy` block when false/absent |
 | `privacy.redaction_requested` | User choice in §5.2.0 two-step flow | No | `true` only if user agreed to edit |
 | `gpt_signals.severity` | `non_wire_metadata.severity` | No | REQ-23 §B / REQ-42; omit block if sidecar absent |
@@ -376,19 +372,21 @@ Run before every `POST /intake/stories` call:
 6. `normalization_metadata.session_language` matches `normalization_metadata.normalizer_module` ref.  
    Informational check only; log mismatch in trace_notes.
 
-7. If `narrative.institution` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
+7. **Institution demo-gate (REQ-28):** if `canonical_payload.institution` is present in `normalized_issue_payload`, **omit** it from the outgoing `narrative.institution` wire field (silently drop — do **not** raise an error). Append a one-line entry to `trace_notes`: `"demo scope: institution omitted (REQ-28)"`. This gate is active until [REQ-43](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md) integration matures; once lifted, the REQ-23 §2.5 check (item 8) governs i18n completeness. Normalizer-layer primary enforcement lives in [`story-normalizer.md`](story-normalizer.md) §4.1 demo-constraint; this pre-flight is defense-in-depth.
+
+8. If `narrative.institution` is still included after item 7 (post-demo, REQ-43 active): all three keys `et`, `ru`, `en` must be non-empty strings (REQ-23 §2.5 secondary directive).  
    If any slot is empty — remove `institution` from `narrative` (do not send partial i18n).
 
-8. If `live_story_context.consistency_notes` is present: must be non-empty trimmed text; language should match `session_language` (or `en`).  
+9. If `live_story_context.consistency_notes` is present: must be non-empty trimmed text; language should match `session_language` (or `en`).  
    If empty after trim — omit entire `live_story_context` block.
 
-9. If `gpt_signals` is included: each present field must match REQ-42 enums.  
-   Omit unknown values or use `UNKNOWN` for `problem_status` only.
+10. If `gpt_signals` is included: each present field must match REQ-42 enums.  
+    Omit unknown values or use `UNKNOWN` for `problem_status` only.
 
-10. If `narrative.summary` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
+11. If `narrative.summary` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
     If any slot is empty — remove `summary` from `narrative` (do not send partial i18n). REQ-25 §2.
 
-11. If `narrative.institution` is present but `narrative.location_query` is omitted while validation/`canonical_payload` narrative still contains an explicit address the user confirmed — add an informational line to `trace_notes` (not stop-the-line). REQ-26 §2.3.
+12. If `narrative.institution` is present (post-demo only — see item 7) but `narrative.location_query` is omitted while validation/`canonical_payload` narrative still contains an explicit address the user confirmed — add an informational line to `trace_notes` (not stop-the-line). REQ-26 §2.3.
 
 If all checks pass → proceed to HTTP call.
 

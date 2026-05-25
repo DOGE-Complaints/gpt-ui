@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.1 |
-| **Date** | 2026-05-24 |
+| **Version** | 0.2.2 |
+| **Date** | 2026-05-25 |
 | **Traceability** | FR-M1-035–037; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
@@ -119,7 +119,7 @@ Single final envelope:
 }
 ```
 
-Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` unless all three slots `{et, ru, en}` are non-empty (REQ-23 §2.5). Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream. Omit `live_story_context` when no narrative contradiction was detected (REQ-23 §3). Omit top-level `location_query` when location was not confirmed or string would be empty (REQ-26 §4.6).
+Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` always in demo scope (REQ-28 — see §4.1 constraint below); post-demo: omit unless all three slots `{et, ru, en}` are non-empty (REQ-23 §2.5). Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream. Omit `live_story_context` when no narrative contradiction was detected (REQ-23 §3). Omit top-level `location_query` when location was not confirmed or string would be empty (REQ-26 §4.6).
 
 ### 4.1 `canonical_payload`
 
@@ -134,6 +134,18 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 | `institution` | Optional `{ et, ru, en }` when interview/validation produced full trilingual institution text; **omit** if any slot is empty (REQ-23 §2.5). |
 
 Do not add donor-era, legacy-only, Search-only, or backend-issued fields to `canonical_payload`.
+
+**`institution` — demo-scope constraint (M1 demo, REQ-28):**
+
+Do **not** populate `canonical_payload.institution` in the current demo scope, regardless of what the GPT infers from the interview. The REQ-23 §2.5 i18n-omit rule (omit if any of `{et, ru, en}` is empty) remains in force as the **secondary** post-demo directive — but in the demo scope this gate has priority and applies even when all three i18n slots are present.
+
+If interview reasoning produced an institution candidate (even with all three i18n slots populated):
+
+- Record the candidate object in `non_wire_metadata.institution_candidate` (§4.3) — informational only, never wired.
+- Leave `canonical_payload.institution` **absent** / not emitted.
+- Add a one-line entry to `normalization_metadata.trace_notes`, e.g. `"demo scope: institution candidate parked in non_wire_metadata (REQ-28)"`.
+
+This gate is lifted when backend integration for institution-routing matures — tracked as [REQ-43](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md). The orchestrator pre-flight in [`api-orchestrator.md`](api-orchestrator.md) §5.2 enforces the same constraint as defense-in-depth.
 
 ### 4.2 `normalization_metadata` (required keys — instruction-layer scaffold)
 
@@ -191,8 +203,9 @@ Allowed enum values (must match REQ-42 when mapped to wire):
 | `severity` | `LOW`, `MEDIUM`, `HIGH`, `CRITICAL` |
 | `impact_estimation` | `LOCAL`, `DISTRICT`, `CITY`, `NATIONAL` |
 | `problem_status` | `ONGOING`, `RESOLVED`, `RECURRING`, `UNKNOWN` |
+| `institution_candidate` | Optional `{ et, ru, en }` (REQ-28): informational fallback for an institution candidate suppressed by the §4.1 demo-scope constraint. Never copied to wire; lift gate when [REQ-43](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md) integration matures. |
 
-If unsure about a value, prefer `UNKNOWN` for `problem_status` or omit that field from `non_wire_metadata`.
+If unsure about a value, prefer `UNKNOWN` for `problem_status` or omit that field from `non_wire_metadata`. `institution_candidate` is **only** populated when §4.1 demo-constraint suppressed a candidate from `canonical_payload.institution` — otherwise omit it.
 
 ### 4.4 PII detection (REQ-23 §1.2)
 
@@ -299,3 +312,4 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.1.9 | 2026-05-22 | **REQ-22 / GIM-104:** required `normalization_metadata.detected_input_language` for `narrative.language` wire mapping. |
 | 0.2.1 | 2026-05-24 | **REQ-26 / GIM-119:** §4.6 top-level `location_query` from confirmed `location.freeform`; omit when unconfirmed or empty. |
 | 0.2.0 | 2026-05-22 | **REQ-23 / GIM-108–111:** §4.4 PII (`contains_pii`); §4.5 `live_story_context.consistency_notes`; §4.3 → `gpt_signals` wire via orchestrator; institution emit when full i18n. |
+| 0.2.2 | 2026-05-25 | **REQ-28 / GIM-125:** §4.1 explicit demo-scope constraint for `canonical_payload.institution` (do-not-populate + `trace_notes` entry); §4.3 `institution_candidate` sidecar fallback row; REQ-23 §2.5 i18n-omit retained as secondary post-demo directive; lift gate tied to REQ-43. |
