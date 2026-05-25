@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (26 файлов)
+## Оглавление REQ (27 файлов)
 
 | № | Файл |
 |---|------|
@@ -37,5 +37,6 @@
 | 24 | [REQ-24-gpt-orchestrator-response-contract-corrections.md](./REQ-24-gpt-orchestrator-response-contract-corrections.md) |
 | 25 | [REQ-25-canonical-type-labels-and-summary-wire-activation.md](./REQ-25-canonical-type-labels-and-summary-wire-activation.md) |
 | 26 | [REQ-26-location-query-normalizer-to-wire.md](./REQ-26-location-query-normalizer-to-wire.md) |
+| 27 | [REQ-27-gpt-signals-enum-sync-and-data-model-update.md](./REQ-27-gpt-signals-enum-sync-and-data-model-update.md) |
 
-**Версия:** 1.0 · 2026-05-24 (REQ-23…26: behavioral extensions, response contract, canonical/summary wire, location_query; lockstep gap-analysis 2026-05-22).
+**Версия:** 1.1 · 2026-05-25 (REQ-27: gpt_signals enum sync — `story-data-model.md` ↔ `contracts.py` frozensets; orchestrator `impact_estimation` hint fix; follow-up REQ-23 wire activation).
