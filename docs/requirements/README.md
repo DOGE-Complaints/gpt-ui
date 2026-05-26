@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (28 файлов)
+## Оглавление REQ (29 файлов)
 
 | № | Файл |
 |---|------|
@@ -39,5 +39,6 @@
 | 26 | [REQ-26-location-query-normalizer-to-wire.md](./REQ-26-location-query-normalizer-to-wire.md) |
 | 27 | [REQ-27-gpt-signals-enum-sync-and-data-model-update.md](./REQ-27-gpt-signals-enum-sync-and-data-model-update.md) |
 | 28 | [REQ-28-institution-demo-constraint-gate.md](./REQ-28-institution-demo-constraint-gate.md) |
+| 29 | [REQ-29-phase7-translation-review.md](./REQ-29-phase7-translation-review.md) |
 
-**Версия:** 1.2 · 2026-05-25 (REQ-28: institution demo-constraint gate — `story-normalizer.md` §4.1/§4.3 + `api-orchestrator.md` §5.2 pre-flight instruction-layer enforcement; follow-up REQ-23 §2.5 institution policy; FINDING-03 closure).
+**Версия:** 1.3 · 2026-05-25 (REQ-29: phase7 translation disclosure step — `story-interview-flow.md` §7.2 mandatory-sequence Step 6 «Translation transparency note (non-interactive)» поверх Step 5 session title generation; FINDING-04 translation transparency closure).
