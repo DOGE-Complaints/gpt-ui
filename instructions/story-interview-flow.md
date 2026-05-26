@@ -5,8 +5,8 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.16 |
-| **Date** | 2026-04-27 |
+| **Version** | 0.17 |
+| **Date** | 2026-05-25 |
 | **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
 
 **Related modules:** [`story-data-model.md`](story-data-model.md) · [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) · [`safety-compliance.md`](safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
@@ -149,6 +149,13 @@ Sources: **FR-M1-032**, **FR-M1-033**, **FR-M1-034**. This subsection is the **n
    - Language: must match `normalization_metadata.session_language` (`et` | `ru` | `en`).
    - Do **not** ask the user to name or approve the title separately — derive it from the already-confirmed narrative. If the user asks to change it, accept in-place.
    - Store in `canonical_payload.title[session_language]` and populate trilingual `canonical_payload.title.{et,ru,en}` before handoff to [`story-normalizer.md`](story-normalizer.md). Wire v2 maps the full `title` object via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1 (no `title_hint*` fields).
+
+6. **Step 6 — Translation transparency note (mandatory) (REQ-29):** After step 5 produces the trilingual title (and before any handoff toward [`story-normalizer.md`](story-normalizer.md)), append exactly **one short sentence** in `session_language` that discloses three facts to the resident: (a) the issue will be saved / published in all three languages (`et`, `ru`, `en`), (b) only the `session_language` version was reviewed together during this dialogue, and (c) translations into the remaining two languages are AI-generated and have **not** been individually reviewed. This step is **non-interactive** (information only, no response needed) — do **not** ask the user to approve or correct the translations, and do **not** display the translated `title` / `description` / `summary` text proactively. After delivering the note, proceed directly to handoff. This closes FINDING-04 (translation transparency in civic record).
+   - Example (`et`): «Kaebus salvestatakse eesti, vene ja inglise keeles; tõlked on automaatsed.»
+   - Example (`ru`): «Жалоба будет сохранена на эстонском, русском и английском; переводы выполнены автоматически.»
+   - Example (`en`): «The issue will be saved in Estonian, Russian, and English; translations are AI-generated.»
+   - Scope guard: this disclosure does **not** alter `canonical_payload`, normalizer fields, or wire contract — REQ-29 §5 keeps [`story-normalizer.md`](story-normalizer.md), [`api-orchestrator.md`](api-orchestrator.md), and [`story-data-model.md`](story-data-model.md) out of scope.
+   - Anti-pattern alignment: the note must not promise translation accuracy or government action (§8 row 7 «False promises») and must not invite a meaning-correction round (§7.2 step 2–3 already closed by the time step 6 runs).
 
 **Distinction from §7.1:** §7.1 templates are for **phases 3–4** micro-checks; §7.2 is the **final** Phase 7 block before structural validation / normalizer prep.
 
@@ -301,3 +308,4 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 | 0.14 | 2026-04-20 | Added demo rule: no `institution` extraction from dialogue. |
 | 0.15 | 2026-04-26 | Added label evidence capture by dialogue phase and Phase 7 correction disposition (GIM-87). |
 | 0.16 | 2026-04-27 | Instruction-bundle self-contained: bare-filename cross-links only; removed external repository references from narrative. |
+| 0.17 | 2026-05-25 | **REQ-29 / GIM-128:** §7.2 mandatory-sequence Step 6 «Translation transparency note (mandatory)» inserted after Step 5 session-title generation — non-interactive disclosure that only `session_language` version was reviewed and that `{et, ru, en}` translations are AI-generated; et/ru/en examples per REQ-29 §2.3. Closes FINDING-04 (`audit-field-provenance-2026-05-24.md`). |
