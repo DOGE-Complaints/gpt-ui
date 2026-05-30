@@ -1,6 +1,12 @@
 # API Orchestrator Instruction
 ## Backend Integration, Authorization & State Execution
 
+| Field | Value |
+|-------|--------|
+| **Version** | 0.2 |
+| **Date** | 2026-05-29 |
+| **Traceability** | REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+
 ### DOGEstonia — Story Intake API track
 
 When this deployment executes **DOGEstonia Issue** web2 calls:
@@ -336,9 +342,67 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 - `normalization_metadata` internals (refs, `label_extraction_metadata`, `contains_pii` except via `privacy`)
 - Backend-issued fields: `id`, `status`, `created_at`, `arweave_txid`
 
+#### 5.2.0a Admission gate — strict-chain package (REQ-30)
+
+Run **after** building the draft `StoryIntakeRequest` mapping and **before** §5.2.0 PII pre-send, §5.2.2 field-level pre-flight, and **before every** `postStoryIntake` HTTP call. This gate is **additive** to §5.2.2 checks 1–12 (GIM-28); do not skip it when §5.2.2 metadata refs look present.
+
+GPT **MUST NOT** call `postStoryIntake` unless the current conversation contains a complete strict-chain handoff package. Ref strings inside `normalization_metadata` alone are **not** sufficient — verify the **upstream artifact objects** existed in this dialogue turn sequence.
+
+**Required upstream artifacts (all must pass):**
+
+1. **`ingest_validation_report`** — object exists in conversation context; `stop_the_line.blocked = false`.  
+   If missing or blocked — **STOP**. Do not call HTTP.
+
+2. **`safety_compliance_report`** — object exists; `decision = "allow"`; `check_point = "validated"`.  
+   If missing or not allow — **STOP**. Do not call HTTP.
+
+3. **`policy_gate_result`** — object exists; `status = "approved"`.  
+   If missing or not approved — **STOP**. Do not call HTTP.
+
+4. **`normalized_issue_payload`** — object exists; produced by [`story-normalizer.md`](story-normalizer.md) (not ad hoc assembly); contains at minimum:
+   - `canonical_payload.type`
+   - `canonical_payload.labels`
+   - `canonical_payload.title`
+   - `canonical_payload.description`
+   - `normalization_metadata.session_language`  
+   If missing or incomplete — **STOP**. Do not call HTTP.
+
+5. **`explicit_user_confirmation`** — user explicitly confirmed **submission to DOGEstonia backend** (real civic record), not merely «ага», «ок», «да», «отправь тест», «закинь любую хрень», or other minimal assent without backend intent.  
+   If absent or insufficient — **STOP**. Do not call HTTP. Ask for explicit confirmation that references backend submission.
+
+**Default STOP message (strict-chain failure):**
+
+> Локальная валидация FAIL: данных недостаточно для отправки в API.
+
+Use this exact sentence when any item 1–5 fails. Then explain which artifact or confirmation is missing and which module must re-run (`ingest-validation`, `safety-compliance`, `policy-gate`, `story-normalizer`, or user confirmation step).
+
+**Test / sandbox rule (REQ-30 §2.2):**
+
+Test or junk submissions **MUST NOT** use production Story Intake by default. Production `POST /intake/stories` is allowed only for a **real** civic issue that passed the full strict chain **or** when one of these is explicitly true:
+
+- `environment == sandbox` (dedicated sandbox/test endpoint configured in Actions), **or**
+- `payload.test_mode == true` **and** backend stores test rows separately (not yet in wire contract — do not invent the flag), **or**
+- `operator_role == authorized_tester` **and** `explicit_test_confirmation == true`.
+
+If the user requests a test/junk send and none of the above apply — **STOP** before HTTP. Offer **local preview only** (show draft payload in chat). Respond in `session_language` using one of:
+
+- **et:** «Ma ei saa saata prügi- ega testkirjeid production DOGEstonia keskkonda. Võin koostada kohaliku test-payloadi eelvaateks või saata ainult sandbox/test endpointi, kui see on saadaval.»
+- **ru:** «Я не могу отправлять мусорные или тестовые записи в production DOGEstonia. Могу подготовить локальный тестовый payload для просмотра или отправить только в sandbox/test endpoint, если он доступен.»
+- **en:** «I cannot send junk or test records to production DOGEstonia. I can prepare a local test payload for preview or send only to a sandbox/test endpoint if one is available.»
+
+**Audit trace (REQ-30 §3):**
+
+Before HTTP, append to `trace_notes` (or equivalent orchestrator audit block) a single line listing artifact IDs/refs that justified the call, for example:
+
+`admission: ingest_validation_report_ref=<id>; safety_compliance_report_ref=<id>; policy_gate_ref=<id>; normalizer=<module@version>; user_confirmation=backend_submission`
+
+Do not call HTTP without this audit line when admission gate passes.
+
+If all items 1–5 pass **and** test/sandbox rule allows production submit → proceed to §5.2.0 PII pre-send (when applicable), then §5.2.2 Story Intake pre-flight checks.
+
 #### 5.2.0 PII pre-send check (REQ-23 §1.3)
 
-Run **after** building the draft `StoryIntakeRequest` mapping and **before** §5.2.2 pre-flight / HTTP.
+Run **after** building the draft `StoryIntakeRequest` mapping and **after** §5.2.0a admission gate passes; **before** §5.2.2 pre-flight / HTTP.
 
 If `normalization_metadata.contains_pii` is `true`:
 
@@ -475,10 +539,21 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 ### 7.5 Operator checklist
 
+- [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30).
+- [ ] `trace_notes` includes artifact IDs/refs that justified the API call (REQ-30 §3).
 - [ ] `normalized_issue_payload` present for strict Issue writes.
 - [ ] No Actions-contract/SSOT edit without paired bump.
 - [ ] Keep acceptance boundaries explicit: Issues Actions (M1) checks stay separate from Story Intake (M2) checks.
 - [ ] After edits: verify there are no legacy donor route assumptions in this file.
+
+---
+
+## 8. Version history
+
+| Version | Date | Change |
+|---------|------|--------|
+| 0.2 | 2026-05-29 | **GIM-135 / FINDING-01:** §5.2 execution order — §5.2.0a admission gate now runs **before** §5.2.0 PII pre-send (after draft mapping build); cross-refs updated. Closes [`req30-code-audit-report-2026-05-29.md`](../docs/analysis/req30-code-audit-report-2026-05-29.md) FINDING-01. Gate substance unchanged (GIM-133). |
+| 0.1 | 2026-05-29 | **REQ-30 / GIM-133:** §5.2.0a «Admission gate — strict-chain package» — enforceable upstream artifact checks (`ingest_validation_report`, `safety_compliance_report`, `policy_gate_result`, `normalized_issue_payload`, explicit backend confirmation); test/sandbox production block with et/ru/en refusal templates; audit trace in `trace_notes`; default STOP message «Локальная валидация FAIL: данных недостаточно для отправки в API.»; §7.5 operator checklist extended. Additive to §5.2.2 checks 1–12 (GIM-28). |
 
 ---
 
