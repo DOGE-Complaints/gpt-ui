@@ -1,12 +1,12 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.4 · 2026-05-24  
+**Version:** 1.6 · 2026-05-31  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
 This file is the **HTTP source of truth for story intake runtime** inside the instruction bundle. Import the deployed story intake OpenAPI into GPT Actions (or equivalent) and treat that imported contract as authoritative for `operationId`, paths, schemas, and security. Until the node publishes canonical OpenAPI, paths below are **candidates**; before production, reconcile with `GET /openapi.json` on the deployed API.
 
-**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.4.0** at current instruction alignment — REQ-23 behavioral extensions on REQ-22 wire v2). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.4.2** at current instruction alignment — REQ-31 metadata + REQ-23 on REQ-22 wire v2). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
 
 ---
 
@@ -14,7 +14,7 @@ This file is the **HTTP source of truth for story intake runtime** inside the in
 
 | operationId | Method | Path | Request contract | Success envelope | Purpose |
 |-------------|--------|------|------------------|------------------|---------|
-| `postStoryIntake` | POST | `/intake/stories` | `StoryIntakeRequest` | `SuccessEnvelope_StoryIntake` (`202`) | Submit story intake payload to runtime. |
+| `postStoryIntake` | POST | `/intake/stories` | `StoryIntakeRequest` | `SuccessEnvelope_StoryIntake` (`202`) | Send a citizen story to DOGEstonia for processing (REQ-31 citizen-facing label; operationId unchanged). |
 
 Additional operations (search/reference/update) — add only when runtime contract exists; mirror in this table and in imported Actions contract with one-to-one method/path lock.
 
@@ -36,7 +36,7 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.location_query` | no | `normalized_issue_payload.location_query` when user confirmed location (REQ-26); omit if absent |
 | `narrative.canonical_type` | no | `canonical_payload.type`; `complaint` / `system_bug` → issue promotion gate (REQ-25) |
 | `narrative.canonical_labels` | no | `canonical_payload.labels[]`; canonical disposition only per `story-label-taxonomy.md` (REQ-25) |
-| `narrative.institution` | no | `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / REQ-43) |
+| `narrative.institution` | no | **Demo scope: always omit (REQ-28 pre-flight #7).** Post-demo: `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / REQ-43). |
 | `privacy.contains_pii` | no | `normalization_metadata.contains_pii` after §5.2.0 flow (REQ-23 §A) |
 | `privacy.redaction_requested` | no | user choice in api-orchestrator §5.2.0 |
 | `gpt_signals.severity` | no | `non_wire_metadata.severity` (REQ-42 enums) |
@@ -105,6 +105,8 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.6 | 2026-05-31 | **REQ-31 / GIM-137:** citizen-facing purpose text for `postStoryIntake`; lock `info.version` **0.4.2** (summary/description human-readable; operationId unchanged — Actions re-import required). |
+| 1.5 | 2026-05-26 | **REQ-28 / GAP-YAML-08:** `narrative.institution` field lock updated with demo-gate note — always omit in demo scope (REQ-28 pre-flight #7); post-demo gate lifted by REQ-43. |
 | 1.4 | 2026-05-24 | **REQ-26 / GIM-120:** `narrative.location_query` source = top-level normalizer `location_query`. |
 | 1.3 | 2026-05-24 | **REQ-25 / GIM-116–117:** activate `canonical_type` / `canonical_labels` wire; summary omit entire block if any slot empty. |
 | 1.2 | 2026-05-24 | **REQ-23 / GIM-107–111:** `gpt_signals`, `narrative.institution`, `privacy.*`, `live_story_context.consistency_notes`; lock `info.version` **0.4.0**. |

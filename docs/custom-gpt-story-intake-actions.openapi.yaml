@@ -10,16 +10,20 @@
 openapi: 3.1.0
 info:
   title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
-  version: "0.4.0"
+  version: "0.4.2"
   description: >
     Minimal subset for GPT Actions targeting story intake runtime (wire contract v2 + REQ-23 behavioral extensions).
+    REQ-31 (GIM-137): citizen-facing operation summary/description — human-readable labels; operationId unchanged (lockstep deferred).
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
-    Replace servers.url and reconcile components with the live FastAPI OpenAPI before production.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
+    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.4.2); the runtime server
+    tracks its own implementation version (currently 0.1.0 at GET /openapi.json). These are separate versioning
+    axes and are NOT expected to be equal. Increment this version when operationId/method/path/required fields/
+    response envelope/auth semantics change (see story-api-methods-reference.md §4 lockstep policy).
 
 servers:
-  - url: https://dogestonia-tallinn-demo.up.railway.app
-    description: REPLACE with DOGEstonia node public origin (no trailing path).
+  - url: https://dogestonia-tallinn.up.railway.app
+    description: DOGEstonia node public origin (no trailing path). DO NOT import from live GET /openapi.json — FastAPI auto-generated schema omits request body, uses wrong operationId and HTTP 200 instead of 202, and has no security scheme. This hand-crafted YAML is the authoritative GPT Actions import artifact.
 
 security:
   - GptActionsBearer: []
@@ -27,6 +31,7 @@ security:
 components:
   securitySchemes:
     GptActionsBearer:
+      # corresponds to server BearerAuth / Authorization: Bearer <token>
       type: http
       scheme: bearer
       description: >
@@ -81,7 +86,11 @@ components:
         description:
           $ref: "#/components/schemas/I18nText"
         summary:
-          $ref: "#/components/schemas/I18nText"
+          allOf:
+            - $ref: "#/components/schemas/I18nText"
+          nullable: true
+          description: >
+            Omit entire block if any et/ru/en slot is empty (REQ-25). Do not send null — omit the key.
         location_query:
           type: string
           nullable: true
@@ -93,9 +102,13 @@ components:
           items:
             type: string
         institution:
-          $ref: "#/components/schemas/I18nText"
+          allOf:
+            - $ref: "#/components/schemas/I18nText"
+          nullable: true
           description: >
-            Optional institution/agency i18n. When present, et/ru/en are all required (REQ-43).
+            DEMO SCOPE: always omit — do not populate (REQ-28 pre-flight #7; gate lifted by REQ-43).
+            Post-demo: include only when all et/ru/en are non-empty (REQ-23 §2.5 / REQ-43).
+            Omit the key; do not send null.
 
     GptSignals:
       type: object
@@ -148,18 +161,25 @@ components:
         schema_version:
           type: string
           enum: [m2.story_intake_envelope.v2]
+          description: >
+            Wire contract version (required). Shown in operator God Mode preview; minimize
+            citizen-facing discussion per api-orchestrator §5.2.0b (REQ-31).
         submitter:
           $ref: "#/components/schemas/Submitter"
         narrative:
           $ref: "#/components/schemas/Narrative"
         origin:
           $ref: "#/components/schemas/Origin"
+          description: >
+            Optional traceability sidecar. Prefer omitting from citizen summaries (REQ-31 §2.5.3).
         privacy:
           $ref: "#/components/schemas/Privacy"
         live_story_context:
           $ref: "#/components/schemas/LiveStoryContext"
         gpt_signals:
           $ref: "#/components/schemas/GptSignals"
+          description: >
+            Optional classification block (REQ-42). Use human labels in Citizen Mode; full block in God Mode.
 
     StoryIntakeResponseData:
       type: object
@@ -170,11 +190,28 @@ components:
           enum: [m2.story_intake_response.v1]
         story_id:
           type: string
+        # GAP-YAML-04 cross-spec drift note (closed-from-gpt-side 2026-05-26).
+        # Full server StoryLifecycleStatus enum (doge-complaints-gateway/src/core/domain/contracts.py:20-24) has 4 values:
+        #   accepted, partial_ready, ready_for_profile, clustered.
+        # For POST /intake/stories success response only TWO are reachable:
+        #   - services.py:187 creates record as ACCEPTED;
+        #   - services.py:276-285 immediately calls advance_story_readiness;
+        #   - services.py:352-358 locks transition ACCEPTED -> READY_FOR_PROFILE | PARTIAL_READY before HTTP return;
+        #   - handlers.py:214-220 returns final_story.lifecycle_status.value (post-advance) wrapped in SuccessEnvelope.
+        # Gateway runtime YAML (doge-complaints-gateway/docs/runtime-docs/api-reference/openapi.yaml:405-406) uses weaker
+        # `status: type: string` without enum — intentionally broader domain to accommodate future status values.
+        # This Actions YAML enum is endpoint-scoped (narrowed to actual reachable success-response values) — see
+        # GPT UI/docs/analysis/handoff-gateway-runtime-yaml-status-enum.md for full cross-spec analysis.
         status:
           type: string
           enum: [ready_for_profile, partial_ready]
           description: >
-            Intake lifecycle status (API_REFERENCE §6.5–6.6). Server never returns "received".
+            Intake lifecycle status for POST /intake/stories success response (API_REFERENCE §6.5–6.6).
+            Server never returns "received". Endpoint-scoped enum: full server StoryLifecycleStatus has 4 values
+            (accepted, partial_ready, ready_for_profile, clustered) but ACCEPTED is always advanced
+            (services.py:352-358) and CLUSTERED is post-cron — neither is reachable in this success envelope.
+            Gateway runtime YAML uses weaker `type: string` without enum (GAP-YAML-04 cross-spec drift; see
+            handoff-gateway-runtime-yaml-status-enum.md).
 
     SuccessEnvelope_StoryIntake:
       type: object
@@ -208,10 +245,13 @@ components:
 paths:
   /intake/stories:
     post:
+      # X-Trace-Id and Idempotency-Key not defined — GPT Actions cannot set custom headers. Server auto-generates trace_id and uses SHA-256(body) as idempotency key.
       operationId: postStoryIntake
-      summary: Submit story intake payload
+      summary: Send a citizen story to DOGEstonia for processing
       description: >
-        Story-first primary submission path for runtime intake (wire contract v2).
+        Submit the resident's story to DOGEstonia for intake and processing after interview
+        normalization and confirmation. Citizen-facing label; wire path POST /intake/stories
+        (operationId postStoryIntake retained for REQ-22 lockstep — re-import Actions after bump).
       x-openai-isConsequential: true
       security:
         - GptActionsBearer: []
