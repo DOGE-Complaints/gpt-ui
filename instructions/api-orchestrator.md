@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.2 |
-| **Date** | 2026-05-29 |
-| **Traceability** | REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.1 |
+| **Date** | 2026-05-31 |
+| **Traceability** | REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -398,20 +398,89 @@ Before HTTP, append to `trace_notes` (or equivalent orchestrator audit block) a 
 
 Do not call HTTP without this audit line when admission gate passes.
 
-If all items 1–5 pass **and** test/sandbox rule allows production submit → proceed to §5.2.0 PII pre-send (when applicable), then §5.2.2 Story Intake pre-flight checks.
+If all items 1–5 pass **and** test/sandbox rule allows production submit → proceed to §5.2.0 PII pre-send (when applicable), then §5.2.0b dual-mode pre-submit preview, then §5.2.2 Story Intake pre-flight checks.
 
 #### 5.2.0 PII pre-send check (REQ-23 §1.3)
 
-Run **after** building the draft `StoryIntakeRequest` mapping and **after** §5.2.0a admission gate passes; **before** §5.2.2 pre-flight / HTTP.
+Run **after** building the draft `StoryIntakeRequest` mapping and **after** §5.2.0a admission gate passes; **before** §5.2.0b pre-submit preview and §5.2.2 pre-flight / HTTP.
 
 If `normalization_metadata.contains_pii` is `true`:
 
 1. **Inform the user** which PII type(s) were detected in `original_text` / `description.*` and ask whether they want to remove them before submission.
 2. **If the user agrees to edit:** help edit the narrative, re-run [`story-normalizer.md`](story-normalizer.md) on the edited text, then set `privacy.contains_pii = true` and `privacy.redaction_requested = true`.
 3. **If the user declines:** set `privacy.contains_pii = true` and `privacy.redaction_requested = false`.
-4. Proceed to §5.2.2 pre-flight.
+4. Proceed to §5.2.0b dual-mode preview, then §5.2.2 pre-flight.
 
-If `contains_pii` is `false` or absent: **omit** the entire `privacy` block; proceed directly to §5.2.2.
+If `contains_pii` is `false` or absent: **omit** the entire `privacy` block; proceed to §5.2.0b dual-mode preview, then §5.2.2.
+
+#### 5.2.0b Dual-mode pre-submit preview — Citizen Mode / God Mode (REQ-31)
+
+Run **after** §5.2.0a admission gate passes and §5.2.0 PII flow (when applicable), and **before** §5.2.2 field-level pre-flight and **before every** `postStoryIntake` HTTP call. This block controls **how** the draft submission is shown to the user; it does not replace admission gate, PII flow, or §5.2.2 checks.
+
+**Session state:** maintain `debug_mode` for the **current conversation only** (not cross-session, not global).
+
+- Default: `debug_mode = false` (**Citizen Mode**).
+- When the user message matches the **operator-configured debug activation phrase** (exact match; phrase is defined in the operator deployment runbook — **MUST NOT** be written in citizen help, onboarding, or this instruction’s citizen-facing templates), set `debug_mode = true` (**God Mode**) for the remainder of this conversation.
+
+**Security — debug activation phrase (REQ-31 §2.2):**
+
+- **MUST NOT** list the activation phrase in UI help, onboarding, or citizen preview templates.
+- **MUST NOT** suggest or invent a phrase when the user asks how to enable debug, what commands exist, or to reveal hidden modes. Reply that debug tooling is operator-only and continue in Citizen Mode unless the phrase was already matched in this conversation.
+- **MUST NOT** persist `debug_mode` beyond the current conversation.
+
+---
+
+##### Citizen Mode (`debug_mode = false`)
+
+Use **human language only** in pre-submit messages. **MUST NOT** use these words or identifiers in citizen-facing preview or confirmation copy: `schema`, `payload`, `operationId`, `JSON`, `API`, `envelope`, `gpt_signals`, `canonical_payload`, `normalization_metadata`, or the internal operation name `postStoryIntake`.
+
+**Submission preview (required before HTTP):** show a template like:
+
+```text
+Ready to submit:
+
+Title:
+<human title from canonical_payload.title[session_language]>
+
+Summary:
+<short human summary from narrative / canonical_payload>
+
+Location:
+<human location if user confirmed; omit line if absent>
+
+Destination:
+DOGEstonia
+
+Would you like to submit?
+```
+
+**Confirmation copy:** prefer **«Submit Story»** (or equivalent in `session_language`). **MUST NOT** label the user-facing step as `postStoryIntake` or expose HTTP path/method names.
+
+**Transport abstraction:** describe fields by **purpose**, not wire names. Examples:
+
+- «Category: Complaint» — not `canonical_type=complaint`
+- «Labels: …» — not `canonical_labels=[…]`
+- Do **not** describe `schema_version`, `identity_issuer`, `gpt_signals`, `origin`, or raw envelope fields to the citizen unless God Mode is active.
+
+If the user confirms submission in Citizen Mode → proceed to §5.2.2, then HTTP when checks pass.
+
+---
+
+##### God Mode (`debug_mode = true`)
+
+When `debug_mode = true`, prefix GPT responses that include submission preview with a visible banner:
+
+```text
+DEBUG MODE ACTIVE
+```
+
+**Zero simplification (REQ-31 §2.4):** show the **full** draft `StoryIntakeRequest` (and mapping notes) exactly as built for HTTP — including `schema_version`, `narrative`, `gpt_signals`, `origin`, `privacy`, `live_story_context`, labels, severity, and transport fields. Use a JSON block when helpful. **No** redaction, **no** citizen-style abstraction in this mode.
+
+God Mode does **not** bypass §5.2.0a, §5.2.0, or §5.2.2. After operator review and explicit confirmation → proceed to §5.2.2, then HTTP.
+
+---
+
+**Platform note (REQ-31 §6.1):** ChatGPT may still show native Action confirmation UI controlled by OpenAI. This block improves instruction-layer preview and Actions metadata; graceful degradation applies.
 
 #### 5.2.2 Story Intake pre-flight checks (before HTTP)
 
@@ -540,6 +609,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 ### 7.5 Operator checklist
 
 - [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30).
+- [ ] §5.2.0b dual-mode preview shown: Citizen Mode default or God Mode with banner; «Submit Story» citizen copy (REQ-31).
 - [ ] `trace_notes` includes artifact IDs/refs that justified the API call (REQ-30 §3).
 - [ ] `normalized_issue_payload` present for strict Issue writes.
 - [ ] No Actions-contract/SSOT edit without paired bump.
@@ -552,6 +622,8 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.1 | 2026-05-31 | **GIM-139 / GAP-01:** §5.2.0b Citizen preview template — add **Destination: DOGEstonia** after Location (REQ-31 §4 AC #1). |
+| 0.3 | 2026-05-31 | **REQ-31 / GIM-136:** §5.2.0b «Dual-mode pre-submit preview» — Citizen Mode (human preview, forbidden lexicon, «Submit Story», transport abstraction) + God Mode (operator activation phrase, session-scoped `debug_mode`, `DEBUG MODE ACTIVE`, full JSON payload). Runs after §5.2.0a/§5.2.0, before §5.2.2/HTTP. §7.5 checklist extended. |
 | 0.2 | 2026-05-29 | **GIM-135 / FINDING-01:** §5.2 execution order — §5.2.0a admission gate now runs **before** §5.2.0 PII pre-send (after draft mapping build); cross-refs updated. Closes [`req30-code-audit-report-2026-05-29.md`](../docs/analysis/req30-code-audit-report-2026-05-29.md) FINDING-01. Gate substance unchanged (GIM-133). |
 | 0.1 | 2026-05-29 | **REQ-30 / GIM-133:** §5.2.0a «Admission gate — strict-chain package» — enforceable upstream artifact checks (`ingest_validation_report`, `safety_compliance_report`, `policy_gate_result`, `normalized_issue_payload`, explicit backend confirmation); test/sandbox production block with et/ru/en refusal templates; audit trace in `trace_notes`; default STOP message «Локальная валидация FAIL: данных недостаточно для отправки в API.»; §7.5 operator checklist extended. Additive to §5.2.2 checks 1–12 (GIM-28). |
 
