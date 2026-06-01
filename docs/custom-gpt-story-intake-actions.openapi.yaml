@@ -171,7 +171,11 @@ components:
         origin:
           $ref: "#/components/schemas/Origin"
           description: >
-            Optional traceability sidecar. Prefer omitting from citizen summaries (REQ-31 §2.5.3).
+            Optional traceability sidecar. Always include origin.source='openai_gpt_action' in
+            every StoryIntakeRequest regardless of Citizen/God Mode. Do NOT omit from the API
+            request body — "omit from citizen summaries" means do not display origin fields in
+            the conversational preview, not that the block should be absent from the request.
+            (REQ-32 / REQ-31 §2.5.3 display vs transport.)
         privacy:
           $ref: "#/components/schemas/Privacy"
         live_story_context:
