@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3.1 |
-| **Date** | 2026-05-31 |
-| **Traceability** | REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.2 |
+| **Date** | 2026-06-01 |
+| **Traceability** | REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -323,7 +323,7 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `narrative.canonical_labels` | `canonical_payload.labels[]` | No | REQ-25: only canonical disposition labels from [`story-label-taxonomy.md`](story-label-taxonomy.md); exclude metadata-only / low-confidence; omit if empty |
 | `narrative.summary` | `canonical_payload.summary` (`{et, ru, en}`) | No | REQ-25: include only when **all three** slots are non-empty; if any slot empty — omit entire `summary` block (server `parse_required_i18n_dict` → HTTP 400 on partial) |
 | `narrative.location_query` | `normalized_issue_payload.location_query` (top-level) | No | REQ-26: freeform location string; server `geo_service.resolve_for_story()`; omit if absent, null, or empty after trim |
-| `origin.source` | Fixed: `openai_gpt_action` (or product-agreed string) | No | Traceability; closes GAP-04 when set |
+| `origin.source` | Fixed: `openai_gpt_action` | **de-facto required** | Always include: this is the only way to track submission source. Value is fixed = `openai_gpt_action` for GPT Action runtime. Do not omit — `origin.source = null` in DB means the story cannot be attributed to the GPT channel. |
 | `origin.conversation_id` | Session / thread id available to the orchestrator | No | |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
 | `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | **Always omit in current demo scope (REQ-28)** — §5.2.2 pre-flight #7 institution demo-gate drops this field regardless of `canonical_payload` content; normalizer-layer enforcement in [`story-normalizer.md`](story-normalizer.md) §4.1. Post-demo (REQ-43 lifted): omit only if any i18n slot empty (REQ-23 §2.5 secondary directive — pre-flight #8). |
@@ -455,6 +455,8 @@ Would you like to submit?
 ```
 
 **Confirmation copy:** prefer **«Submit Story»** (or equivalent in `session_language`). **MUST NOT** label the user-facing step as `postStoryIntake` or expose HTTP path/method names.
+
+**Transport fields vs display fields (REQ-32):** Citizen Mode controls what is *shown* to the user, not what is *sent* in the API request. **`origin`**, `schema_version`, `identity_issuer`, `gpt_signals` — always included in the `StoryIntakeRequest` body with `origin.source = "openai_gpt_action"`; never described to the citizen in conversational preview unless God Mode is active.
 
 **Transport abstraction:** describe fields by **purpose**, not wire names. Examples:
 
@@ -622,6 +624,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.2 | 2026-06-01 | **REQ-32 / GIM-142:** §5.2.1 `origin.source` de-facto required; §5.2.0b «Transport fields vs display fields» — always send `origin` in HTTP body. |
 | 0.3.1 | 2026-05-31 | **GIM-139 / GAP-01:** §5.2.0b Citizen preview template — add **Destination: DOGEstonia** after Location (REQ-31 §4 AC #1). |
 | 0.3 | 2026-05-31 | **REQ-31 / GIM-136:** §5.2.0b «Dual-mode pre-submit preview» — Citizen Mode (human preview, forbidden lexicon, «Submit Story», transport abstraction) + God Mode (operator activation phrase, session-scoped `debug_mode`, `DEBUG MODE ACTIVE`, full JSON payload). Runs after §5.2.0a/§5.2.0, before §5.2.2/HTTP. §7.5 checklist extended. |
 | 0.2 | 2026-05-29 | **GIM-135 / FINDING-01:** §5.2 execution order — §5.2.0a admission gate now runs **before** §5.2.0 PII pre-send (after draft mapping build); cross-refs updated. Closes [`req30-code-audit-report-2026-05-29.md`](../docs/analysis/req30-code-audit-report-2026-05-29.md) FINDING-01. Gate substance unchanged (GIM-133). |
