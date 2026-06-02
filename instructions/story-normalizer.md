@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.4 |
+| **Version** | 0.2.5 |
 | **Date** | 2026-06-02 |
-| **Traceability** | FR-M1-035–037; REQ-33; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -55,6 +55,7 @@ The normalizer consumes a **handoff package** produced by upstream modules (name
 | **Validated Issue fields** | Draft values for §4.1 fields (from interview + validation), already meeting ingest rules for the current step. |
 | **`policy_gate_result`** | Must be **`approved`**; include `policy_ref`, `rulebook_version` for traceability in metadata. |
 | **Pointers to upstream artifacts** | Stable references (e.g. logical ids, timestamps, or one-line summaries) to **`ingest_validation_report`**, relevant **`safety_compliance_report`** checkpoints, and the **gate** result — for `normalization_metadata` (§6). |
+| **`summary_draft` (optional)** | From Phase 7 Step 5b in [`story-interview-flow.md`](story-interview-flow.md): 1–2 sentences in `session_language`; use as primary source for `canonical_payload.summary[session_language]` before trilingual expansion. |
 
 If `policy_gate_result.status` is not **`approved`**: **do not** emit `normalized_issue_payload` for API-bound ingest; return control to lifecycle / gate (same pattern as legacy reference normalizer after rejection).
 
@@ -120,7 +121,7 @@ Single final envelope:
 }
 ```
 
-Omit `summary` if no validated short text exists. Omit `institution` from `canonical_payload` always in demo scope (REQ-28 — see §4.1 constraint below); post-demo: omit unless all three slots `{et, ru, en}` are non-empty (REQ-23 §2.5). Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream. Omit `live_story_context` when no narrative contradiction was detected (REQ-23 §3). Omit top-level `location_query` when location was not confirmed or string would be empty (REQ-26 §4.6).
+Populate `canonical_payload.summary` per §4.1 **`summary` generation rule** (do not omit solely because upstream did not supply short text). Omit `institution` from `canonical_payload` always in demo scope (REQ-28 — see §4.1 constraint below); post-demo: omit unless all three slots `{et, ru, en}` are non-empty (REQ-23 §2.5). Omit `non_wire_metadata` entirely when subjective fields were not stated or confirmed upstream. Omit `live_story_context` when no narrative contradiction was detected (REQ-23 §3). Omit top-level `location_query` when location was not confirmed or string would be empty (REQ-26 §4.6).
 
 ### 4.1 `canonical_payload`
 
@@ -128,13 +129,34 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 
 | Field | Rule |
 |-------|------|
-| `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5. |
+| `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5. Apply **observation vs complaint decision rule** below. |
 | `labels` | String array; keys must be `canonical` labels allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. Apply **multi-axis** extraction per §2.1 — see rule below. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
-| `summary` | Optional `{ et, ru, en }`; if omitted, orchestrator/UI may use short-field fallbacks per product/UI conventions. |
+| `summary` | Optional `{ et, ru, en }` when content is minimal (see **`summary` generation rule** below); orchestrator/UI use summary for card preview when present. |
 | `institution` | Optional `{ et, ru, en }` when interview/validation produced full trilingual institution text; **omit** if any slot is empty (REQ-23 §2.5). |
 
 Do not add donor-era, legacy-only, Search-only, or backend-issued fields to `canonical_payload`.
+
+**`summary` generation rule (REQ-34):** If `canonical_payload.description` and the interview narrative contain sufficient content (more than a bare factual incident — i.e., there is meaning, desired state, or civic angle beyond a bare description), the normalizer **MUST** generate a concise summary:
+
+- 1–2 sentences in `session_language` capturing: what the problem is + what the desired state is (or civic angle).
+- Prefer Phase 7 **`summary_draft[session_language]`** when present; otherwise derive from validated description and narrative.
+- Translate to the other two languages per [`story-i18n-policy.md`](story-i18n-policy.md).
+- Include as `canonical_payload.summary = { et, ru, en }`.
+
+**Omit** `summary` only when: the story is so minimal that a meaningful summary would merely repeat the title. Do **not** omit because summary was not produced upstream — generate it here.
+
+**observation vs complaint decision rule (REQ-34):** Use `complaint` when the story describes an **absent or malfunctioning condition** that the resident experiences as a problem — even if framed gently or as a wish. Key signal: the resident implies that something **should** exist or work, but **does not**.
+
+Use `observation` only when: the story is a positive description of desired improvement **without** implied absence or harm — i.e., the resident explicitly frames it as a preference or idea, not a problem.
+
+Examples:
+
+- "There's no cultural space for children in our district" → `complaint` (absence = problem; improvement wish + implied harm).
+- "It would be nice to have more parks" → `observation` (pure improvement wish, no implied harm or absence).
+- "The kindergarten is overcrowded and there's nowhere to go after school" → `complaint` (concrete harm + absence).
+
+When in doubt: if the user would answer "yes" to "Does this bother you or cause a problem?" → use `complaint`, not `observation`. Align with [`story-interview-flow.md`](story-interview-flow.md) §8 row 9 (FR-M1-025 improvement-without-harm baseline).
 
 **Multi-axis label rule:** A single story commonly maps to labels from multiple taxonomy axes:
 
@@ -339,3 +361,4 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.2 | 2026-05-25 | **REQ-28 / GIM-125:** §4.1 explicit demo-scope constraint for `canonical_payload.institution` (do-not-populate + `trace_notes` entry); §4.3 `institution_candidate` sidecar fallback row; REQ-23 §2.5 i18n-omit retained as secondary post-demo directive; lift gate tied to REQ-43. |
 | 0.2.3 | 2026-06-01 | **REQ-33 / GIM-145:** §2.1 multi-axis label extraction + conservative clarification; §4.1 multi-axis rule + example; §4.1a extraction hints (`public_space`, `city_for_people`, `improvement_wish`, `equity_access`) + broken-road regression guard. |
 | 0.2.4 | 2026-06-02 | **REQ-33 audit follow-up / GIM-147…148:** §2.1 changed to `one or more keys per applicable axis`; header traceability explicitly includes `REQ-33` (GAP-01/02 closure). |
+| 0.2.5 | 2026-06-02 | **REQ-34 / GIM-149…150:** §4.1 `summary` generation rule (mandatory when content sufficient); §4.1 `type` observation vs complaint boundary with examples; handoff input `summary_draft` (§3). |

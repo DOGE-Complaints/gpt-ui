@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.17 |
-| **Date** | 2026-05-25 |
-| **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
+| **Version** | 0.18 |
+| **Date** | 2026-06-02 |
+| **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
 
 **Related modules:** [`story-data-model.md`](story-data-model.md) · [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) · [`safety-compliance.md`](safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
 
@@ -150,7 +150,9 @@ Sources: **FR-M1-032**, **FR-M1-033**, **FR-M1-034**. This subsection is the **n
    - Do **not** ask the user to name or approve the title separately — derive it from the already-confirmed narrative. If the user asks to change it, accept in-place.
    - Store in `canonical_payload.title[session_language]` and populate trilingual `canonical_payload.title.{et,ru,en}` before handoff to [`story-normalizer.md`](story-normalizer.md). Wire v2 maps the full `title` object via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1 (no `title_hint*` fields).
 
-6. **Step 6 — Translation transparency note (mandatory) (REQ-29):** After step 5 produces the trilingual title (and before any handoff toward [`story-normalizer.md`](story-normalizer.md)), append exactly **one short sentence** in `session_language` that discloses three facts to the resident: (a) the issue will be saved / published in all three languages (`et`, `ru`, `en`), (b) only the `session_language` version was reviewed together during this dialogue, and (c) translations into the remaining two languages are AI-generated and have **not** been individually reviewed. This step is **non-interactive** (information only, no response needed) — do **not** ask the user to approve or correct the translations, and do **not** display the translated `title` / `description` / `summary` text proactively. After delivering the note, proceed directly to handoff. This closes FINDING-04 (translation transparency in civic record).
+5b. **Summary draft (REQ-34 / GIM-149):** After step 5 and **before** step 6, compose a **1–2 sentence** summary in `session_language` from the confirmed Phase 7 narrative (problem + desired state or civic angle). Do **not** ask the user to approve the summary separately — derive it from the already-confirmed interpretation (same discipline as step 5 title). Store as `summary_draft[session_language]` for handoff; the normalizer expands to trilingual `canonical_payload.summary` per [`story-normalizer.md`](story-normalizer.md) §4.1 **`summary` generation rule**.
+
+6. **Step 6 — Translation transparency note (mandatory) (REQ-29):** After step 5b produces the summary draft and step 5 produced the trilingual title (and before any handoff toward [`story-normalizer.md`](story-normalizer.md)), append exactly **one short sentence** in `session_language` that discloses three facts to the resident: (a) the issue will be saved / published in all three languages (`et`, `ru`, `en`), (b) only the `session_language` version was reviewed together during this dialogue, and (c) translations into the remaining two languages are AI-generated and have **not** been individually reviewed. This step is **non-interactive** (information only, no response needed) — do **not** ask the user to approve or correct the translations, and do **not** display the translated `title` / `description` / `summary` text proactively. After delivering the note, proceed directly to handoff. This closes FINDING-04 (translation transparency in civic record).
    - Example (`et`): «Kaebus salvestatakse eesti, vene ja inglise keeles; tõlked on automaatsed.»
    - Example (`ru`): «Жалоба будет сохранена на эстонском, русском и английском; переводы выполнены автоматически.»
    - Example (`en`): «The issue will be saved in Estonian, Russian, and English; translations are AI-generated.»
@@ -197,7 +199,7 @@ Operational **DO NOT** in Issue interview:
 | 6 | False empathy | Over-dramatize or fake intimacy. | Calm, respectful reflection (5.6) without performance. |
 | 7 | False promises | “We will forward…”, “The city will see…”, “Your ticket is approved…”. | **Forbidden** — same class of error as false backend claims in [`root.md`](root.md). Only describe **local** readiness and what **API response** can confirm. |
 | 8 | Substituting user will | Finalize interpretation without confirmation. | **§7.2:** summary → correction offer → revised framing if needed → re-confirm; only then handoff (FR-M1-032…034). |
-| 9 | Misusing **observation** | Relabel clear **harm** narratives as “just an observation” to skip depth or safety bar. | Keep **§4–§5** when user expresses harm; use **observation** routing only for genuine **improvement-without-harm** (**FR-M1-025**). Cross-check [`ingest-deep-parsing.md`](ingest-deep-parsing.md) Issue overlay + [`ingest-validation.md`](ingest-validation.md). |
+| 9 | Misusing **observation** | Relabel clear **harm** narratives as “just an observation” to skip depth or safety bar. | Keep **§4–§5** when user expresses harm; use **observation** routing only for genuine **improvement-without-harm** (**FR-M1-025**). At normalization, apply [`story-normalizer.md`](story-normalizer.md) §4.1 **observation vs complaint decision rule** (REQ-34) — absence/malfunction → `complaint`, not `observation`. Cross-check [`ingest-deep-parsing.md`](ingest-deep-parsing.md) Issue overlay + [`ingest-validation.md`](ingest-validation.md). |
 
 **Civic-outcomes alignment:** do not imply guaranteed government or institutional outcomes; civic signal ≠ promise of action.
 
@@ -309,3 +311,4 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 | 0.15 | 2026-04-26 | Added label evidence capture by dialogue phase and Phase 7 correction disposition (GIM-87). |
 | 0.16 | 2026-04-27 | Instruction-bundle self-contained: bare-filename cross-links only; removed external repository references from narrative. |
 | 0.17 | 2026-05-25 | **REQ-29 / GIM-128:** §7.2 mandatory-sequence Step 6 «Translation transparency note (mandatory)» inserted after Step 5 session-title generation — non-interactive disclosure that only `session_language` version was reviewed and that `{et, ru, en}` translations are AI-generated; et/ru/en examples per REQ-29 §2.3. Closes FINDING-04 (`audit-field-provenance-2026-05-24.md`). |
+| 0.18 | 2026-06-02 | **REQ-34 / GIM-149:** §7.2 Step 5b summary draft before translation note; §8 row 9 cross-link to normalizer observation vs complaint rule. |
