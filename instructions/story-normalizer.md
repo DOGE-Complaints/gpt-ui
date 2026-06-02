@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.2 |
-| **Date** | 2026-05-25 |
-| **Traceability** | FR-M1-035–037; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.4 |
+| **Date** | 2026-06-02 |
+| **Traceability** | FR-M1-035–037; REQ-33; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -26,7 +26,8 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 - Emit **`normalized_issue_payload`** with:
   - **`canonical_payload`** — Issue fields aligned with [`story-data-model.md`](story-data-model.md) **§4.1** (`type`, `labels`, `title`, `description`, optional `summary`, optional `institution`; trilingual objects `{ et, ru, en }` per that file and [`story-i18n-policy.md`](story-i18n-policy.md)).
   - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
-- Preserve **conservative** typing: enums and label keys must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)).
+- **Label extraction:** apply **all** taxonomy keys that genuinely apply to the story — one or more keys per applicable axis (`topic_domain`, `failure_mode`, `civic_signal`, `issue_archetype_support`) where evidence exists in the validated narrative. **Conservative** means: do not invent labels or apply low-confidence keys — it does **not** mean use only one label total.
+- Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)).
 
 ### 2.2 This instruction MUST NOT
 
@@ -128,12 +129,35 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 | Field | Rule |
 |-------|------|
 | `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5. |
-| `labels` | String array; keys must be `canonical` labels allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. |
+| `labels` | String array; keys must be `canonical` labels allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. Apply **multi-axis** extraction per §2.1 — see rule below. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }`; if omitted, orchestrator/UI may use short-field fallbacks per product/UI conventions. |
 | `institution` | Optional `{ et, ru, en }` when interview/validation produced full trilingual institution text; **omit** if any slot is empty (REQ-23 §2.5). |
 
 Do not add donor-era, legacy-only, Search-only, or backend-issued fields to `canonical_payload`.
+
+**Multi-axis label rule:** A single story commonly maps to labels from multiple taxonomy axes:
+
+- **topic_domain** (what civic area): `education`, `public_space`, `transport`, etc.
+- **civic_signal** (what pattern): `city_for_people`, `equity_access`, `systemic_pattern`, etc.
+- **issue_archetype_support** (story form): `improvement_wish`, `harm_reported`, `positive_observation`, etc.
+
+Extract from each axis **independently**. A story about wanting better public spaces for children should produce: `["education", "public_space", "city_for_people", "improvement_wish"]` — not just `["education"]`.
+
+Do **not** omit `civic_signal` labels because they seem "less obvious" — these are among the most valuable for clustering and analytics.
+
+#### 4.1a Label extraction hints (commonly under-applied keys)
+
+Use [`story-label-taxonomy.md`](story-label-taxonomy.md) as SSOT. When narrative evidence matches, include the key even if another topic_domain label is already present:
+
+| Label | Axis | Signals in the resident narrative |
+|-------|------|-----------------------------------|
+| `public_space` | topic_domain | площадь, парк, двор, детская площадка, пешеходная зона, набережная, общественное пространство, улица, сквер; if the story is about a shared physical place — apply |
+| `city_for_people` | civic_signal | «хотелось бы», «нужен», «должен быть», «пространство для», «удобный», «место для людей», «развитие»; if the story describes a desired city environment — apply |
+| `improvement_wish` | issue_archetype_support | story frames desired improvement rather than only broken infrastructure; if `type = observation` and context is positive aspiration — apply |
+| `equity_access` | civic_signal | children, elderly, people with disabilities, social groups, unequal access — apply when fair-access theme is present |
+
+**Regression guard:** a broken-road **complaint** about potholes or repair backlog must **not** receive `city_for_people` — that civic_signal applies to desired human-centered city improvement, not infrastructure failure reports.
 
 **`institution` — demo-scope constraint (M1 demo, REQ-28):**
 
@@ -313,3 +337,5 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.1 | 2026-05-24 | **REQ-26 / GIM-119:** §4.6 top-level `location_query` from confirmed `location.freeform`; omit when unconfirmed or empty. |
 | 0.2.0 | 2026-05-22 | **REQ-23 / GIM-108–111:** §4.4 PII (`contains_pii`); §4.5 `live_story_context.consistency_notes`; §4.3 → `gpt_signals` wire via orchestrator; institution emit when full i18n. |
 | 0.2.2 | 2026-05-25 | **REQ-28 / GIM-125:** §4.1 explicit demo-scope constraint for `canonical_payload.institution` (do-not-populate + `trace_notes` entry); §4.3 `institution_candidate` sidecar fallback row; REQ-23 §2.5 i18n-omit retained as secondary post-demo directive; lift gate tied to REQ-43. |
+| 0.2.3 | 2026-06-01 | **REQ-33 / GIM-145:** §2.1 multi-axis label extraction + conservative clarification; §4.1 multi-axis rule + example; §4.1a extraction hints (`public_space`, `city_for_people`, `improvement_wish`, `equity_access`) + broken-road regression guard. |
+| 0.2.4 | 2026-06-02 | **REQ-33 audit follow-up / GIM-147…148:** §2.1 changed to `one or more keys per applicable axis`; header traceability explicitly includes `REQ-33` (GAP-01/02 closure). |
