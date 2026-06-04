@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.5 |
-| **Date** | 2026-06-02 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.6 |
+| **Date** | 2026-06-03 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -238,7 +238,17 @@ Only candidates with `disposition = "canonical"` and keys allowed by [`story-lab
 
 ### 4.3 `non_wire_metadata` (optional sidecar)
 
-`severity`, `impact_estimation`, and `problem_status` are resident-perceived subjective fields from [`story-data-model.md`](story-data-model.md) **§4.3**. If collected and confirmed upstream, place them in optional `non_wire_metadata`; otherwise omit this sidecar.
+`severity`, `impact_estimation`, and `problem_status` are resident-perceived subjective fields from [`story-data-model.md`](story-data-model.md) **§4.3**.
+
+**Subjective signals determination rule (REQ-35):** When the interview narrative contains sufficient context to infer resident-perceived seriousness, scope, or problem status — from what the resident **already stated**, without leading questions or new interview prompts — **actively determine** and place all applicable fields in `non_wire_metadata`, including `severity` when a seriousness signal is present (do not omit `severity` merely because it was not pre-labeled upstream).
+
+- Collect values **only** from stated resident material per [`story-data-model.md`](story-data-model.md) §4.3 («without leading the user»).
+- When context supports all three dimensions, populate `severity`, `impact_estimation`, and `problem_status` together when each has a defensible mapping.
+- **Omit** a field (or the entire sidecar) when no defensible signal exists — do **not** invent values.
+- For `impact_estimation`: if unsure, **omit the field** — do **not** use `UNKNOWN` as a fallback (wire enum has no `UNKNOWN` for this field).
+- For `problem_status`: if unsure, prefer `UNKNOWN` or omit that field only.
+
+If nothing was collected or confirmed upstream **and** the narrative lacks sufficient subjective context, omit `non_wire_metadata`.
 
 `non_wire_metadata` is an **internal** sidecar only. [`api-orchestrator.md`](api-orchestrator.md) maps these three fields to wire `gpt_signals` (REQ-23 §2). Do **not** copy the `non_wire_metadata` object into `StoryIntakeRequest`.
 
@@ -304,8 +314,8 @@ Optional **top-level** string on `normalized_issue_payload` (sibling to `canonic
 
 **Formation rules:**
 
-1. Include **only** when the user explicitly named or confirmed a location in the interview.
-2. **Format:** freeform string, preferably `<street/place>, <city>` or `<district>, Tallinn`.
+1. **Mandatory when location is confirmed (REQ-35):** If the resident named or confirmed a city, district, street, or landmark in any interview phase (and §7.2 affirmation applies), the normalizer **MUST** form `location_query` from the confirmed `location.freeform` material — do **not** omit solely because the field was optional upstream. The only grounds to omit are rules **3–5** below.
+2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script** (e.g. `Tallinn`, `Kalamaja, Tallinn`, `Tartu mnt 80, Tallinn`). The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)); Latin is more reliable for demo geo-resolve. Cyrillic is acceptable when the resident used it and Latin transliteration would distort meaning; Cyrillic expansion is a separate backend concern (REQ-46). Do **not** invent address detail beyond what the resident stated.
 3. If the user mentioned **multiple** locations without a single clear primary — pick the most specific / complaint-relevant one (D-02). Reflect ambiguity in `live_story_context.consistency_notes` (§4.5) when useful.
 4. If location was **not** confirmed or remains ambiguous after §7.2 — **omit** `location_query` (do not send null or `""`).
 5. Never emit a blank or whitespace-only string.
@@ -362,3 +372,4 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.3 | 2026-06-01 | **REQ-33 / GIM-145:** §2.1 multi-axis label extraction + conservative clarification; §4.1 multi-axis rule + example; §4.1a extraction hints (`public_space`, `city_for_people`, `improvement_wish`, `equity_access`) + broken-road regression guard. |
 | 0.2.4 | 2026-06-02 | **REQ-33 audit follow-up / GIM-147…148:** §2.1 changed to `one or more keys per applicable axis`; header traceability explicitly includes `REQ-33` (GAP-01/02 closure). |
 | 0.2.5 | 2026-06-02 | **REQ-34 / GIM-149…150:** §4.1 `summary` generation rule (mandatory when content sufficient); §4.1 `type` observation vs complaint boundary with examples; handoff input `summary_draft` (§3). |
+| 0.2.6 | 2026-06-03 | **REQ-35 / GIM-152…153:** §4.6 `location_query` MUST when place confirmed + Latin/format + `normalize_location_query()` ref; §4.3 active subjective signals determination (`severity` + peers, no leading questions). |

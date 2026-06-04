@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3.2 |
-| **Date** | 2026-06-01 |
-| **Traceability** | REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.3 |
+| **Date** | 2026-06-03 |
+| **Traceability** | REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -287,7 +287,7 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
   },
   "origin": {
     "source": "openai_gpt_action",
-    "conversation_id": "<active conversation id>",
+    "conversation_id": "<GPT Actions session conversation_id when available — omit key if unavailable; never null string>",
     "tool_call_id": "<tool call id if this submit is tool-driven; else omit>"
   },
   "privacy": {
@@ -324,7 +324,7 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `narrative.summary` | `canonical_payload.summary` (`{et, ru, en}`) | No | REQ-25: include only when **all three** slots are non-empty; if any slot empty — omit entire `summary` block (server `parse_required_i18n_dict` → HTTP 400 on partial) |
 | `narrative.location_query` | `normalized_issue_payload.location_query` (top-level) | No | REQ-26: freeform location string; server `geo_service.resolve_for_story()`; omit if absent, null, or empty after trim |
 | `origin.source` | Fixed: `openai_gpt_action` | **de-facto required** | Always include: this is the only way to track submission source. Value is fixed = `openai_gpt_action` for GPT Action runtime. Do not omit — `origin.source = null` in DB means the story cannot be attributed to the GPT channel. |
-| `origin.conversation_id` | Session / thread id available to the orchestrator | No | |
+| `origin.conversation_id` | Active `conversation_id` from GPT Actions session context when the orchestrator runtime exposes it (thread / conversation id for this Custom GPT session) | No | **REQ-35:** populate when available for channel attribution; do **not** send `null`, empty string, or placeholder text — **omit** the `conversation_id` key entirely when the id is not available to the runtime (instruction cannot guarantee Actions context; fill when present). |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
 | `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | **Always omit in current demo scope (REQ-28)** — §5.2.2 pre-flight #7 institution demo-gate drops this field regardless of `canonical_payload` content; normalizer-layer enforcement in [`story-normalizer.md`](story-normalizer.md) §4.1. Post-demo (REQ-43 lifted): omit only if any i18n slot empty (REQ-23 §2.5 secondary directive — pre-flight #8). |
 | `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A; omit entire `privacy` block when false/absent |
@@ -624,6 +624,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.3 | 2026-06-03 | **REQ-35 / GIM-154:** §5.2.1 `origin.conversation_id` Notes — GPT Actions session id when available; omit key if unavailable; never null string. |
 | 0.3.2 | 2026-06-01 | **REQ-32 / GIM-142:** §5.2.1 `origin.source` de-facto required; §5.2.0b «Transport fields vs display fields» — always send `origin` in HTTP body. |
 | 0.3.1 | 2026-05-31 | **GIM-139 / GAP-01:** §5.2.0b Citizen preview template — add **Destination: DOGEstonia** after Location (REQ-31 §4 AC #1). |
 | 0.3 | 2026-05-31 | **REQ-31 / GIM-136:** §5.2.0b «Dual-mode pre-submit preview» — Citizen Mode (human preview, forbidden lexicon, «Submit Story», transport abstraction) + God Mode (operator activation phrase, session-scoped `debug_mode`, `DEBUG MODE ACTIVE`, full JSON payload). Runs after §5.2.0a/§5.2.0, before §5.2.2/HTTP. §7.5 checklist extended. |
