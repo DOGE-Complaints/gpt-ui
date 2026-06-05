@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (35 файлов)
+## Оглавление REQ (40 файлов)
 
 | № | Файл |
 |---|------|
@@ -46,5 +46,13 @@
 | 33 | [REQ-33-label-extraction-multi-axis-improvement.md](./REQ-33-label-extraction-multi-axis-improvement.md) |
 | 34 | [REQ-34-summary-generation-and-canonical-type-clarity.md](./REQ-34-summary-generation-and-canonical-type-clarity.md) |
 | 35 | [REQ-35-demo-field-population-gpt-fixes.md](./REQ-35-demo-field-population-gpt-fixes.md) |
+| 36 | [REQ-36-civic-taxonomy-expansion-multi-axis.md](./REQ-36-civic-taxonomy-expansion-multi-axis.md) |
+| 37 | _(вакантен — черновик Trigger reliability перенесён в REQ-40/41)_ |
+| 38 | [REQ-38-ecosystem-deficit-story-detection.md](./REQ-38-ecosystem-deficit-story-detection.md) |
+| 39 | [REQ-39-geographic-intelligence-confidence-canonicalization.md](./REQ-39-geographic-intelligence-confidence-canonicalization.md) |
+| 40 | [REQ-40-pre-submission-instruction-compliance-validation.md](./REQ-40-pre-submission-instruction-compliance-validation.md) |
+| 41 | [REQ-41-trigger-observability-audit-trail.md](./REQ-41-trigger-observability-audit-trail.md) |
 
-**Версия:** 1.4 · 2026-06-03 (REQ-35: перенос GPT-части backend REQ-47 §2 в GPT UI — остаточная дельта location_query obligation+латиница / origin.conversation_id / gpt_signals severity; индекс дополнен пропущенными REQ-30…34).
+**Версия:** 1.6 · 2026-06-05 (REQ-40 черновик «Trigger Reliability & Execution Determinism» разбит по механизму на 2 дока: REQ-40 pre-submission instruction-compliance validation (enforcement, расширяет §5.2.2 pre-flight, Critical), REQ-41 trigger observability/audit trail (диагностика God Mode, зависит от REQ-40). Номер REQ-37 освобождён — исходный draft перемещён пользователем в REQ-40 и стандартизирован.
+
+Предыдущее (1.5 · 2026-06-04): REQ-36 черновик «Story Intelligence Coverage» разбит на REQ-36 civic taxonomy expansion (foundational SSOT) / REQ-38 ecosystem-deficit detection (зависит от REQ-36) / REQ-39 geographic intelligence (расширяет REQ-26/35).
