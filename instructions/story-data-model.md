@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.12 |
-| **Date** | 2026-05-25 |
-| **Traceability** | [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md) |
+| **Version** | 0.13 |
+| **Date** | 2026-06-05 |
+| **Traceability** | REQ-36; [`story-label-taxonomy.md`](story-label-taxonomy.md) v0.2; [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md) |
 
 ---
 
@@ -91,7 +91,7 @@ These fields are sent via the **`gpt_signals`** block in `StoryIntakeRequest` (R
 ## 5. Source of truth for enums
 
 - **Types and statuses:** product enums `ISSUE_TYPE`, `ISSUE_STATUS` — match §4 literal sets above for instruction-layer work.
-- **Labels:** [`story-label-taxonomy.md`](story-label-taxonomy.md) — controlled axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling.
+- **Labels:** [`story-label-taxonomy.md`](story-label-taxonomy.md) v0.2 — controlled axes (`topic_domain`, `service_object`, `affected_scope`, `civic_signal`, `deep_need`, `desired_outcome`, `ecosystem_signal`, `governance_signal`, plus `failure_mode`, `issue_archetype_support`, internal-only), canonical allowed keys in §4, metadata-only candidates in §5, and unknown-value handling. No separate `equity_dimension` or `affected_population` axis (REQ-36 OD-1/OD-2).
 
 If UI mocks disagree with this file on `title`/`summary` shape (string vs `{ et, ru, en }`), for **Module 1 GPT → UI** priority is **§4.1** (trilingual objects) unless the deployed OpenAPI explicitly locks a different wire shape.
 
@@ -133,3 +133,4 @@ Do not collect PII by default; do not store personal data in Issue content beyon
 | 0.10 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |
 | 0.11 | 2026-04-26 | Linked `labels` to controlled label taxonomy and forbade unknown/free-text/internal label values in canonical payload (GIM-86). |
 | 0.12 | 2026-05-25 | REQ-27: synced §4.3 subjective enums (`severity`, `impact_estimation`, `problem_status`) to server frozensets in [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L61–65 (uppercase `LOW/MEDIUM/HIGH/CRITICAL`, `LOCAL/DISTRICT/CITY/NATIONAL`, `ONGOING/RESOLVED/RECURRING/UNKNOWN`); removed stale «non-wire metadata / must not be sent» wording — REQ-23/REQ-42 already activated the wire `gpt_signals` block (OpenAPI v0.4.0) (GIM-122). |
+| 0.13 | 2026-06-05 | **REQ-36 / GIM-159:** §5 labels SoT cross-ref updated for expanded taxonomy v0.2 (new civic axes and promoted canonical scopes). |

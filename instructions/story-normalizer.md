@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.6 |
-| **Date** | 2026-06-03 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.7 |
+| **Date** | 2026-06-05 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -178,8 +178,15 @@ Use [`story-label-taxonomy.md`](story-label-taxonomy.md) as SSOT. When narrative
 | `city_for_people` | civic_signal | «хотелось бы», «нужен», «должен быть», «пространство для», «удобный», «место для людей», «развитие»; if the story describes a desired city environment — apply |
 | `improvement_wish` | issue_archetype_support | story frames desired improvement rather than only broken infrastructure; if `type = observation` and context is positive aspiration — apply |
 | `equity_access` | civic_signal | children, elderly, people with disabilities, social groups, unequal access — apply when fair-access theme is present |
+| `culture` | topic_domain | культура, театр, музыка, музей, фестиваль, творчество, heritage, культурный центр, cultural centre — apply when the story is about cultural life or cultural capital, not only school curriculum |
+| `youth_development` | topic_domain | молодёжь, youth, подростки, youth centre, молодёжный центр, after-school, кружки — apply when youth programs or spaces are central, even if `education` also applies |
+| `science_and_research` | topic_domain | наука, STEM, исследования, лаборатория, научные школы, intellectual environment — apply when science/research culture is the theme |
+| `ecosystem_gap` | ecosystem_signal | нет среды, не хватает программ/менторов/пространств, ecosystem thin, institutional decline, loss of continuity — apply when the problem is absence of environment, not one broken object |
+| `cooperative_model` | governance_signal | кооператив, community ownership, participatory governance, открытая модель — apply when governance/ownership model is part of the desired solution |
 
 **Regression guard:** a broken-road **complaint** about potholes or repair backlog must **not** receive `city_for_people` — that civic_signal applies to desired human-centered city improvement, not infrastructure failure reports.
+
+**Multi-axis rule (REQ-36):** cultural/science/youth stories often need `culture`, `youth_development`, or `science_and_research` **in addition to** `education` — do not collapse civic narratives to a single `education` label when other topic_domain keys match.
 
 **`institution` — demo-scope constraint (M1 demo, REQ-28):**
 
@@ -373,3 +380,4 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.4 | 2026-06-02 | **REQ-33 audit follow-up / GIM-147…148:** §2.1 changed to `one or more keys per applicable axis`; header traceability explicitly includes `REQ-33` (GAP-01/02 closure). |
 | 0.2.5 | 2026-06-02 | **REQ-34 / GIM-149…150:** §4.1 `summary` generation rule (mandatory when content sufficient); §4.1 `type` observation vs complaint boundary with examples; handoff input `summary_draft` (§3). |
 | 0.2.6 | 2026-06-03 | **REQ-35 / GIM-152…153:** §4.6 `location_query` MUST when place confirmed + Latin/format + `normalize_location_query()` ref; §4.3 active subjective signals determination (`severity` + peers, no leading questions). |
+| 0.2.7 | 2026-06-05 | **REQ-36 / GIM-159:** §4.1a extraction hints for `culture`, `youth_development`, `science_and_research`, `ecosystem_gap`, `cooperative_model`; multi-axis rule against `education`-only collapse for civic narratives. |
