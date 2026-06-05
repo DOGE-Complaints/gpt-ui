@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.18 |
-| **Date** | 2026-06-02 |
-| **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
+| **Version** | 0.19 |
+| **Date** | 2026-06-05 |
+| **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **REQ-38**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
 
 **Related modules:** [`story-data-model.md`](story-data-model.md) · [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) · [`safety-compliance.md`](safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
 
@@ -172,8 +172,8 @@ Labels are an **internal projection** from the mature story, not a questionnaire
 | **2** Episode capture | What happened, object/service, place/context, concrete friction. | `topic_domain`, `service_object`, `location_context`, `failure_mode` |
 | **3** Emotion and meaning | What felt unfair, draining, unsafe, disrespectful, or confusing. | `deep_need`, `failure_mode`, `civic_signal` |
 | **4** Deeper need | Confirmed value/need such as predictability, respect, dignity, agency, fairness. | `deep_need` as metadata-only unless taxonomy later promotes it |
-| **5** Desired state | Better future scenario or specific improvement shape. | `desired_outcome`, `topic_domain`, `service_object` |
-| **6** Civic generalization | Recurrence, others affected, system pattern, public cost. | `civic_signal`, `affected_scope`, `issue_archetype_support` |
+| **5** Desired state | Better future scenario or specific improvement shape. | `desired_outcome`, `topic_domain`, `service_object`, `ecosystem_signal`, `governance_signal` |
+| **6** Civic generalization | Recurrence, others affected, system pattern, public cost. | `civic_signal`, `affected_scope`, `issue_archetype_support`, `ecosystem_signal` |
 | **Safety/limited-depth** | PII, minors, health, violence, or trust/safety limits. | `risk_privacy_safety` internal-only labels |
 
 Operational rules:
@@ -182,6 +182,25 @@ Operational rules:
 - If the user corrects facts, location, meaning, desired state, or civic framing in Phase 7, remove or downgrade label candidates based on the rejected framing.
 - Use surface topic labels only when deeper evidence is absent; do not invent civic/deep labels to make the Issue look richer.
 - Internal safety/privacy candidates must remain internal and never become public/card labels.
+
+### 7.4 Ecosystem-deficit story recognition (REQ-38)
+
+When the resident describes **absence of environment / ecosystem deficit** — not a single broken service object — capture evidence for downstream `ecosystem_signal` classification per [`story-label-taxonomy.md`](story-label-taxonomy.md) §4.9. Recognition uses **only what the resident already said**; do **not** ask leading taxonomy questions (same privacy baseline as REQ-35 §4.3 — no “Is this about ecosystem gap?” prompts).
+
+**Trigger classes** (non-exhaustive resident phrases):
+
+| Class | Resident signals (examples) | Downstream axis hints |
+|-------|----------------------------|------------------------|
+| **Absence of environment** | «негде», «нет места для», «раньше было, теперь нет», «нет среды», «nowhere for kids to…» | `ecosystem_gap`, `missing_infrastructure` |
+| **Institutional decline / continuity loss** | Closing venues, programs ending, mentor/teacher shortage, «used to have…» | `institutional_decline`, `mentor_shortage`, `loss_of_continuity` |
+| **Community fragmentation** | Weak ties, underused spaces, «people don’t gather anymore» | `community_fragmentation`, `underused_resources` |
+| **Replicable model desire** | «Should work in other districts too», «model for other neighbourhoods» | `replicable_model_needed`, `governance_signal` when ownership model is named |
+
+**Operational rules:**
+
+- Record evidence in interview notes / label candidate metadata — **do not** output `type` or `labels` in dialogue (**§8** row 2; REQ-12).
+- Ecosystem-deficit stories often include `education`, `culture`, or `youth_development` topic cues — capture **both** topic and ecosystem evidence; do not assume a single-domain story.
+- At normalization, [`story-normalizer.md`](story-normalizer.md) §4.1a.1 applies preferential `ecosystem_signal` rules (REQ-38); `type` (`complaint` vs `observation`) is chosen independently per §4.1 REQ-34.
 
 ---
 
@@ -312,3 +331,4 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 | 0.16 | 2026-04-27 | Instruction-bundle self-contained: bare-filename cross-links only; removed external repository references from narrative. |
 | 0.17 | 2026-05-25 | **REQ-29 / GIM-128:** §7.2 mandatory-sequence Step 6 «Translation transparency note (mandatory)» inserted after Step 5 session-title generation — non-interactive disclosure that only `session_language` version was reviewed and that `{et, ru, en}` translations are AI-generated; et/ru/en examples per REQ-29 §2.3. Closes FINDING-04 (`audit-field-provenance-2026-05-24.md`). |
 | 0.18 | 2026-06-02 | **REQ-34 / GIM-149:** §7.2 Step 5b summary draft before translation note; §8 row 9 cross-link to normalizer observation vs complaint rule. |
+| 0.19 | 2026-06-05 | **REQ-38 / GIM-163:** §7.4 ecosystem-deficit recognition (4 trigger classes, no leading questions); §7.3 phase 5–6 `ecosystem_signal`/`governance_signal` evidence columns. |

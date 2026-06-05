@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.7 |
+| **Version** | 0.2.9 |
 | **Date** | 2026-06-05 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -158,6 +158,8 @@ Examples:
 
 When in doubt: if the user would answer "yes" to "Does this bother you or cause a problem?" → use `complaint`, not `observation`. Align with [`story-interview-flow.md`](story-interview-flow.md) §8 row 9 (FR-M1-025 improvement-without-harm baseline).
 
+**Type vs axis classification (REQ-38):** Choosing `type` (`complaint` / `observation`) is **orthogonal** to multi-axis label extraction. An ecosystem-deficit narrative with implied absence → `complaint` per REQ-34 **and** `ecosystem_signal` + `topic_domain` labels when evidence supports both. Do not skip `ecosystem_signal` because `type` is already set.
+
 **Multi-axis label rule:** A single story commonly maps to labels from multiple taxonomy axes:
 
 - **topic_domain** (what civic area): `education`, `public_space`, `transport`, etc.
@@ -182,7 +184,19 @@ Use [`story-label-taxonomy.md`](story-label-taxonomy.md) as SSOT. When narrative
 | `youth_development` | topic_domain | молодёжь, youth, подростки, youth centre, молодёжный центр, after-school, кружки — apply when youth programs or spaces are central, even if `education` also applies |
 | `science_and_research` | topic_domain | наука, STEM, исследования, лаборатория, научные школы, intellectual environment — apply when science/research culture is the theme |
 | `ecosystem_gap` | ecosystem_signal | нет среды, не хватает программ/менторов/пространств, ecosystem thin, institutional decline, loss of continuity — apply when the problem is absence of environment, not one broken object |
+| `institutional_decline` | ecosystem_signal | venues/programs closing, institutions weakening, «раньше было, теперь нет» at ecosystem scale |
+| `mentor_shortage` | ecosystem_signal | lack of mentors, tutors, guides across programs — not a single staffing ticket |
+| `community_fragmentation` | ecosystem_signal | weak community ties, participation breaking down, underused civic spaces |
+| `replicable_model_needed` | ecosystem_signal | resident describes a gap that a replicable civic model could fill |
 | `cooperative_model` | governance_signal | кооператив, community ownership, participatory governance, открытая модель — apply when governance/ownership model is part of the desired solution |
+
+#### 4.1a.1 Ecosystem-deficit classification preference (REQ-38)
+
+When narrative evidence matches **absence of environment / missing ecosystem** (see [`story-interview-flow.md`](story-interview-flow.md) §7.4) — not a single malfunctioning object:
+
+1. **Preferentially** include one or more `ecosystem_signal` keys (`ecosystem_gap`, `institutional_decline`, `mentor_shortage`, `loss_of_continuity`, `community_fragmentation`, `replicable_model_needed`, `underused_resources`) **in addition to** applicable `topic_domain` keys.
+2. **Anti-collapse:** do **not** emit only `["education"]` (or any single `topic_domain` key) when ecosystem evidence is present — mirror REQ-36 multi-axis rule below.
+3. **Single-object failures** (one broken swing, one pothole, one portal error) → use `failure_mode` / `service_object` axes; **do not** force `ecosystem_signal` unless the resident frames systemic absence.
 
 **Regression guard:** a broken-road **complaint** about potholes or repair backlog must **not** receive `city_for_people` — that civic_signal applies to desired human-centered city improvement, not infrastructure failure reports.
 
@@ -381,3 +395,5 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.5 | 2026-06-02 | **REQ-34 / GIM-149…150:** §4.1 `summary` generation rule (mandatory when content sufficient); §4.1 `type` observation vs complaint boundary with examples; handoff input `summary_draft` (§3). |
 | 0.2.6 | 2026-06-03 | **REQ-35 / GIM-152…153:** §4.6 `location_query` MUST when place confirmed + Latin/format + `normalize_location_query()` ref; §4.3 active subjective signals determination (`severity` + peers, no leading questions). |
 | 0.2.7 | 2026-06-05 | **REQ-36 / GIM-159:** §4.1a extraction hints for `culture`, `youth_development`, `science_and_research`, `ecosystem_gap`, `cooperative_model`; multi-axis rule against `education`-only collapse for civic narratives. |
+| 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
+| 0.2.8 | 2026-06-05 | **REQ-38 / GIM-164:** §4.1 type-vs-axis orthogonality; §4.1a.1 ecosystem-deficit preferential classification + anti-collapse; expanded `ecosystem_signal` hints (`institutional_decline`, `mentor_shortage`, `community_fragmentation`, `replicable_model_needed`). |
