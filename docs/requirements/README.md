@@ -53,6 +53,8 @@
 | 40 | [REQ-40-pre-submission-instruction-compliance-validation.md](./REQ-40-pre-submission-instruction-compliance-validation.md) |
 | 41 | [REQ-41-trigger-observability-audit-trail.md](./REQ-41-trigger-observability-audit-trail.md) |
 
-**Версия:** 1.6 · 2026-06-05 (REQ-40 черновик «Trigger Reliability & Execution Determinism» разбит по механизму на 2 дока: REQ-40 pre-submission instruction-compliance validation (enforcement, расширяет §5.2.2 pre-flight, Critical), REQ-41 trigger observability/audit trail (диагностика God Mode, зависит от REQ-40). Номер REQ-37 освобождён — исходный draft перемещён пользователем в REQ-40 и стандартизирован.
+**Версия:** 1.7 · 2026-06-05 (REQ-38 Done — ecosystem-deficit detection in `story-interview-flow.md` v0.19 + `story-normalizer.md` v0.2.9; pkg-000018 GIM-163…166).
+
+Предыдущее (1.6 · 2026-06-05): REQ-40 черновик «Trigger Reliability & Execution Determinism» разбит по механизму на 2 дока: REQ-40 pre-submission instruction-compliance validation (enforcement, расширяет §5.2.2 pre-flight, Critical), REQ-41 trigger observability/audit trail (диагностика God Mode, зависит от REQ-40). Номер REQ-37 освобождён — исходный draft перемещён пользователем в REQ-40 и стандартизирован.
 
 Предыдущее (1.5 · 2026-06-04): REQ-36 черновик «Story Intelligence Coverage» разбит на REQ-36 civic taxonomy expansion (foundational SSOT) / REQ-38 ecosystem-deficit detection (зависит от REQ-36) / REQ-39 geographic intelligence (расширяет REQ-26/35).

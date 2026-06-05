@@ -5,7 +5,7 @@
 > **Технический контекст:** ось `ecosystem_signal` (`ecosystem_gap`, `institutional_decline`, …) определяется в REQ-36 в [`story-label-taxonomy.md`](../../instructions/story-label-taxonomy.md); этот REQ добавляет правила её **применения** в [`story-interview-flow.md`](../../instructions/story-interview-flow.md) и [`story-normalizer.md`](../../instructions/story-normalizer.md). REQ-33 уже требует multi-axis extraction, REQ-34 разводит observation/complaint — оба смежны.
 
 **Версия:** 1.0 · 2026-06-04
-**Статус:** requirements — blocked-by REQ-36 (нужна ось `ecosystem_signal`)
+**Статус:** Done — instruction P3 (pkg-000018 · GIM-163…165) + audit follow-up P6 (GIM-166 · normalizer v0.2.9); manual replay Advisory pending
 **Приоритет:** P3 (classification quality для ecosystem-историй; зависит от foundational REQ-36)
 **Тип:** GPT instruction update — `story-interview-flow.md` (detection в интервью), `story-normalizer.md` §4.1/§4.1a (classification preference)
 **Серверная сторона:** не требует изменений
@@ -25,7 +25,7 @@
 
 ### 1.3 Зависимость от REQ-36
 
-Ось `ecosystem_signal` и её ключи (`ecosystem_gap`, `institutional_decline`, `mentor_shortage`, `loss_of_continuity`, `replicable_model_needed`) **отсутствуют** в [`story-label-taxonomy.md`](../../instructions/story-label-taxonomy.md) v0.1 — добавляются REQ-36 §2.7. До их появления detection-правило не на что мапить. **REQ-38 заблокирован REQ-36.**
+Ось `ecosystem_signal` и её ключи (`ecosystem_gap`, `institutional_decline`, `mentor_shortage`, `loss_of_continuity`, `replicable_model_needed`) добавлены REQ-36 в [`story-label-taxonomy.md`](../../instructions/story-label-taxonomy.md) v0.2.1 §4.9. **REQ-38 разблокирован** — P3 добавляет detection/classification rules (не vocabulary).
 
 ---
 
