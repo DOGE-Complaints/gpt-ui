@@ -5,7 +5,8 @@
 > **Технический контекст (verified по коду):** [`api-orchestrator.md`](../../instructions/api-orchestrator.md) §5.2.2 содержит checks **1–12** (GIM-28, L487–526) — это **shape/consistency** проверки построенного payload (non-empty слоты, enum-валидность, gate approved); item 12 (L524) — единственная evidence-aware строка, но только **informational trace** в узком post-demo institution-кейсе. Evidence↔payload сравнения как **FAIL** в §5.2.2 нет. Evidence-сторона доступна: `location.freeform` из ingest validation artifact ([`story-normalizer.md`](../../instructions/story-normalizer.md) §4.6 L303), `ingest_validation_report` из [`ingest-validation.md`](../../instructions/ingest-validation.md).
 
 **Версия:** 1.0 · 2026-06-05
-**Статус:** requirements — ready for tasking
+**Статус:** Done — instruction P3+P6 (pkg-000020 · GIM-171…174 🟢 Awaiting Commits); GAP-40-01 closed (GIM-174); 2 live AC ⏳ Advisory pending
+**Prerequisite (Done):** REQ-30, REQ-32, REQ-33, REQ-34, REQ-35
 **Приоритет:** P1 (Critical — execution determinism; напрямую закрывает корневую причину пустых полей demo)
 **Тип:** GPT instruction update — `api-orchestrator.md` §5.2.2 (расширение pre-flight), вторичное `ingest-validation.md` (evidence-сторона), `story-normalizer.md` (severity_confidence)
 **Серверная сторона:** не требует изменений (валидация на instruction-слое до HTTP)
@@ -97,13 +98,13 @@ Required-триггеры (location при confirmed, origin.source) → **FAIL*
 ## 4. Acceptance Criteria
 
 **Static (verifiable по `api-orchestrator.md` §5.2.2):**
-- [ ] Есть check: confirmed `location.freeform` в evidence + `location_query` отсутствует → **STOP/FAIL** (не informational)
-- [ ] Есть check: multi-domain evidence + один label → **warning** + trace_notes
-- [ ] Есть consolidated missing-trigger pass (location/origin/summary/labels/signals) с разделением FAIL vs warning
-- [ ] `origin.conversation_id` omit при unavailable сопровождается trace_notes-объяснением (не silent)
-- [ ] `story-normalizer.md` §4.3 содержит явный `severity_confidence = LOW → omit`
-- [ ] Все новые проверки оформлены как items §5.2.2 (additive к 1–12), не параллельный валидатор
-- [ ] Регрессия: checks 1–12 (GIM-28), §5.2.0a admission gate, §5.2.0 PII не изменены семантически
+- [x] Есть check: confirmed `location.freeform` в evidence + `location_query` отсутствует → **STOP/FAIL** (не informational)
+- [x] Есть check: multi-domain evidence + один label → **warning** + trace_notes
+- [x] Есть consolidated missing-trigger pass (location/origin/summary/labels/signals) с разделением FAIL vs warning
+- [x] `origin.conversation_id` omit при unavailable сопровождается trace_notes-объяснением (не silent)
+- [x] `story-normalizer.md` §4.3 содержит явный `severity_confidence = LOW → omit`
+- [x] Все новые проверки оформлены как items §5.2.2 (additive к 1–12), не параллельный валидатор
+- [x] Регрессия: checks 1–12 (GIM-28), §5.2.0a admission gate, §5.2.0 PII не изменены семантически
 
 **Advisory (live replay):**
 - [ ] История «в Таллине» без `location_query` → pre-flight FAIL с указанием re-run §4.6
