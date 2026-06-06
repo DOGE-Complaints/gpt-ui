@@ -5,7 +5,7 @@
 > **Технический контекст (verified по коду):** backend `geo_service.resolve_for_story()` → `normalize_location_query()` ([`src/core/geo/normalize.py`](../../../doge-complaints-gateway/src/core/geo/normalize.py)) приводит к lowercase + collapse whitespace; stub-резолвер ([`src/core/geo/providers.py`](../../../doge-complaints-gateway/src/core/geo/providers.py) L316–323) матчит **подстрокой** (`if keyword in canonical_key`) по алиасам, включающим латиницу **и кириллицу** (`"tallinn"`, `"таллин"`, `"таллинн"`); city-labels в форме `"Tallinn, EE"`. Значит форма `Tallinn, Estonia` backend-совместима (подстрока `tallinn` находится), но для матчинга избыточна — её ценность в disambiguation для будущего реального geocoder.
 
 **Версия:** 1.0 · 2026-06-04
-**Статус:** requirements — ready for tasking
+**Статус:** Done (Awaiting Commits) — pkg-000019 P3 execute; normalizer v0.2.11; matrix v1.0; 2 advisory replay pending
 **Приоритет:** P3 (geo-полнота demo; частично перекрыто REQ-35 — остаётся узкая дельта)
 **Тип:** GPT instruction update — `story-normalizer.md` §4.6 (canonicalization) + §4.2.1/новый sidecar (confidence metadata)
 **Серверная сторона:** не требует изменений (substring-match уже принимает `<City>, Estonia`; реальный geocoder — product backlog)
@@ -77,10 +77,10 @@ Verified: форма backend-совместима (substring-match найдёт 
 ## 4. Acceptance Criteria
 
 **Static (verifiable по `story-normalizer.md`):**
-- [ ] §4.6 содержит правило city-канонизации `<City>, Estonia` с примерами (`Tallinn` / `Tallinna linn` → `Tallinn, Estonia`)
-- [ ] Канонизация применяется к city-уровню и НЕ затирает district/street (`Kalamaja, Tallinn` сохраняется)
-- [ ] `normalization_metadata` содержит confidence-поля (`location_detected`, `location_source`, `confidence`) как non-wire
-- [ ] Регрессия: REQ-35 MUST-when-confirmed (L317), Latin (L318), omit-rules 3–5 (L319–321) не ослаблены; confidence-sidecar не попадает в `StoryIntakeRequest`
+- [x] §4.6 содержит правило city-канонизации `<City>, Estonia` с примерами (`Tallinn` / `Tallinna linn` → `Tallinn, Estonia`)
+- [x] Канонизация применяется к city-уровню и НЕ затирает district/street (`Kalamaja, Tallinn` сохраняется)
+- [x] `normalization_metadata` содержит confidence-поля (`location_detected`, `location_source`, `confidence`) как non-wire
+- [x] Регрессия: REQ-35 MUST-when-confirmed (L317), Latin (L318), omit-rules 3–5 (L319–321) не ослаблены; confidence-sidecar не попадает в `StoryIntakeRequest`
 
 **Advisory (live replay):**
 - [ ] История с «Tallinn» → `location_query = "Tallinn, Estonia"` без доп. вопросов (AC-36.3 источника)
