@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3.3 |
-| **Date** | 2026-06-03 |
-| **Traceability** | REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.5 |
+| **Date** | 2026-06-06 |
+| **Traceability** | REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -523,6 +523,17 @@ Run before every `POST /intake/stories` call:
 
 12. If `narrative.institution` is present (post-demo only — see item 7) but `narrative.location_query` is omitted while validation/`canonical_payload` narrative still contains an explicit address the user confirmed — add an informational line to `trace_notes` (not stop-the-line). REQ-26 §2.3.
 
+13. **Location coverage (REQ-40 / GIM-171):** If `ingest_validation_report.pre_submission_compliance_evidence.location.confirmed = true` **and** `narrative.location_query` is absent or empty after trim → **STOP**. Do not call HTTP. Message: confirmed location in validation evidence but `location_query` is missing — re-run [`story-normalizer.md`](story-normalizer.md) §4.6 and rebuild the draft before submit. (Blocking upgrade for confirmed-location; item 12 remains informational for the narrow post-demo institution case.)
+
+14. **Single-label collapse (REQ-40):** If `pre_submission_compliance_evidence.multi_axis_evidence.domain_count ≥ 2` (or `axes_detected` length ≥ 2) **and** `narrative.canonical_labels` contains exactly one key → append a **validation warning** to `trace_notes` (not STOP): `"compliance: multi-domain evidence but single canonical label (REQ-33 multi-axis)"`.
+
+15. **Missing-trigger compliance pass (REQ-40):** Before HTTP, using `ingest_validation_report.pre_submission_compliance_evidence` and the built draft, collect expected-but-missing triggers:
+    - **FAIL (stop-the-line):** confirmed location + missing `location_query` (item 13); `origin.source` missing, null, or empty string.
+    - **Warning (`trace_notes` only):** `pre_submission_compliance_evidence.narrative_sufficient_for_summary = true` but `narrative.summary` absent; multi-axis evidence with single label (item 14); `pre_submission_compliance_evidence.subjective_signal_present = true` but `gpt_signals` absent.
+    Prefix each finding `compliance:` in `trace_notes`; FAIL on an item overrides warning for the same field.
+
+16. **Runtime capability trace (REQ-40):** When `origin.conversation_id` is omitted because the Actions runtime did **not** expose a session/conversation id → append to `trace_notes`: `"runtime did not expose conversation_id (REQ-35 omit-key rule)"` — distinguish runtime unavailability from silent instruction failure.
+
 If all checks pass → proceed to HTTP call.
 
 #### 5.2.3 Story Intake response handling
@@ -624,6 +635,8 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.5 | 2026-06-06 | **REQ-40 / GIM-174:** §5.2.2 item 15 — qualified paths `pre_submission_compliance_evidence.narrative_sufficient_for_summary` and `.subjective_signal_present` (GAP-40-01 closure). Semantics unchanged. |
+| 0.3.4 | 2026-06-06 | **REQ-40 / GIM-171:** §5.2.2 items 13–16 — location-coverage FAIL, single-label-collapse warning, missing-trigger compliance pass (FAIL vs warning), runtime `conversation_id` trace_notes. Additive to checks 1–12. |
 | 0.3.3 | 2026-06-03 | **REQ-35 / GIM-154:** §5.2.1 `origin.conversation_id` Notes — GPT Actions session id when available; omit key if unavailable; never null string. |
 | 0.3.2 | 2026-06-01 | **REQ-32 / GIM-142:** §5.2.1 `origin.source` de-facto required; §5.2.0b «Transport fields vs display fields» — always send `origin` in HTTP body. |
 | 0.3.1 | 2026-05-31 | **GIM-139 / GAP-01:** §5.2.0b Citizen preview template — add **Destination: DOGEstonia** after Location (REQ-31 §4 AC #1). |

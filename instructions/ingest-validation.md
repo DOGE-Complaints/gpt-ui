@@ -186,6 +186,36 @@ Legacy donor Draft / SentToReview / Approved matrices are **removed**. For Issue
 
 Optional and subjective fields per [`story-data-model.md`](story-data-model.md) §4.2–§4.3 (e.g. optional `institution` with full i18n per REQ-23, subjective intake notes). `summary` and `institution` must not appear in `missing_required_fields[]`; omit `institution` unless all `{et, ru, en}` are filled. Subjective fields (`severity`, `impact_estimation`, `problem_status`) can be preserved as non-wire validation/report metadata but must not block `StoryIntake` / draft handoff as wire-required fields. Safety can still restrict or block minors-related content, but it does not add structured minors fields to `canonical_payload`. No legacy donor event_/service_ branches.
 
+### 5.1 Pre-submission compliance evidence (REQ-40 / GIM-172 / GIM-174)
+
+When emitting `ingest_validation_report`, **MUST** include `pre_submission_compliance_evidence` so [`api-orchestrator.md`](api-orchestrator.md) §5.2.2 items 13+ can compare evidence ↔ payload. Report-internal only — **not** copied to wire or `normalized_issue_payload`.
+
+```json
+"pre_submission_compliance_evidence": {
+  "location": {
+    "freeform": "Pärnu mnt, Tallinn",
+    "confirmed": true
+  },
+  "multi_axis_evidence": {
+    "axes_detected": ["topic_domain", "affected_scope"],
+    "domain_count": 2
+  },
+  "narrative_sufficient_for_summary": true,
+  "subjective_signal_present": false
+}
+```
+
+| Field | Rule |
+|-------|------|
+| `location.freeform` | Place string from dialogue, Phase 7 affirmation, or validated deep-parse hint the resident accepted |
+| `location.confirmed` | `true` only when the resident **named or confirmed** the place (same bar as [`story-normalizer.md`](story-normalizer.md) §4.6 / `location_source = explicit`); omit the `location` block or set `confirmed = false` when unconfirmed |
+| `multi_axis_evidence.axes_detected` | Distinct taxonomy axes with story evidence — use `affected_scope`, not draft `affected_population` ([REQ-36](../../docs/requirements/REQ-36-civic-taxonomy-expansion-multi-axis.md) §1.3) |
+| `multi_axis_evidence.domain_count` | Count of distinct domains/axes with evidence; `≥ 2` enables single-label-collapse warning in orchestrator §5.2.2 item 14 |
+| `narrative_sufficient_for_summary` | `true` when REQ-34 content threshold is met (enough material for summary generation) |
+| `subjective_signal_present` | `true` when resident material supports severity / impact / problem_status inference per [`story-normalizer.md`](story-normalizer.md) §4.3 |
+
+Populate on every validation round that may precede HTTP; preserve through handoff to normalizer and orchestrator conversation context.
+
 ---
 
 ## 6. Enum validation (Issue)
@@ -279,6 +309,7 @@ This integration applies **only for non-dialogue input**.
      * `readiness_level`
      * `missing_required_fields[]`
      * `invalid_fields[]`
+     * `pre_submission_compliance_evidence` (§5.1 — location confirmed, multi-axis signals)
      * `stop_the_line.blocked` (true if missing_required_fields[] or invalid_fields[] not empty)
      * `artifact_id` (format: `validation_<ISO_timestamp>`)
      * `version: "v1"`
@@ -420,7 +451,7 @@ For the **structure** of input data, see Section 2.1.
 Ingest Validation MUST produce `ingest_validation_report` as output artifact:
 
 - **When:** After each validation round (may be multiple rounds if user provides fields incrementally)
-- **Required fields:** See Section 4.2 (Artifact Creation) for full structure
+- **Required fields:** See §5.1 (`pre_submission_compliance_evidence`) and workflow fields in §11.1 (`readiness_level`, `missing_required_fields[]`, `stop_the_line`, …)
 - **Version:** `v1`
 - **Artifact ID:** `validation_<ISO_timestamp>`
 
@@ -575,4 +606,17 @@ The output of this instruction MUST be:
 }
 ```
 
-**Validation emphasis:** confirm §4.1 minimums, preserve ambiguities for batching, then hand off per §12 routing.
+**Validation emphasis:** confirm §4.1 minimums, preserve ambiguities for batching, emit `pre_submission_compliance_evidence.location.confirmed = true` when the resident confirmed the address (§5.1), then hand off per §12 routing.
+
+**Example `pre_submission_compliance_evidence` for the excerpt above:**
+```json
+"pre_submission_compliance_evidence": {
+  "location": { "freeform": "Pärnu mnt, Tallinn", "confirmed": true },
+  "multi_axis_evidence": {
+    "axes_detected": ["topic_domain"],
+    "domain_count": 1
+  },
+  "narrative_sufficient_for_summary": true,
+  "subjective_signal_present": false
+}
+```

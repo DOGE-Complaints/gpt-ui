@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.11 |
-| **Date** | 2026-06-05 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.12 |
+| **Date** | 2026-06-06 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -284,6 +284,16 @@ When location is processed per §4.6, record extraction confidence under `normal
 
 **Subjective signals determination rule (REQ-35):** When the interview narrative contains sufficient context to infer resident-perceived seriousness, scope, or problem status — from what the resident **already stated**, without leading questions or new interview prompts — **actively determine** and place all applicable fields in `non_wire_metadata`, including `severity` when a seriousness signal is present (do not omit `severity` merely because it was not pre-labeled upstream).
 
+**Severity confidence (REQ-40 / GIM-172):** When inferring `severity`, assign internal `severity_confidence` as `HIGH`, `MEDIUM`, or `LOW`:
+
+| `severity_confidence` | When |
+|-----------------------|------|
+| `HIGH` | Resident explicitly stated seriousness or unambiguous harm language |
+| `MEDIUM` | Defensible inference from stated context without explicit severity wording |
+| `LOW` | Weak, ambiguous, or single-token signal without supporting context |
+
+**`severity_confidence = LOW` → omit `severity`** from `non_wire_metadata` (and thus from wire `gpt_signals.severity`). Do **not** weaken REQ-35 active determination above: when context supports a defensible `MEDIUM` or `HIGH` mapping, populate `severity` as today.
+
 - Collect values **only** from stated resident material per [`story-data-model.md`](story-data-model.md) §4.3 («without leading the user»).
 - When context supports all three dimensions, populate `severity`, `impact_estimation`, and `problem_status` together when each has a defensible mapping.
 - **Omit** a field (or the entire sidecar) when no defensible signal exists — do **not** invent values.
@@ -424,4 +434,5 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.8 | 2026-06-05 | **REQ-38 / GIM-164:** §4.1 type-vs-axis orthogonality; §4.1a.1 ecosystem-deficit preferential classification + anti-collapse; expanded `ecosystem_signal` hints (`institutional_decline`, `mentor_shortage`, `community_fragmentation`, `replicable_model_needed`). |
 | 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
 | 0.2.10 | 2026-06-05 | **REQ-39 / GIM-167:** §4.6 rule 2 city-level canonicalization to `<City>, Estonia` (`Tallinn`, `Tallinna linn` examples); district/street strings preserved (`Kalamaja, Tallinn`). |
+| 0.2.12 | 2026-06-06 | **REQ-40 / GIM-172:** §4.3 explicit `severity_confidence` (`HIGH`/`MEDIUM`/`LOW`); `LOW` → omit `severity`; REQ-35 active determination preserved. |
 | 0.2.11 | 2026-06-05 | **REQ-39 / GIM-168:** §4.2.2 `location_extraction_metadata` sidecar (`location_detected`, `location_source`, `confidence`); non-wire; explicit source from resident-stated material only. |
