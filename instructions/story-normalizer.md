@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.9 |
+| **Version** | 0.2.11 |
 | **Date** | 2026-06-05 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -229,6 +229,7 @@ Stable **references** to upstream work (opaque strings or objects — align with
 | `normalizer_module` | e.g. `issue-normalizer` + **version** of this instruction file (from document header). |
 | `trace_notes` | Optional: free-text **internal** consistency notes (not for end-user display). |
 | `label_extraction_metadata` | Optional label candidate metadata from validation; stores label, axis, source, confidence, and disposition. It is not copied to transport unless schema changes in lockstep. |
+| `location_extraction_metadata` | Optional location confidence metadata from §4.6 processing; stores `location_detected`, `location_source`, and `confidence`. Internal diagnostic sidecar only (REQ-39) — not copied to transport. |
 
 #### 4.2.1 `label_extraction_metadata`
 
@@ -256,6 +257,26 @@ When validation supplies label reasoning, keep it under `normalization_metadata.
 ```
 
 Only candidates with `disposition = "canonical"` and keys allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, or `rejected` disposition remain in metadata only.
+
+#### 4.2.2 `location_extraction_metadata`
+
+When location is processed per §4.6, record extraction confidence under `normalization_metadata.location_extraction_metadata`:
+
+```json
+{
+  "location_detected": true,
+  "location_source": "explicit",
+  "confidence": "HIGH"
+}
+```
+
+| Field | Values | Rule |
+|-------|--------|------|
+| `location_detected` | boolean | `true` when §4.6 formed `location_query`; `false` when location omitted per rules 3–5 |
+| `location_source` | `explicit` \| `inferred` | `explicit` only when the resident **named or confirmed** the place in interview material (REQ-35 privacy baseline — not invented from context alone); `inferred` when derived from narrative context without direct location confirmation |
+| `confidence` | `LOW` \| `MEDIUM` \| `HIGH` | `HIGH` = explicit confirmation + unambiguous string; `MEDIUM` = confirmed but ambiguous or partial; `LOW` = inferred or weak signal |
+
+**Non-wire rule:** This object is **internal-only** — do **not** copy to `StoryIntakeRequest`, `canonical_payload`, or any top-level wire field. [`api-orchestrator.md`](api-orchestrator.md) does not consume it. Omit `location_extraction_metadata` entirely when `location_detected = false`.
 
 ### 4.3 `non_wire_metadata` (optional sidecar)
 
@@ -337,6 +358,11 @@ Optional **top-level** string on `normalized_issue_payload` (sibling to `canonic
 
 1. **Mandatory when location is confirmed (REQ-35):** If the resident named or confirmed a city, district, street, or landmark in any interview phase (and §7.2 affirmation applies), the normalizer **MUST** form `location_query` from the confirmed `location.freeform` material — do **not** omit solely because the field was optional upstream. The only grounds to omit are rules **3–5** below.
 2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script** (e.g. `Tallinn`, `Kalamaja, Tallinn`, `Tartu mnt 80, Tallinn`). The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)); Latin is more reliable for demo geo-resolve. Cyrillic is acceptable when the resident used it and Latin transliteration would distort meaning; Cyrillic expansion is a separate backend concern (REQ-46). Do **not** invent address detail beyond what the resident stated.
+   - **City-level canonicalization (REQ-39):** When the confirmed location is **city-level only** (resident named a city without street, district, or landmark detail), canonicalize to `<City>, Estonia` in Latin:
+     - `Tallinn` → `Tallinn, Estonia`
+     - `Tallinn, Estonia` → `Tallinn, Estonia` (already canonical)
+     - `Tallinna linn` → `Tallinn, Estonia`
+     When the string includes **district, street, or landmark** detail (e.g. `Kalamaja, Tallinn`, `Tartu mnt 80, Tallinn`), **preserve** that detail — do **not** collapse to city-only or strip finer granularity. Do **not** append `, Estonia` when it would simplify a more specific address the resident confirmed.
 3. If the user mentioned **multiple** locations without a single clear primary — pick the most specific / complaint-relevant one (D-02). Reflect ambiguity in `live_story_context.consistency_notes` (§4.5) when useful.
 4. If location was **not** confirmed or remains ambiguous after §7.2 — **omit** `location_query` (do not send null or `""`).
 5. Never emit a blank or whitespace-only string.
@@ -395,5 +421,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.5 | 2026-06-02 | **REQ-34 / GIM-149…150:** §4.1 `summary` generation rule (mandatory when content sufficient); §4.1 `type` observation vs complaint boundary with examples; handoff input `summary_draft` (§3). |
 | 0.2.6 | 2026-06-03 | **REQ-35 / GIM-152…153:** §4.6 `location_query` MUST when place confirmed + Latin/format + `normalize_location_query()` ref; §4.3 active subjective signals determination (`severity` + peers, no leading questions). |
 | 0.2.7 | 2026-06-05 | **REQ-36 / GIM-159:** §4.1a extraction hints for `culture`, `youth_development`, `science_and_research`, `ecosystem_gap`, `cooperative_model`; multi-axis rule against `education`-only collapse for civic narratives. |
-| 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
 | 0.2.8 | 2026-06-05 | **REQ-38 / GIM-164:** §4.1 type-vs-axis orthogonality; §4.1a.1 ecosystem-deficit preferential classification + anti-collapse; expanded `ecosystem_signal` hints (`institutional_decline`, `mentor_shortage`, `community_fragmentation`, `replicable_model_needed`). |
+| 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
+| 0.2.10 | 2026-06-05 | **REQ-39 / GIM-167:** §4.6 rule 2 city-level canonicalization to `<City>, Estonia` (`Tallinn`, `Tallinna linn` examples); district/street strings preserved (`Kalamaja, Tallinn`). |
+| 0.2.11 | 2026-06-05 | **REQ-39 / GIM-168:** §4.2.2 `location_extraction_metadata` sidecar (`location_detected`, `location_source`, `confidence`); non-wire; explicit source from resident-stated material only. |
