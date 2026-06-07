@@ -5,7 +5,7 @@
 > **Технический контекст (verified по коду):** God Mode уже существует — [`api-orchestrator.md`](../../instructions/api-orchestrator.md) §5.2.0b (REQ-31, L416–481) показывает полный draft `StoryIntakeRequest` оператору, но **без** per-trigger activation-таблицы (видно поле в payload, но не «сработал ли триггер и почему»). `trace_notes` ([`story-normalizer.md`](../../instructions/story-normalizer.md) §4.2.1) — существующий internal-канал для диагностических заметок.
 
 **Версия:** 1.0 · 2026-06-05
-**Статус:** requirements — depends-on REQ-40 (общее определение набора триггеров)
+**Статус:** Done — P3 Done · [`pkg-000021`](../docs/analysis/tasks/gpt-active-packages/pkg-000021-20260606-req41-trigger-observability.yaml) (GIM-175…177 🟢 Done Awaiting Commits) · depends-on REQ-40 Done
 **Приоритет:** P3 (operator diagnostics / explainability; не блокирует submit)
 **Тип:** GPT instruction update — `api-orchestrator.md` §5.2.0b God Mode (диагностический вывод), `story-normalizer.md` §4.2 (trace источника триггеров)
 **Серверная сторона:** не требует изменений (диагностика на instruction-слое; не wire)
