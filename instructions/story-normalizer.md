@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.12 |
-| **Date** | 2026-06-06 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.13 |
+| **Date** | 2026-06-07 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -230,6 +230,7 @@ Stable **references** to upstream work (opaque strings or objects — align with
 | `trace_notes` | Optional: free-text **internal** consistency notes (not for end-user display). |
 | `label_extraction_metadata` | Optional label candidate metadata from validation; stores label, axis, source, confidence, and disposition. It is not copied to transport unless schema changes in lockstep. |
 | `location_extraction_metadata` | Optional location confidence metadata from §4.6 processing; stores `location_detected`, `location_source`, and `confidence`. Internal diagnostic sidecar only (REQ-39) — not copied to transport. |
+| `trigger_activation_metadata` | Optional per-trigger activation audit (REQ-41) — see §4.2.3. Internal diagnostic only; source for God Mode table in [`api-orchestrator.md`](api-orchestrator.md) §5.2.0b. |
 
 #### 4.2.1 `label_extraction_metadata`
 
@@ -277,6 +278,35 @@ When location is processed per §4.6, record extraction confidence under `normal
 | `confidence` | `LOW` \| `MEDIUM` \| `HIGH` | `HIGH` = explicit confirmation + unambiguous string; `MEDIUM` = confirmed but ambiguous or partial; `LOW` = inferred or weak signal |
 
 **Non-wire rule:** This object is **internal-only** — do **not** copy to `StoryIntakeRequest`, `canonical_payload`, or any top-level wire field. [`api-orchestrator.md`](api-orchestrator.md) does not consume it. Omit `location_extraction_metadata` entirely when `location_detected = false`.
+
+#### 4.2.3 `trigger_activation_metadata` (REQ-41 / GIM-175)
+
+When `ingest_validation_report.pre_submission_compliance_evidence` is available, **MUST** record trigger activation under `normalization_metadata.trigger_activation_metadata` using **the same trigger definitions** as [`api-orchestrator.md`](api-orchestrator.md) §5.2.2 items 13–15 (REQ-40 §2.3). This is the normalizer-side audit source for God Mode diagnostics — **not** enforcement (REQ-40 owns FAIL/warning).
+
+```json
+{
+  "triggers": [
+    { "trigger": "location_trigger", "activated": true, "reason": null },
+    { "trigger": "origin_trigger", "activated": true, "reason": null },
+    { "trigger": "summary_generation_trigger", "activated": false, "reason": "omitted-by-rule" },
+    { "trigger": "multi_axis_labels_trigger", "activated": true, "reason": null },
+    { "trigger": "gpt_signals_trigger", "activated": false, "reason": "no-evidence" }
+  ],
+  "evaluation_ref": "ingest_validation_report.pre_submission_compliance_evidence + normalized handoff (REQ-40 §2.3)"
+}
+```
+
+| Trigger | `activated = true` when | Typical `reason` when `activated = false` |
+|---------|-------------------------|-------------------------------------------|
+| `location_trigger` | `pre_submission_compliance_evidence.location.confirmed = true` **and** §4.6 emitted non-empty `location_query` on the narrative handoff | `no-evidence` — location not confirmed; `omitted-by-rule` — confirmed but §4.6 omitted `location_query` |
+| `origin_trigger` | Draft will send `origin.source = "openai_gpt_action"` (REQ-32) **and** `origin.conversation_id` present when Actions runtime exposed a session id | `runtime-unavailable` — `conversation_id` omitted because runtime did not expose session id (REQ-35); `no-evidence` — `origin.source` would be missing (should not reach HTTP) |
+| `summary_generation_trigger` | `pre_submission_compliance_evidence.narrative_sufficient_for_summary = true` **and** `canonical_payload.summary` populated per §4.1 (REQ-34) | `no-evidence` — content threshold not met; `omitted-by-rule` — sufficient material but summary omitted |
+| `multi_axis_labels_trigger` | `multi_axis_evidence.domain_count ≥ 2` (or `axes_detected` length ≥ 2) **and** `canonical_payload.labels` reflects multi-axis evidence (≥ 2 distinct axis keys when evidence supports it) | `no-evidence` — single-domain narrative; `omitted-by-rule` — multi-axis evidence but label collapse to single key (align with orchestrator item 14 warning) |
+| `gpt_signals_trigger` | `pre_submission_compliance_evidence.subjective_signal_present = true` **and** applicable `non_wire_metadata` / wire `gpt_signals` populated per §4.3 (respecting `severity_confidence = LOW → omit`) | `no-evidence` — no subjective signal in evidence; `omitted-by-rule` — signal present but omitted by §4.3 confidence / omit rules |
+
+**Reason enum (when `activated = false`):** `no-evidence` \| `runtime-unavailable` \| `omitted-by-rule`. Use `null` (or omit `reason`) when `activated = true`.
+
+**Non-wire rule:** Internal-only — do **not** copy to `StoryIntakeRequest` or wire envelope. Optionally mirror one-line summaries in `trace_notes` (e.g. `"trigger_audit: summary omitted-by-rule (REQ-41)"`) — free-text supplements only; structured truth lives in `trigger_activation_metadata`.
 
 ### 4.3 `non_wire_metadata` (optional sidecar)
 
@@ -434,5 +464,6 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.8 | 2026-06-05 | **REQ-38 / GIM-164:** §4.1 type-vs-axis orthogonality; §4.1a.1 ecosystem-deficit preferential classification + anti-collapse; expanded `ecosystem_signal` hints (`institutional_decline`, `mentor_shortage`, `community_fragmentation`, `replicable_model_needed`). |
 | 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
 | 0.2.10 | 2026-06-05 | **REQ-39 / GIM-167:** §4.6 rule 2 city-level canonicalization to `<City>, Estonia` (`Tallinn`, `Tallinna linn` examples); district/street strings preserved (`Kalamaja, Tallinn`). |
+| 0.2.13 | 2026-06-07 | **REQ-41 / GIM-175:** §4.2.3 `trigger_activation_metadata` — five-trigger activation audit (`location`/`origin`/`summary`/`multi_axis_labels`/`gpt_signals`) with Reason enum; reuses REQ-40 evidence definitions; non-wire diagnostic source for God Mode. |
 | 0.2.12 | 2026-06-06 | **REQ-40 / GIM-172:** §4.3 explicit `severity_confidence` (`HIGH`/`MEDIUM`/`LOW`); `LOW` → omit `severity`; REQ-35 active determination preserved. |
 | 0.2.11 | 2026-06-05 | **REQ-39 / GIM-168:** §4.2.2 `location_extraction_metadata` sidecar (`location_detected`, `location_source`, `confidence`); non-wire; explicit source from resident-stated material only. |

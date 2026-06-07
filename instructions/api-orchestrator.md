@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3.5 |
-| **Date** | 2026-06-06 |
-| **Traceability** | REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.6 |
+| **Date** | 2026-06-07 |
+| **Traceability** | REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -478,6 +478,18 @@ DEBUG MODE ACTIVE
 
 **Zero simplification (REQ-31 §2.4):** show the **full** draft `StoryIntakeRequest` (and mapping notes) exactly as built for HTTP — including `schema_version`, `narrative`, `gpt_signals`, `origin`, `privacy`, `live_story_context`, labels, severity, and transport fields. Use a JSON block when helpful. **No** redaction, **no** citizen-style abstraction in this mode.
 
+**Trigger activation table (REQ-41 / GIM-176 — God Mode only, non-wire):** After the JSON preview (or immediately before operator confirmation), show a diagnostic **markdown table** of extraction-trigger activation. **MUST NOT** show this table in Citizen Mode (`debug_mode = false`). **MUST NOT** include this table in the HTTP request body or `StoryIntakeRequest`.
+
+| Trigger | Activated | Reason (if not activated) |
+|---------|-----------|---------------------------|
+| `location_trigger` | true / false | `no-evidence` / `omitted-by-rule` / — |
+| `origin_trigger` | true / false | `no-evidence` / `runtime-unavailable` / — |
+| `summary_generation_trigger` | true / false | `no-evidence` / `omitted-by-rule` / — |
+| `multi_axis_labels_trigger` | true / false | `no-evidence` / `omitted-by-rule` / — |
+| `gpt_signals_trigger` | true / false | `no-evidence` / `omitted-by-rule` / — |
+
+**Single-evaluation rule (REQ-41 §2.1):** Populate Activated/Reason from **the same inputs** as §5.2.2 items 13–15 — `ingest_validation_report.pre_submission_compliance_evidence` plus the built draft — **not** a second independent assessment. When present, prefer displaying `normalization_metadata.trigger_activation_metadata` from [`story-normalizer.md`](story-normalizer.md) §4.2.3 (normalizer audit source). Reason values: `no-evidence`, `runtime-unavailable`, `omitted-by-rule` (REQ-41 §2.2). This table is **diagnostic only** — it does **not** block submit (enforcement remains REQ-40 items 13–15).
+
 God Mode does **not** bypass §5.2.0a, §5.2.0, or §5.2.2. After operator review and explicit confirmation → proceed to §5.2.2, then HTTP.
 
 ---
@@ -635,6 +647,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.6 | 2026-06-07 | **REQ-41 / GIM-176:** §5.2.0b God Mode — trigger activation table (5 triggers + Reason enum); God-Mode-only, non-wire; single-evaluation rule reuses §5.2.2 items 13–15 / `trigger_activation_metadata`. Citizen forbidden-lexicon unchanged. |
 | 0.3.5 | 2026-06-06 | **REQ-40 / GIM-174:** §5.2.2 item 15 — qualified paths `pre_submission_compliance_evidence.narrative_sufficient_for_summary` and `.subjective_signal_present` (GAP-40-01 closure). Semantics unchanged. |
 | 0.3.4 | 2026-06-06 | **REQ-40 / GIM-171:** §5.2.2 items 13–16 — location-coverage FAIL, single-label-collapse warning, missing-trigger compliance pass (FAIL vs warning), runtime `conversation_id` trace_notes. Additive to checks 1–12. |
 | 0.3.3 | 2026-06-03 | **REQ-35 / GIM-154:** §5.2.1 `origin.conversation_id` Notes — GPT Actions session id when available; omit key if unavailable; never null string. |
