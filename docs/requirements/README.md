@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (40 файлов)
+## Оглавление REQ (42 файла; №37 вакантен)
 
 | № | Файл |
 |---|------|
@@ -52,8 +52,11 @@
 | 39 | [REQ-39-geographic-intelligence-confidence-canonicalization.md](./REQ-39-geographic-intelligence-confidence-canonicalization.md) |
 | 40 | [REQ-40-pre-submission-instruction-compliance-validation.md](./REQ-40-pre-submission-instruction-compliance-validation.md) |
 | 41 | [REQ-41-trigger-observability-audit-trail.md](./REQ-41-trigger-observability-audit-trail.md) |
+| 42 | [REQ-42-adaptive-post-submission-confirmation-message.md](./REQ-42-adaptive-post-submission-confirmation-message.md) |
 
-**Версия:** 1.7 · 2026-06-05 (REQ-38 Done — ecosystem-deficit detection in `story-interview-flow.md` v0.19 + `story-normalizer.md` v0.2.9; pkg-000018 GIM-163…166).
+**Версия:** 1.8 · 2026-06-08 (REQ-42 Done — adaptive post-submit message; `comm_context.cognitive_style` (systemic/narrative/mixed, passive, default mixed), `api-orchestrator.md` §5.2.4, оба 202-статуса, Citizen forbidden-lexicon; GAP-42-01 namespace disambiguation gateway vs GPT-UI REQ-42; P3 demo+post-demo).
+
+Предыдущее (1.7 · 2026-06-05): REQ-38 Done — ecosystem-deficit detection in `story-interview-flow.md` v0.19 + `story-normalizer.md` v0.2.9; pkg-000018 GIM-163…166.
 
 Предыдущее (1.6 · 2026-06-05): REQ-40 черновик «Trigger Reliability & Execution Determinism» разбит по механизму на 2 дока: REQ-40 pre-submission instruction-compliance validation (enforcement, расширяет §5.2.2 pre-flight, Critical), REQ-41 trigger observability/audit trail (диагностика God Mode, зависит от REQ-40). Номер REQ-37 освобождён — исходный draft перемещён пользователем в REQ-40 и стандартизирован.
 

@@ -39,7 +39,7 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.institution` | no | **Demo scope: always omit (REQ-28 pre-flight #7).** Post-demo: `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / REQ-43). |
 | `privacy.contains_pii` | no | `normalization_metadata.contains_pii` after §5.2.0 flow (REQ-23 §A) |
 | `privacy.redaction_requested` | no | user choice in api-orchestrator §5.2.0 |
-| `gpt_signals.severity` | no | `non_wire_metadata.severity` (REQ-42 enums) |
+| `gpt_signals.severity` | no | `non_wire_metadata.severity` (gateway REQ-42 / gpt_signals enums) |
 | `gpt_signals.impact_estimation` | no | `non_wire_metadata.impact_estimation` |
 | `gpt_signals.problem_status` | no | `non_wire_metadata.problem_status` |
 | `live_story_context.consistency_notes` | no | normalizer §4.5; omit if null |

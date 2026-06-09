@@ -334,7 +334,7 @@ If nothing was collected or confirmed upstream **and** the narrative lacks suffi
 
 `non_wire_metadata` is an **internal** sidecar only. [`api-orchestrator.md`](api-orchestrator.md) maps these three fields to wire `gpt_signals` (REQ-23 §2). Do **not** copy the `non_wire_metadata` object into `StoryIntakeRequest`.
 
-Allowed enum values (must match REQ-42 when mapped to wire):
+Allowed enum values (must match **gateway REQ-42 (gpt_signals)** when mapped to wire — [`42-gpt-signals-story-intake-extension.md`](../../doge-complaints-gateway/docs/requirements/42-gpt-signals-story-intake-extension.md); not GPT-UI REQ-42 adaptive post-submit):
 
 | Field | Values |
 |-------|--------|
