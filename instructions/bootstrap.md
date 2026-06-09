@@ -4,11 +4,12 @@
 
 ## Purpose
 
-Communication Bootstrap determines 4 communication parameters on the first user message:
+Communication Bootstrap determines 5 communication parameters on the first user message:
 1. Dialog language (ui_lang)
 2. Tone/style (tone_preset)
 3. Verbosity level (verbosity_level)
 4. Transparency/diagnostics (transparency_mode)
+5. Cognitive framing style (cognitive_style) — GPT-UI REQ-42; passive inference only
 
 Bootstrap executes **before** routing to functional modules (INGEST/SEARCH/HELP/POLICY).
 
@@ -68,6 +69,7 @@ comm_context = {
     tone_preset: "neutral_friendly",
     verbosity_level: "normal",
     transparency_mode: "comfort",
+    cognitive_style: "mixed",
     bootstrap_completed: false
 }
 ```
@@ -261,6 +263,40 @@ comm_context = {
 - `comfort` — comfort mode (no technical details, default)
 - `debug` — debug mode (with technical details, artifacts, logs)
 
+**Step 4.5: Initialize `cognitive_style` (GPT-UI REQ-42 / GIM-178)**
+
+**Orthogonality:** `cognitive_style` (how the user structures meaning: systemic vs narrative) is **independent** of `tone_preset` (emotional warmth) and `transparency_mode` (diagnostic visibility). Do not infer cognitive style from transparency or tone alone.
+
+**Algorithm (passive only — no command, no leading question):**
+```
+1. Default at init: cognitive_style = "mixed"
+
+2. NO slash command for cognitive_style (unlike /lang, /style, /brief, /debug).
+   DO NOT ask: "Do you think in systems or stories?" or similar.
+
+3. From user material already in the session (first message + prior turns):
+   systemic signals → "systemic":
+     - interest in clusters, pipelines, statuses, downstream processing
+     - boundaries between private story vs public Issue
+     - structural / pattern language ("system", "data point", "taxonomy")
+   narrative signals → "narrative":
+     - lived experience, emotions, personal story framing
+     - first-person impact without system vocabulary
+
+4. IF clear systemic signal and no competing narrative signal → cognitive_style = "systemic"; mark "inferred"
+   IF clear narrative signal and no competing systemic signal → cognitive_style = "narrative"; mark "inferred"
+   ELSE → cognitive_style = "mixed"; mark "default"
+
+5. Ongoing session rule: MAY update cognitive_style passively when later user
+   messages provide new evidence — still without commands or leading questions.
+   Privacy baseline: align with REQ-35 minimal-questions (no extra intake question).
+```
+
+**Available values:**
+- `systemic` — user thinks in systems/clusters/status/pipelines
+- `narrative` — user thinks in lived story and emotions
+- `mixed` — no clear skew (default)
+
 **Step 5: Finalize Bootstrap**
 
 **Algorithm:**
@@ -273,13 +309,15 @@ comm_context = {
       - Language: [ui_lang]
       - Style: [tone_preset]
       - Verbosity: [verbosity_level]
-      - Transparency: [transparency_mode]"
+      - Transparency: [transparency_mode]
+      - Cognitive style: [cognitive_style]"
 
 3. Apply comm_context immediately:
    → Use ui_lang for response language
    → Use tone_preset for response tone
    → Use verbosity_level for response length
    → Use transparency_mode for artifact visibility
+   → Use cognitive_style for structural framing (post-submit copy per [`api-orchestrator.md`](api-orchestrator.md) §5.2.4)
 
 4. Continue to normal routing:
    → Proceed to Base Instruction (Mode Detection)
@@ -390,3 +428,11 @@ comm_context = {
 Bootstrap sets **verbosity** and **tone** for the session. For Issue **INGEST**, Phase **7** interpretation summaries ([`story-interview-flow.md`](story-interview-flow.md) **§7.2**) should stay **short** when `verbosity_level` is `brief` or `normal`; reserve longer recap for user-requested detail or `detailed` verbosity. The **order** of Phase 7 (summary → corrections → framing update) is defined only in `story-interview-flow.md` §7.2 — not overridden here.
 
 **`ui_lang` and i18n:** `comm_context.ui_lang` (and `/lang` commands) is the **default surface language** for the civic interview; full rules and trilingual field strategy are in [`story-i18n-policy.md`](story-i18n-policy.md). **Tone presets** do not override language choice.
+
+---
+
+## Version history
+
+| Version | Date | Change |
+|---------|------|--------|
+| 0.2.0 | 2026-06-08 | **REQ-42 / GIM-178:** `comm_context.cognitive_style` (`systemic`/`narrative`/`mixed`, default `mixed`); Step 4.5 passive inference (no command/question); orthogonality vs `tone_preset`/`transparency_mode`; finalize + §5.2.4 consumer ref. |

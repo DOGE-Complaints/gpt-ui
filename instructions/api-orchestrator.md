@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3.6 |
-| **Date** | 2026-06-07 |
-| **Traceability** | REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.7 |
+| **Date** | 2026-06-08 |
+| **Traceability** | GPT-UI REQ-42 / GIM-179 (§5.2.4 adaptive post-submit message); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -329,9 +329,9 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | **Always omit in current demo scope (REQ-28)** — §5.2.2 pre-flight #7 institution demo-gate drops this field regardless of `canonical_payload` content; normalizer-layer enforcement in [`story-normalizer.md`](story-normalizer.md) §4.1. Post-demo (REQ-43 lifted): omit only if any i18n slot empty (REQ-23 §2.5 secondary directive — pre-flight #8). |
 | `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A; omit entire `privacy` block when false/absent |
 | `privacy.redaction_requested` | User choice in §5.2.0 two-step flow | No | `true` only if user agreed to edit |
-| `gpt_signals.severity` | `non_wire_metadata.severity` | No | REQ-23 §B / REQ-42; omit block if sidecar absent |
-| `gpt_signals.impact_estimation` | `non_wire_metadata.impact_estimation` | No | Enum per REQ-42: `LOCAL`, `DISTRICT`, `CITY`, `NATIONAL`; omit field if unsure (no `UNKNOWN` fallback for this field — server frozenset [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L62 rejects with HTTP 400) |
-| `gpt_signals.problem_status` | `non_wire_metadata.problem_status` | No | Enum per REQ-42 |
+| `gpt_signals.severity` | `non_wire_metadata.severity` | No | REQ-23 §B / gateway REQ-42 (gpt_signals); omit block if sidecar absent |
+| `gpt_signals.impact_estimation` | `non_wire_metadata.impact_estimation` | No | Enum per gateway REQ-42 (gpt_signals): `LOCAL`, `DISTRICT`, `CITY`, `NATIONAL`; omit field if unsure (no `UNKNOWN` fallback for this field — server frozenset [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L62 rejects with HTTP 400) |
+| `gpt_signals.problem_status` | `non_wire_metadata.problem_status` | No | Enum per gateway REQ-42 (gpt_signals) |
 | `live_story_context.consistency_notes` | `normalized_issue_payload.live_story_context.consistency_notes` | No | REQ-23 §C; omit block when null |
 
 **Wire transform (`non_wire_metadata` → `gpt_signals`):** map the three classification fields to root `gpt_signals` per REQ-23 §2.2–2.4. Do **not** copy the `non_wire_metadata` object itself into the HTTP body.
@@ -527,7 +527,7 @@ Run before every `POST /intake/stories` call:
 9. If `live_story_context.consistency_notes` is present: must be non-empty trimmed text; language should match `session_language` (or `en`).  
    If empty after trim — omit entire `live_story_context` block.
 
-10. If `gpt_signals` is included: each present field must match REQ-42 enums.  
+10. If `gpt_signals` is included: each present field must match gateway REQ-42 (gpt_signals) enums ([`42-gpt-signals-story-intake-extension.md`](../../doge-complaints-gateway/docs/requirements/42-gpt-signals-story-intake-extension.md)).  
     Omit unknown values or use `UNKNOWN` for `problem_status` only.
 
 11. If `narrative.summary` is included: all three keys `et`, `ru`, `en` must be non-empty strings.  
@@ -550,7 +550,7 @@ If all checks pass → proceed to HTTP call.
 
 #### 5.2.3 Story Intake response handling
 
-- **HTTP 202:** story accepted. Report `story_id` and `status` from response `data` envelope to the user. Do not retry on 202.
+- **HTTP 202:** story accepted. Read `story_id` and `status` from response `data` envelope. Do not retry on 202. **User-facing confirmation** — apply §5.2.4 (adaptive post-submit); technical semantics below remain authoritative for status meaning.
   - `status = "ready_for_profile"`: story will enter clustering and may become a public issue.
   - `status = "partial_ready"`: story is saved but **not** clustered — narrative is incomplete (empty `title`, `description`, or a language slot). Tell the user the story is saved but needs completion before publication.
   - If the request included `gpt_signals`: a failure to persist signals on the server does **not** change HTTP 202. The story is still accepted; `gpt_signals` may be missing from `story_signals` when the DB write fails — the server logs this and does not fail intake.
@@ -559,7 +559,51 @@ If all checks pass → proceed to HTTP call.
 - **HTTP 422 (`GEO_SCOPE_MISMATCH`):** `location_query` resolved outside the server geo scope (for demo: Estonia / Tallinn). Ask the user to clarify location within the supported region. Do not treat this as a schema error — schema/field problems are **400** (`DOMAIN_ERROR`).
 - **HTTP 5xx:** gateway error; report uncertainty to user; do not retry automatically.
 
-On any error response, read `error` as an object `{code, type, message, details}` and top-level `trace_id` (see §6.1). Do not expect `success`, `timestamp`, or `request_id` fields.
+On any error response, read `error` as an object `{code, type, message, details}` and top-level `trace_id` (see §6.1). Do not expect `success`, `timestamp`, or `request_id` fields. **Do not** apply §5.2.4 on non-202 responses — error copy stays in this §5.2.3 block only.
+
+#### 5.2.4 Adaptive post-submit message (GPT-UI REQ-42 / GIM-179)
+
+**Activation:** **Only** after successful **HTTP 202** from `POST /intake/stories`. **MUST NOT** run on 400/401/422/5xx (those remain §5.2.3 above).
+
+**Inputs:** `story_id` and `status` from response `data` envelope (verbatim — no re-labeling); `comm_context` (`ui_lang`, `tone_preset`, `verbosity_level`, `cognitive_style` from [`bootstrap.md`](bootstrap.md) Step 4.5).
+
+**Mandatory structure (all modes):**
+
+1. **What happened** — story saved as a separate case (not yet a public Issue).
+2. **Backend fact** — show `story_id` and backend `status` **exactly** as returned.
+3. **What did NOT happen** — submitting ≠ Issue created; submitting ≠ approved/published unless backend says so.
+4. **What next** — story is a signal/data point; Issue may arise **only later** via clustering/profile/gate/downstream (possibility, not promise).
+5. **No false claims** — per [`root.md`](root.md): do not say «accepted», «approved», «became Issue», or «published» unless the backend response explicitly states it.
+
+**Status-specific guidance (both 202 outcomes required):**
+
+| `status` | Meaning for user copy |
+|----------|----------------------|
+| `ready_for_profile` | Saved; may enter clustering; **may later** become a public Issue if patterns emerge — not now. |
+| `partial_ready` | Saved but narrative incomplete (per §5.2.3); needs more detail before it can progress — gently, without blame. |
+
+**Style adaptation (`cognitive_style` + `tone_preset`):**
+
+| Mode | Rule |
+|------|------|
+| Citizen (`debug_mode = false`) | Adapt tone/structure per `cognitive_style` and `tone_preset`. **MUST** obey §5.2.0b forbidden-lexicon (L435) — explain clusters/Issue/downstream in **human words**; backend `status` strings (`ready_for_profile`, `partial_ready`) **are allowed** in citizen copy. |
+| `cognitive_style = systemic` | Direct conceptual framing: explicit what happened / what did not / what next; «data point», «pattern», «Issue only later». |
+| `cognitive_style = narrative` / warm `tone_preset` | Supportive wording; same facts and structure; no false promises. |
+| `mixed` | Neutral-clear structure with all four sections. |
+| God Mode (`debug_mode = true`) | Full system wording allowed; may include envelope/field detail; forbidden-lexicon does **not** apply. |
+
+**Example templates (Citizen — adapt to `ui_lang`; placeholders from backend only):**
+
+*`cognitive_style = systemic` · `ready_for_profile`:*
+> Story saved as a separate case (`story_id: <id>`).
+> Status: `ready_for_profile`.
+> This does **not** mean an Issue already exists or that the system declared a systemic problem. It is one data point. It may be matched with similar stories later — a stable pattern could **later** produce an Issue.
+
+*`cognitive_style = narrative` · `partial_ready`:*
+> Thank you — your story is saved (`story_id: <id>`).
+> Status: `partial_ready`. It is recorded but still incomplete: more detail is needed before it can move forward. That is normal — you can add to it later.
+
+**Regression:** §5.2.3 error bullets (400/401/422/5xx) and §5.2.0b Citizen forbidden-lexicon (L435) are **unchanged** by this section.
 
 ---
 
@@ -647,6 +691,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.7 | 2026-06-08 | **REQ-42 / GIM-179:** §5.2.4 adaptive post-submit (HTTP 202 only); structure what happened / not / next + `root.md` no-false-claims; both `ready_for_profile` + `partial_ready`; `cognitive_style` + Citizen/God rules; §5.2.3 error paths unchanged. |
 | 0.3.6 | 2026-06-07 | **REQ-41 / GIM-176:** §5.2.0b God Mode — trigger activation table (5 triggers + Reason enum); God-Mode-only, non-wire; single-evaluation rule reuses §5.2.2 items 13–15 / `trigger_activation_metadata`. Citizen forbidden-lexicon unchanged. |
 | 0.3.5 | 2026-06-06 | **REQ-40 / GIM-174:** §5.2.2 item 15 — qualified paths `pre_submission_compliance_evidence.narrative_sufficient_for_summary` and `.subjective_signal_present` (GAP-40-01 closure). Semantics unchanged. |
 | 0.3.4 | 2026-06-06 | **REQ-40 / GIM-171:** §5.2.2 items 13–16 — location-coverage FAIL, single-label-collapse warning, missing-trigger compliance pass (FAIL vs warning), runtime `conversation_id` trace_notes. Additive to checks 1–12. |
