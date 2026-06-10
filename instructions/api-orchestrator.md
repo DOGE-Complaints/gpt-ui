@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3.7 |
-| **Date** | 2026-06-08 |
-| **Traceability** | GPT-UI REQ-42 / GIM-179 (§5.2.4 adaptive post-submit message); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.8 |
+| **Date** | 2026-06-09 |
+| **Traceability** | GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 adaptive post-submit message); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -326,7 +326,7 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `origin.source` | Fixed: `openai_gpt_action` | **de-facto required** | Always include: this is the only way to track submission source. Value is fixed = `openai_gpt_action` for GPT Action runtime. Do not omit — `origin.source = null` in DB means the story cannot be attributed to the GPT channel. |
 | `origin.conversation_id` | Active `conversation_id` from GPT Actions session context when the orchestrator runtime exposes it (thread / conversation id for this Custom GPT session) | No | **REQ-35:** populate when available for channel attribution; do **not** send `null`, empty string, or placeholder text — **omit** the `conversation_id` key entirely when the id is not available to the runtime (instruction cannot guarantee Actions context; fill when present). |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
-| `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | **Always omit in current demo scope (REQ-28)** — §5.2.2 pre-flight #7 institution demo-gate drops this field regardless of `canonical_payload` content; normalizer-layer enforcement in [`story-normalizer.md`](story-normalizer.md) §4.1. Post-demo (REQ-43 lifted): omit only if any i18n slot empty (REQ-23 §2.5 secondary directive — pre-flight #8). |
+| `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | **Always omit in current demo scope (REQ-28)** — §5.2.2 pre-flight #7 institution demo-gate drops this field regardless of `canonical_payload` content; normalizer-layer enforcement in [`story-normalizer.md`](story-normalizer.md) §4.1. Post-demo (gateway REQ-43 (institution) lifted): omit only if any i18n slot empty (REQ-23 §2.5 secondary directive — pre-flight #8). |
 | `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A; omit entire `privacy` block when false/absent |
 | `privacy.redaction_requested` | User choice in §5.2.0 two-step flow | No | `true` only if user agreed to edit |
 | `gpt_signals.severity` | `non_wire_metadata.severity` | No | REQ-23 §B / gateway REQ-42 (gpt_signals); omit block if sidecar absent |
@@ -519,9 +519,9 @@ Run before every `POST /intake/stories` call:
 6. `normalization_metadata.session_language` matches `normalization_metadata.normalizer_module` ref.  
    Informational check only; log mismatch in trace_notes.
 
-7. **Institution demo-gate (REQ-28):** if `canonical_payload.institution` is present in `normalized_issue_payload`, **omit** it from the outgoing `narrative.institution` wire field (silently drop — do **not** raise an error). Append a one-line entry to `trace_notes`: `"demo scope: institution omitted (REQ-28)"`. This gate is active until [REQ-43](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md) integration matures; once lifted, the REQ-23 §2.5 check (item 8) governs i18n completeness. Normalizer-layer primary enforcement lives in [`story-normalizer.md`](story-normalizer.md) §4.1 demo-constraint; this pre-flight is defense-in-depth.
+7. **Institution demo-gate (REQ-28):** if `canonical_payload.institution` is present in `normalized_issue_payload`, **omit** it from the outgoing `narrative.institution` wire field (silently drop — do **not** raise an error). Append a one-line entry to `trace_notes`: `"demo scope: institution omitted (REQ-28)"`. This gate is active until gateway REQ-43 (institution) integration matures ([`43-institution-json-story-column.md`](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md)); once lifted, the REQ-23 §2.5 check (item 8) governs i18n completeness. Normalizer-layer primary enforcement lives in [`story-normalizer.md`](story-normalizer.md) §4.1 demo-constraint; this pre-flight is defense-in-depth.
 
-8. If `narrative.institution` is still included after item 7 (post-demo, REQ-43 active): all three keys `et`, `ru`, `en` must be non-empty strings (REQ-23 §2.5 secondary directive).  
+8. If `narrative.institution` is still included after item 7 (post-demo, gateway REQ-43 (institution) active): all three keys `et`, `ru`, `en` must be non-empty strings (REQ-23 §2.5 secondary directive).  
    If any slot is empty — remove `institution` from `narrative` (do not send partial i18n).
 
 9. If `live_story_context.consistency_notes` is present: must be non-empty trimmed text; language should match `session_language` (or `en`).  
@@ -691,6 +691,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.8 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §5.2.1 `narrative.institution` row; §5.2.2 items 7–8 (demo-gate lift + post-demo i18n). Semantics unchanged. |
 | 0.3.7 | 2026-06-08 | **REQ-42 / GIM-179:** §5.2.4 adaptive post-submit (HTTP 202 only); structure what happened / not / next + `root.md` no-false-claims; both `ready_for_profile` + `partial_ready`; `cognitive_style` + Citizen/God rules; §5.2.3 error paths unchanged. |
 | 0.3.6 | 2026-06-07 | **REQ-41 / GIM-176:** §5.2.0b God Mode — trigger activation table (5 triggers + Reason enum); God-Mode-only, non-wire; single-evaluation rule reuses §5.2.2 items 13–15 / `trigger_activation_metadata`. Citizen forbidden-lexicon unchanged. |
 | 0.3.5 | 2026-06-06 | **REQ-40 / GIM-174:** §5.2.2 item 15 — qualified paths `pre_submission_compliance_evidence.narrative_sufficient_for_summary` and `.subjective_signal_present` (GAP-40-01 closure). Semantics unchanged. |

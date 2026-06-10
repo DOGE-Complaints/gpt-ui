@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (42 файла; №37 вакантен)
+## Оглавление REQ (43 файла; №37 вакантен)
 
 | № | Файл |
 |---|------|
@@ -53,8 +53,11 @@
 | 40 | [REQ-40-pre-submission-instruction-compliance-validation.md](./REQ-40-pre-submission-instruction-compliance-validation.md) |
 | 41 | [REQ-41-trigger-observability-audit-trail.md](./REQ-41-trigger-observability-audit-trail.md) |
 | 42 | [REQ-42-adaptive-post-submission-confirmation-message.md](./REQ-42-adaptive-post-submission-confirmation-message.md) |
+| 43 | [REQ-43-proactive-story-intake-offer.md](./REQ-43-proactive-story-intake-offer.md) |
 
-**Версия:** 1.8 · 2026-06-08 (REQ-42 Done — adaptive post-submit message; `comm_context.cognitive_style` (systemic/narrative/mixed, passive, default mixed), `api-orchestrator.md` §5.2.4, оба 202-статуса, Citizen forbidden-lexicon; GAP-42-01 namespace disambiguation gateway vs GPT-UI REQ-42; P3 demo+post-demo).
+**Версия:** 1.9 · 2026-06-09 (REQ-43 Done — proactive story-intake offer; `story-interview-flow.md` v0.20 §5 Q7 non-blocking, §7.5 proactive offer, §8 anti-pattern row 10; GAP-43-01/02 gateway REQ-43 (institution) namespace disambiguation; P3 demo+post-demo).
+
+Предыдущее (1.8 · 2026-06-08): REQ-42 Done — adaptive post-submit message; `comm_context.cognitive_style` (systemic/narrative/mixed, passive, default mixed), `api-orchestrator.md` §5.2.4, оба 202-статуса, Citizen forbidden-lexicon; GAP-42-01 namespace disambiguation gateway vs GPT-UI REQ-42; P3 demo+post-demo.
 
 Предыдущее (1.7 · 2026-06-05): REQ-38 Done — ecosystem-deficit detection in `story-interview-flow.md` v0.19 + `story-normalizer.md` v0.2.9; pkg-000018 GIM-163…166.
 

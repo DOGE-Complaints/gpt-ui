@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.13 |
-| **Date** | 2026-06-07 |
+| **Version** | 0.2.14 |
+| **Date** | 2026-06-09 |
 | **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
@@ -212,7 +212,7 @@ If interview reasoning produced an institution candidate (even with all three i1
 - Leave `canonical_payload.institution` **absent** / not emitted.
 - Add a one-line entry to `normalization_metadata.trace_notes`, e.g. `"demo scope: institution candidate parked in non_wire_metadata (REQ-28)"`.
 
-This gate is lifted when backend integration for institution-routing matures — tracked as [REQ-43](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md). The orchestrator pre-flight in [`api-orchestrator.md`](api-orchestrator.md) §5.2 enforces the same constraint as defense-in-depth.
+This gate is lifted when backend integration for institution-routing matures — tracked as gateway REQ-43 (institution) ([`43-institution-json-story-column.md`](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md)). The orchestrator pre-flight in [`api-orchestrator.md`](api-orchestrator.md) §5.2 enforces the same constraint as defense-in-depth.
 
 ### 4.2 `normalization_metadata` (required keys — instruction-layer scaffold)
 
@@ -341,7 +341,7 @@ Allowed enum values (must match **gateway REQ-42 (gpt_signals)** when mapped to 
 | `severity` | `LOW`, `MEDIUM`, `HIGH`, `CRITICAL` |
 | `impact_estimation` | `LOCAL`, `DISTRICT`, `CITY`, `NATIONAL` |
 | `problem_status` | `ONGOING`, `RESOLVED`, `RECURRING`, `UNKNOWN` |
-| `institution_candidate` | Optional `{ et, ru, en }` (REQ-28): informational fallback for an institution candidate suppressed by the §4.1 demo-scope constraint. Never copied to wire; lift gate when [REQ-43](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md) integration matures. |
+| `institution_candidate` | Optional `{ et, ru, en }` (REQ-28): informational fallback for an institution candidate suppressed by the §4.1 demo-scope constraint. Never copied to wire; lift gate when gateway REQ-43 (institution) ([`43-institution-json-story-column.md`](../../doge-complaints-gateway/docs/requirements/43-institution-json-story-column.md)) integration matures. |
 
 If unsure about a value, prefer `UNKNOWN` for `problem_status` or omit that field from `non_wire_metadata`. `institution_candidate` is **only** populated when §4.1 demo-constraint suppressed a candidate from `canonical_payload.institution` — otherwise omit it.
 
@@ -464,6 +464,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.8 | 2026-06-05 | **REQ-38 / GIM-164:** §4.1 type-vs-axis orthogonality; §4.1a.1 ecosystem-deficit preferential classification + anti-collapse; expanded `ecosystem_signal` hints (`institutional_decline`, `mentor_shortage`, `community_fragmentation`, `replicable_model_needed`). |
 | 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
 | 0.2.10 | 2026-06-05 | **REQ-39 / GIM-167:** §4.6 rule 2 city-level canonicalization to `<City>, Estonia` (`Tallinn`, `Tallinna linn` examples); district/street strings preserved (`Kalamaja, Tallinn`). |
+| 0.2.14 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §4.1 lift-gate note; §4.3 `institution_candidate` row. Semantics unchanged. |
 | 0.2.13 | 2026-06-07 | **REQ-41 / GIM-175:** §4.2.3 `trigger_activation_metadata` — five-trigger activation audit (`location`/`origin`/`summary`/`multi_axis_labels`/`gpt_signals`) with Reason enum; reuses REQ-40 evidence definitions; non-wire diagnostic source for God Mode. |
 | 0.2.12 | 2026-06-06 | **REQ-40 / GIM-172:** §4.3 explicit `severity_confidence` (`HIGH`/`MEDIUM`/`LOW`); `LOW` → omit `severity`; REQ-35 active determination preserved. |
 | 0.2.11 | 2026-06-05 | **REQ-39 / GIM-168:** §4.2.2 `location_extraction_metadata` sidecar (`location_detected`, `location_source`, `confidence`); non-wire; explicit source from resident-stated material only. |

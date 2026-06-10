@@ -1,6 +1,6 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.6 · 2026-05-31  
+**Version:** 1.7 · 2026-06-09  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
@@ -36,7 +36,7 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.location_query` | no | `normalized_issue_payload.location_query` when user confirmed location (REQ-26); omit if absent |
 | `narrative.canonical_type` | no | `canonical_payload.type`; `complaint` / `system_bug` → issue promotion gate (REQ-25) |
 | `narrative.canonical_labels` | no | `canonical_payload.labels[]`; canonical disposition only per `story-label-taxonomy.md` (REQ-25) |
-| `narrative.institution` | no | **Demo scope: always omit (REQ-28 pre-flight #7).** Post-demo: `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / REQ-43). |
+| `narrative.institution` | no | **Demo scope: always omit (REQ-28 pre-flight #7).** Post-demo: `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / gateway REQ-43 (institution)). |
 | `privacy.contains_pii` | no | `normalization_metadata.contains_pii` after §5.2.0 flow (REQ-23 §A) |
 | `privacy.redaction_requested` | no | user choice in api-orchestrator §5.2.0 |
 | `gpt_signals.severity` | no | `non_wire_metadata.severity` (gateway REQ-42 / gpt_signals enums) |
@@ -105,8 +105,9 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.7 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §1 `narrative.institution` field lock. Semantics unchanged. |
 | 1.6 | 2026-05-31 | **REQ-31 / GIM-137:** citizen-facing purpose text for `postStoryIntake`; lock `info.version` **0.4.2** (summary/description human-readable; operationId unchanged — Actions re-import required). |
-| 1.5 | 2026-05-26 | **REQ-28 / GAP-YAML-08:** `narrative.institution` field lock updated with demo-gate note — always omit in demo scope (REQ-28 pre-flight #7); post-demo gate lifted by REQ-43. |
+| 1.5 | 2026-05-26 | **REQ-28 / GAP-YAML-08:** `narrative.institution` field lock updated with demo-gate note — always omit in demo scope (REQ-28 pre-flight #7); post-demo gate lifted by gateway REQ-43 (institution). |
 | 1.4 | 2026-05-24 | **REQ-26 / GIM-120:** `narrative.location_query` source = top-level normalizer `location_query`. |
 | 1.3 | 2026-05-24 | **REQ-25 / GIM-116–117:** activate `canonical_type` / `canonical_labels` wire; summary omit entire block if any slot empty. |
 | 1.2 | 2026-05-24 | **REQ-23 / GIM-107–111:** `gpt_signals`, `narrative.institution`, `privacy.*`, `live_story_context.consistency_notes`; lock `info.version` **0.4.0**. |
