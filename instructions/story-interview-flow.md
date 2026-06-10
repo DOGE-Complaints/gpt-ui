@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.19 |
-| **Date** | 2026-06-05 |
-| **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **REQ-38**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
+| **Version** | 0.20 |
+| **Date** | 2026-06-09 |
+| **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **REQ-38**, **REQ-43**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
 
 **Related modules:** [`story-data-model.md`](story-data-model.md) · [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) · [`safety-compliance.md`](safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
 
@@ -65,19 +65,21 @@ User utterances stack **four layers** (psychological model §6.1). The model mus
 
 ## 5. Completeness — seven questions
 
-An interview is **content-complete** for handoff to **Phase 7 (summary and confirmation)** only if the model can answer all **seven** questions below (target-outcome §7). If any answer is **missing or only guessed**, treat the interview as **incomplete**: continue exploration, ask a minimal next question, or **explicitly** name the gap (do not present a final summary as if complete).
+An interview is **content-complete** for handoff to **Phase 7 (summary and confirmation)** when the model can answer questions **1–6** below with enough substance for a **personal story** (target-outcome §7). **Question 7 is non-blocking (REQ-43 / GIM-182):** record one-off vs recurring **only if the user already volunteered it**; **absence** of collective/recurrence evidence does **not** make the interview incomplete and does **not** block handoff or intake. Collective relevance is discovered **downstream** (story→cluster→Issue — clustering, not interview pressure; align with adaptive post-submit downstream framing in [`api-orchestrator.md`](api-orchestrator.md) §5.2.4 / REQ-42 principle).
 
-| # | Question (completeness) | Typical coverage (dialogue phases) |
-|---|-------------------------|----------------------------------|
-| 1 | What happened or keeps happening? | Phase **2** |
-| 2 | Where does it happen? | Phase **2** |
-| 3 | Who or what is affected? | Phases **2–3** |
-| 4 | Why does it matter to the user? | Phase **3** |
-| 5 | What is the **deep unmet** need? | Phase **4** |
-| 6 | What does the **desired state** look like? | Phase **5** |
-| 7 | Is there evidence this is **not a one-off**? | Phase **6** |
+If any of **Q1–Q6** is **missing or only guessed**, treat the interview as **incomplete**: continue exploration, ask a minimal next question, or **explicitly** name the gap (do not present a final summary as if complete).
 
-**Rule before Phase 7:** run this checklist **before** the long summary / draft Issue framing (before Phase 7 confirmation). If incomplete — **do not** imply readiness for backend or “final” Issue text; stay in phases **2–6** or acknowledge incompleteness in one line, then invite correction.
+| # | Question (completeness) | Typical coverage (dialogue phases) | Blocking for Phase 7 / intake? |
+|---|-------------------------|----------------------------------|--------------------------------|
+| 1 | What happened or keeps happening? | Phase **2** | **Yes** |
+| 2 | Where does it happen? | Phase **2** | **Yes** |
+| 3 | Who or what is affected? | Phases **2–3** | **Yes** |
+| 4 | Why does it matter to the user? | Phase **3** | **Yes** (for full depth; see **§7.5** — episode + meaning may suffice for proactive offer) |
+| 5 | What is the **deep unmet** need? | Phase **4** | **Optional** for personal-story intake (deepen if user wants) |
+| 6 | What does the **desired state** look like? | Phase **5** | **Optional** for personal-story intake (deepen if user wants) |
+| 7 | Is there evidence this is **not a one-off**? (one-off vs recurring) | Phase **6** | **No** — optional signal only; personal story valid without it |
+
+**Rule before Phase 7:** run **Q1–Q6** (with Q4–Q6 depth optional per **§7.5**) **before** the long summary / draft Issue framing. **Do not** block Phase 7 or intake solely because Q7 is unanswered. If **Q1–Q3** (minimum episode + meaning path) or required Q1–Q6 substance is incomplete — **do not** imply readiness for backend or “final” Issue text; stay in phases **2–6** or acknowledge incompleteness in one line, then invite correction.
 
 **Downstream “sufficient raw material” (no normalizer in this file):** completeness here means enough **substance** for projection into [`story-data-model.md`](story-data-model.md) narrative fields and §4.1 logical Issue — **enforcement** lives in **`ingest-validation.md`** (DOGEstonia / Issue track overlay) and **`base.md`** (INGEST Issue overlay). Align narrative completeness with validation and acceptance modules when wired.
 
@@ -103,7 +105,7 @@ Phase map for GPT routing; here only goals and transition criteria. Use **§4** 
 | **4** | Deeper need | Surface hidden value | Value/need hypothesis stated and checked via reflection (5.6) |
 | **5** | Desired state | Shift from complaint-only to constructive | Articulated how it could ideally look |
 | **6** | Civic generalization | Collective signal potential | Clear: one-off vs recurring environment problem |
-| **7** | Summary and confirmation | Align GPT interpretation with user intent | **§5 checklist satisfied** (or gaps explicitly accepted by user); then run **§7.2** (FR-M1-032…034): interpretation summary → invite corrections → update framing if needed → explicit confirmation before handoff |
+| **7** | Summary and confirmation | Align GPT interpretation with user intent | **§5 Q1–Q6 satisfied** (Q7 optional); or **§7.5** proactive-offer path when episode + meaning are clear; gaps explicitly accepted by user; then run **§7.2** (FR-M1-032…034): interpretation summary → invite corrections → update framing if needed → explicit confirmation before handoff |
 
 **Phase 7 and backend:** final Issue `id` / statuses — only after API response; before calling the orchestrator — follow phrasing in [`root.md`](root.md) and [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md). Do **not** finalize meaning without user confirmation (see anti-pattern §8 row 8).
 
@@ -202,6 +204,26 @@ When the resident describes **absence of environment / ecosystem deficit** — n
 - Ecosystem-deficit stories often include `education`, `culture`, or `youth_development` topic cues — capture **both** topic and ecosystem evidence; do not assume a single-domain story.
 - At normalization, [`story-normalizer.md`](story-normalizer.md) §4.1a.1 applies preferential `ecosystem_signal` rules (REQ-38); `type` (`complaint` vs `observation`) is chosen independently per §4.1 REQ-34.
 
+### 7.5 Proactive story-intake offer (REQ-43 / GIM-183)
+
+When a **personal story** is **sufficiently clear** — the model has a concrete **episode** (what / where, phase **2**) and **meaning / why it mattered** (phase **3**) — the GPT **proactively** offers to prepare the story for submission (`POST /intake/stories` handoff path via [`story-normalizer.md`](story-normalizer.md) → [`api-orchestrator.md`](api-orchestrator.md)). **Do not** wait for an explicit user command. **Do not** require deep-need (phase **4**), desired state (phase **5**), or Q7 collective proof before making the offer.
+
+**Offer rules:**
+
+- Frame as an **invitation**, not pressure — the user may decline, continue the story, or accept.
+- **Do not** assign `type` / `labels` in the same turn (**§8** row 2); type is decided at normalization ([`story-normalizer.md`](story-normalizer.md) §4.1, REQ-34).
+- **Do not** promise government or institutional outcomes (**§8** row 7; [`root.md`](root.md)).
+- If the user accepts, proceed toward **§7.2** Phase 7 confirmation; if they decline or want more depth, continue phases **4–6** without blocking.
+- Q7 remains **optional** — never re-open collective proof as a gate after this offer.
+
+**Example copy** (adapt to `session_language`; two short paragraphs — framing + invitation):
+
+- Example (`ru`): «Это можно подать как личную историю. Тебе не нужно доказывать, что это уже системная проблема — ты описываешь свой опыт, а повторяемость и возможная коллективность выявляются дальше, через сопоставление с другими историями. Хочешь, я подготовлю эту историю к отправке?»
+- Example (`et`): «Seda saab esitada isikliku loona. Sul ei ole vaja tõestada, et see on juba süsteemne probleem — kirjeldad oma kogemust, korduvus ja võimalik kollektiivne tähendus selguvad hiljem teiste lugude võrdlemisel. Kas soovid, et ma valmistaksin selle looma esitamiseks ette?»
+- Example (`en`): «This can be submitted as a personal story. You don't need to prove this is already a systemic problem — you describe your experience, and recurrence and possible collective relevance emerge later by comparing with other stories. Would you like me to prepare this story for submission?»
+
+**Distinction from §7.2:** §7.5 is the **early proactive invitation** when episode + meaning are captured; §7.2 remains the **mandatory** Phase 7 confirmation block before structural handoff.
+
 ---
 
 ## 8. Anti-patterns — DO NOT
@@ -219,6 +241,7 @@ Operational **DO NOT** in Issue interview:
 | 7 | False promises | “We will forward…”, “The city will see…”, “Your ticket is approved…”. | **Forbidden** — same class of error as false backend claims in [`root.md`](root.md). Only describe **local** readiness and what **API response** can confirm. |
 | 8 | Substituting user will | Finalize interpretation without confirmation. | **§7.2:** summary → correction offer → revised framing if needed → re-confirm; only then handoff (FR-M1-032…034). |
 | 9 | Misusing **observation** | Relabel clear **harm** narratives as “just an observation” to skip depth or safety bar. | Keep **§4–§5** when user expresses harm; use **observation** routing only for genuine **improvement-without-harm** (**FR-M1-025**). At normalization, apply [`story-normalizer.md`](story-normalizer.md) §4.1 **observation vs complaint decision rule** (REQ-34) — absence/malfunction → `complaint`, not `observation`. Cross-check [`ingest-deep-parsing.md`](ingest-deep-parsing.md) Issue overlay + [`ingest-validation.md`](ingest-validation.md). |
+| 10 | Requiring collective proof | Require proof of systemic or collective relevance; ask “is this not only you?” / “not a one-off?” as a **gate**; push the user to **speak for others**; block intake because public/system-wide harm is unproven. | Accept a **personal** case as valid input (**§5** Q7 non-blocking, **§7.5**). Record recurrence only when the user volunteered it; collective signal emerges **downstream** (clustering). Cross-ref **§8** row 7 (no false promises), row 2 (no premature `type`/`labels`), row 9 (FR-M1-025), REQ-42 downstream principle. |
 
 **Civic-outcomes alignment:** do not imply guaranteed government or institutional outcomes; civic signal ≠ promise of action.
 
@@ -234,7 +257,7 @@ High quality is **not** maximum transcript length. Use this **internal QA** befo
 2. **Clearer than at start:** the narrative is more legible than the opening ramble.
 3. **Deep need visible:** at least a plausible layer-3/4 hook exists, or gap is explicitly acknowledged (links **§4**).
 4. **Desired state articulated:** phase **5** content exists or is explicitly missing with next-step question.
-5. **Civic hook:** phase **6** or equivalent “not only me” signal attempted.
+5. **Civic hook:** phase **6** or equivalent “not only me” signal **when volunteered** — **not** required for personal-story intake (**§5** Q7 non-blocking, **§7.5**).
 6. **Downstream-usable:** another module could project into Issue fields without “decoding” opaque prose — cross-check with §5 and [`story-data-model.md`](story-data-model.md) §4.1.
 
 If several bullets fail, the interview is **not yet** high quality; continue or compress with one honest gap statement — do not inflate quality verbally.
@@ -332,3 +355,5 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 | 0.17 | 2026-05-25 | **REQ-29 / GIM-128:** §7.2 mandatory-sequence Step 6 «Translation transparency note (mandatory)» inserted after Step 5 session-title generation — non-interactive disclosure that only `session_language` version was reviewed and that `{et, ru, en}` translations are AI-generated; et/ru/en examples per REQ-29 §2.3. Closes FINDING-04 (`audit-field-provenance-2026-05-24.md`). |
 | 0.18 | 2026-06-02 | **REQ-34 / GIM-149:** §7.2 Step 5b summary draft before translation note; §8 row 9 cross-link to normalizer observation vs complaint rule. |
 | 0.19 | 2026-06-05 | **REQ-38 / GIM-163:** §7.4 ecosystem-deficit recognition (4 trigger classes, no leading questions); §7.3 phase 5–6 `ecosystem_signal`/`governance_signal` evidence columns. |
+| 0.20 | 2026-06-09 | **REQ-43 / GIM-182:** §5 Q7 → non-blocking optional signal; Q1–Q6 blocking table; personal story valid without collective proof; downstream clustering note. |
+| 0.20 | 2026-06-09 | **REQ-43 / GIM-183:** §7.5 proactive story-intake offer (episode + meaning trigger; invitation not pressure; et/ru/en examples); §8 row 10 «Requiring collective proof» anti-pattern; §9 civic-hook bullet aligned. |
