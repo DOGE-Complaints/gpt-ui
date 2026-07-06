@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.3.8 |
-| **Date** | 2026-06-09 |
-| **Traceability** | GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 adaptive post-submit message); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.3.9 |
+| **Date** | 2026-07-06 |
+| **Traceability** | GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy + service doc-only legacy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -26,7 +26,9 @@ Story intake orchestrator operations are locked one-to-one to the Actions contra
 
 | operationId | Method | Path | Source |
 |-------------|--------|------|--------|
-| `postStoryIntake` | `POST` | `/intake/stories` | Actions imported contract + `story-api-methods-reference.md` |
+| `postStoryDraftStash` | `POST` | `/story-drafts` | Actions imported contract + `story-api-methods-reference.md` |
+
+`POST /intake/stories` (`postStoryIntake`) is **not** in the GPT Actions artifact — service seed/sim only (direct HTTP scripts; GW-DRAFT-04). User citizen stories use stash + browser redirect (§5.2).
 
 For each operation above, required request fields and expected response envelope must match the same definitions in the imported Actions contract and SSOT markdown before execution updates are merged.
 
@@ -62,7 +64,8 @@ This instruction is activated after:
 - Upstream modules have completed successfully (Normalizer, Search Dialogue).
 
 It executes (per story-first SSOT — [`story-api-methods-reference.md`](story-api-methods-reference.md)):
-- story intake submit (`/intake/stories` as in OpenAPI snapshot)
+- story intake **stash** (`POST /story-drafts` via `postStoryDraftStash` — user citizen path)
+- `POST /intake/stories` — **service-only** seed/sim channel (not GPT Actions user path; GW-DRAFT-04)
 - Search / reference only if wired in product SSOT (do not assume legacy donor routes)
 
 **Legacy:** Donor lifecycle tables and legacy normalizer handoff were **removed** from this instruction (**2026-04-20**). Recover from **git history** if needed.
@@ -170,7 +173,7 @@ Optional keys (`summary`, `institution`, `non_wire_metadata`, `live_story_contex
 
 ### 4.1a Deterministic transform to `StoryIntakeRequest`
 
-For `postStoryIntake`, build the Actions request body from normalized artifact fields per §5.2.1 and runtime schema.
+For `postStoryDraftStash`, build the Actions request body from normalized artifact fields per §5.2.1 and runtime schema.
 
 Do **not** copy instruction-only metadata (`normalization_metadata`, `label_extraction_metadata`, `non_wire_metadata`) into `StoryIntakeRequest` unless runtime schema is explicitly changed in lockstep.
 
@@ -230,23 +233,59 @@ Do **not** copy instruction-only metadata (`normalization_metadata`, `label_extr
 
 | Operation | HTTP Method | Endpoint | Auth | Input Source |
 |-----------|-------------|----------|------|--------------|
-| Submit Story | POST | `/intake/stories` | Bearer per imported Actions contract | Normalized artifact → transform per §5.2.1 |
+| Stash Story Draft (user path) | POST | `/story-drafts` | Bearer per imported Actions contract | Normalized artifact → transform per §5.2.1 (omit `submitter` on stash) |
+| Submit Story (service-only) | POST | `/intake/stories` | Service Bearer (not GPT Actions) | Seed/sim scripts only — not user citizen interviews |
 
 Search, submit, publish, and reference routes — add rows **only** when locked in the same imported Actions contract + SSOT (see `story-api-methods-reference.md` §1).
 
 **Legacy:** Donor route matrices were removed from the hot path (**2026-04-20**). Old text may remain in **git history** alongside removed legacy references.
 
-### 5.2 Story Intake — M2 demo primary path (D-07)
+### 5.2 Story Intake — browser-submit handoff (GPT-SUBMIT-01 / GIM-186…193)
 
-For demo M2, the **primary submission path** is Story Intake (`POST /intake/stories`). Field mapping and decisions **D-03…D-11** are implemented by this module together with [`story-interview-flow.md`](story-interview-flow.md) / [`story-normalizer.md`](story-normalizer.md); do not invent gateway behavior outside the SSOT tables here.
+For **user citizen interviews**, the **only** submission path is: validate/preview the draft `StoryIntakeRequest` (§5.2.0a → §5.2.0 → §5.2.0b → §5.2.2) → **stash** via `postStoryDraftStash` (`POST /story-drafts`, same service Bearer `GPT_ACTIONS_BEARER_SECRET`) → read `{draft_id}` → **redirect** the user to the SPA (§5.2.B). The **browser** completes submit under Supabase session (`POST /story-drafts/{draft_id}/submit` — GW-DRAFT-02); GPT does **not** wait for HTTP 202 or claim the story was created.
+
+Field mapping and decisions **D-03…D-11** are implemented together with [`story-interview-flow.md`](story-interview-flow.md) / [`story-normalizer.md`](story-normalizer.md); do not invent gateway behavior outside the SSOT tables here.
 
 | Operation | HTTP Method | Endpoint | Auth | Source |
 |-----------|-------------|----------|------|--------|
-| Submit Story | POST | `/intake/stories` | Bearer (same `GPT_ACTIONS_BEARER_SECRET`) | `normalized_issue_payload` → transform per §5.2.1 |
+| Stash Story Draft | POST | `/story-drafts` | Bearer (`GPT_ACTIONS_BEARER_SECRET`) | `normalized_issue_payload` → transform per §5.2.1 |
+| Submit Story (service-only) | POST | `/intake/stories` | Service Bearer (direct HTTP, not Actions) | Seed/simulation trusted channel only (GW-DRAFT-04) |
 
-**When to use:** after [`story-normalizer.md`](story-normalizer.md) has produced `normalized_issue_payload` AND `policy_gate_result.status = "approved"` AND Story Intake path is active (demo M2).
+**When to use (user path):** after [`story-normalizer.md`](story-normalizer.md) has produced `normalized_issue_payload` AND `policy_gate_result.status = "approved"` AND the user confirmed submission in §5.2.0b → run §5.2.2 → call `postStoryDraftStash` → §5.2.3 → §5.2.4 redirect copy → §5.2.B redirect URL.
 
-**When NOT to use:** do not call any deprecated Issue draft endpoint for story-intake ingest. Use `/intake/stories` as single runtime handoff path.
+**When NOT to use:** do not call `POST /intake/stories` for user citizen stories from GPT Actions. Do not call deprecated Issue draft endpoints.
+
+**§5.2.x guards stash-payload (D-SUBMIT-1):** §5.2.0a admission gate, §5.2.0 PII, §5.2.0b dual-mode preview, and §5.2.2 pre-flight all run on the **same** draft body that will be stashed — not on a separate post-intake path.
+
+#### 5.2.B Browser redirect URL (GIM-186)
+
+After successful stash (`draft_id` in response `data`), redirect the user to the SPA submit screen.
+
+**Canonical URL template (repository — placeholder):**
+
+```
+{SPA_BASE}/#/story/submit?draft_id=<draft_id>
+```
+
+**Default operator value (set in ChatGPT, not in this file):**
+
+| Setting | Value |
+|---------|--------|
+| `SPA_BASE` (pilot default) | `https://dogestonia-tallinn.ee` |
+| **Where to set** | ChatGPT → **Configure** → **Instructions** (top text field). Paste operator block from [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) **§4.1**. Do **not** edit `{SPA_BASE}` in this repo file for deploy — only the Instructions field in the GPT editor. |
+| Resolved example (with default) | `https://dogestonia-tallinn.ee/#/story/submit?draft_id=<draft_id>` |
+
+| Part | Rule |
+|------|------|
+| `SPA_BASE` | Public HTTPS **origin** of the deployed SPA (scheme + host, no path, no trailing `/`). Pilot default: `https://dogestonia-tallinn.ee`. Operator replaces after deploy. **Not** in SPA repo env — only ChatGPT Instructions. Full steps: [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) §4.1. Cross-ref emergent **E4** (`VITE_STORY_GPT_URL` = link **to** GPT from SPA, not SPA origin). |
+| Hash route | SPA HashRouter canonical path **`/story/submit`** — [`storyHandoffFlowState.js`](../../spa-app/src/auth/storyHandoffFlowState.js) `STORY_SUBMIT_PATH` (SPA-ID-12). |
+| Query | `draft_id` = verbatim value from stash response `data.draft_id`. |
+
+**MUST NOT** use `/story/compose` as the permanent redirect contract (cutover redirect only on SPA side).
+
+Present the link in citizen language (adapt `cognitive_style` per §5.2.4). GPT's role ends after redirect — no polling for submit outcome.
+
+Cross-ref: [SPA-ID-12](../../spa-app/docs/tasks/backlog-stories/identity-auth/STORY-SPA-ID-12-story-draft-handoff-submit.md) · [GW-DRAFT-01](../../doge-complaints-gateway/docs/tasks/backlog-stories/story-draft-handoff/STORY-GW-DRAFT-01-story-draft-stash.md) · [mvp-integration-plan §2](../../docs/analysis/mvp-integration-plan-2026-07-02.md).
 
 #### 5.2.1 Transform: `normalized_issue_payload` → `StoryIntakeRequest`
 
@@ -257,10 +296,6 @@ Build the `StoryIntakeRequest` body **only** from `normalized_issue_payload` fie
 ```json
 {
   "schema_version": "m2.story_intake_envelope.v2",
-  "submitter": {
-    "external_user_id": "<wallet address from session context — demo mock>",
-    "identity_issuer": "dogestonia.gpt.v1"
-  },
   "narrative": {
     "original_text": "<canonical_payload.description[session_language]>",
     "language": "<normalization_metadata.detected_input_language>",
@@ -312,8 +347,9 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `StoryIntakeRequest` field | Source in `normalized_issue_payload` | Required | Decision |
 |---|---|---|---|
 | `schema_version` | Hard-coded: `"m2.story_intake_envelope.v2"` | Yes | Story Intake envelope contract (`contracts.py`) |
-| `submitter.external_user_id` | Wallet from session context (demo mock) | Yes | D-06 |
-| `submitter.identity_issuer` | Hard-coded: `"dogestonia.gpt.v1"` | Yes | REQ-22 GAP-W-02 |
+| `submitter` | — | **Omit on user stash path** | **GIM-191 / N2:** omit entire `submitter` block from `postStoryDraftStash` body; authoritative author = `sub` from identity `/me` on browser `POST /story-drafts/{id}/submit` (GW-DRAFT-02, mvp §2). Service seed/sim direct `POST /intake/stories` scripts may include `submitter` per legacy intake contract. |
+| `submitter.external_user_id` | Wallet from session context (demo mock) | Service-only | D-06 — **not** sent on user stash path |
+| `submitter.identity_issuer` | Hard-coded: `"dogestonia.gpt.v1"` | Service-only | REQ-22 GAP-W-02 — **not** sent on user stash path |
 | `narrative.language` | `normalization_metadata.detected_input_language` | Yes | REQ-22 GAP-W-05; language of user narrative input |
 | `narrative.session_language` | `normalization_metadata.session_language` | Yes | REQ-22 GAP-W-03 |
 | `narrative.title` | `canonical_payload.title` (`{et, ru, en}`) | Yes | REQ-22 GAP-W-04; direct object mapping |
@@ -344,9 +380,9 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 
 #### 5.2.0a Admission gate — strict-chain package (REQ-30)
 
-Run **after** building the draft `StoryIntakeRequest` mapping and **before** §5.2.0 PII pre-send, §5.2.2 field-level pre-flight, and **before every** `postStoryIntake` HTTP call. This gate is **additive** to §5.2.2 checks 1–12 (GIM-28); do not skip it when §5.2.2 metadata refs look present.
+Run **after** building the draft `StoryIntakeRequest` mapping and **before** §5.2.0 PII pre-send, §5.2.2 field-level pre-flight, and **before every** `postStoryDraftStash` HTTP call. This gate is **additive** to §5.2.2 checks 1–17 (GIM-28 + GIM-189); do not skip it when §5.2.2 metadata refs look present.
 
-GPT **MUST NOT** call `postStoryIntake` unless the current conversation contains a complete strict-chain handoff package. Ref strings inside `normalization_metadata` alone are **not** sufficient — verify the **upstream artifact objects** existed in this dialogue turn sequence.
+GPT **MUST NOT** call `postStoryDraftStash` unless the current conversation contains a complete strict-chain handoff package. Ref strings inside `normalization_metadata` alone are **not** sufficient — verify the **upstream artifact objects** existed in this dialogue turn sequence.
 
 **Required upstream artifacts (all must pass):**
 
@@ -378,7 +414,7 @@ Use this exact sentence when any item 1–5 fails. Then explain which artifact o
 
 **Test / sandbox rule (REQ-30 §2.2):**
 
-Test or junk submissions **MUST NOT** use production Story Intake by default. Production `POST /intake/stories` is allowed only for a **real** civic issue that passed the full strict chain **or** when one of these is explicitly true:
+Test or junk submissions **MUST NOT** use production stash by default. Production `postStoryDraftStash` is allowed only for a **real** civic issue that passed the full strict chain **or** when one of these is explicitly true:
 
 - `environment == sandbox` (dedicated sandbox/test endpoint configured in Actions), **or**
 - `payload.test_mode == true` **and** backend stores test rows separately (not yet in wire contract — do not invent the flag), **or**
@@ -415,7 +451,7 @@ If `contains_pii` is `false` or absent: **omit** the entire `privacy` block; pro
 
 #### 5.2.0b Dual-mode pre-submit preview — Citizen Mode / God Mode (REQ-31)
 
-Run **after** §5.2.0a admission gate passes and §5.2.0 PII flow (when applicable), and **before** §5.2.2 field-level pre-flight and **before every** `postStoryIntake` HTTP call. This block controls **how** the draft submission is shown to the user; it does not replace admission gate, PII flow, or §5.2.2 checks.
+Run **after** §5.2.0a admission gate passes and §5.2.0 PII flow (when applicable), and **before** §5.2.2 field-level pre-flight and **before every** `postStoryDraftStash` HTTP call. This block controls **how** the draft submission is shown to the user; it does not replace admission gate, PII flow, or §5.2.2 checks.
 
 **Session state:** maintain `debug_mode` for the **current conversation only** (not cross-session, not global).
 
@@ -432,7 +468,7 @@ Run **after** §5.2.0a admission gate passes and §5.2.0 PII flow (when applicab
 
 ##### Citizen Mode (`debug_mode = false`)
 
-Use **human language only** in pre-submit messages. **MUST NOT** use these words or identifiers in citizen-facing preview or confirmation copy: `schema`, `payload`, `operationId`, `JSON`, `API`, `envelope`, `gpt_signals`, `canonical_payload`, `normalization_metadata`, or the internal operation name `postStoryIntake`.
+Use **human language only** in pre-submit messages. **MUST NOT** use these words or identifiers in citizen-facing preview or confirmation copy: `schema`, `payload`, `operationId`, `JSON`, `API`, `envelope`, `gpt_signals`, `canonical_payload`, `normalization_metadata`, or the internal operation names `postStoryDraftStash` / `postStoryIntake`.
 
 **Submission preview (required before HTTP):** show a template like:
 
@@ -454,7 +490,7 @@ DOGEstonia
 Would you like to submit?
 ```
 
-**Confirmation copy:** prefer **«Submit Story»** (or equivalent in `session_language`). **MUST NOT** label the user-facing step as `postStoryIntake` or expose HTTP path/method names.
+**Confirmation copy:** prefer **«Continue on website»** / **«Submit on DOGEstonia website»** (or equivalent in `session_language`) — user will finish submit in the browser. **MUST NOT** label the user-facing step as `postStoryDraftStash` or expose HTTP path/method names. **MUST NOT** promise «story created» before browser submit.
 
 **Transport fields vs display fields (REQ-32):** Citizen Mode controls what is *shown* to the user, not what is *sent* in the API request. **`origin`**, `schema_version`, `identity_issuer`, `gpt_signals` — always included in the `StoryIntakeRequest` body with `origin.source = "openai_gpt_action"`; never described to the citizen in conversational preview unless God Mode is active.
 
@@ -498,7 +534,7 @@ God Mode does **not** bypass §5.2.0a, §5.2.0, or §5.2.2. After operator revie
 
 #### 5.2.2 Story Intake pre-flight checks (before HTTP)
 
-Run before every `POST /intake/stories` call:
+Run before every `postStoryDraftStash` (`POST /story-drafts`) call:
 
 1. `normalization_metadata.session_language` ∈ `{et, ru, en}`.  
    If **not** — **STOP**. Do not call HTTP. Tell the user:  
@@ -546,24 +582,62 @@ Run before every `POST /intake/stories` call:
 
 16. **Runtime capability trace (REQ-40):** When `origin.conversation_id` is omitted because the Actions runtime did **not** expose a session/conversation id → append to `trace_notes`: `"runtime did not expose conversation_id (REQ-35 omit-key rule)"` — distinguish runtime unavailability from silent instruction failure.
 
-If all checks pass → proceed to HTTP call.
+17. **Stash `session_language` required (D-SUBMIT-4 / GIM-189):** `narrative.session_language` **must** be present and ∈ `{en, et, ru}` before stash. All i18n narrative fields (`title`, `description`, `summary` when present) must be populated for wire v2. If missing or invalid → **STOP**. Do not call HTTP. SPA preview reads `narrative_session_language` — default `en` when absent breaks et/ru UX ([`storyDraftPreview.js`](../../spa-app/src/services/storyDraftPreview.js)). Cross-ref emergent **E3** (gateway stash validation belt-and-suspenders).
 
-#### 5.2.3 Story Intake response handling
+If all checks pass → proceed to `postStoryDraftStash` HTTP call.
 
-- **HTTP 202:** story accepted. Read `story_id` and `status` from response `data` envelope. Do not retry on 202. **User-facing confirmation** — apply §5.2.4 (adaptive post-submit); technical semantics below remain authoritative for status meaning.
-  - `status = "ready_for_profile"`: story will enter clustering and may become a public issue.
-  - `status = "partial_ready"`: story is saved but **not** clustered — narrative is incomplete (empty `title`, `description`, or a language slot). Tell the user the story is saved but needs completion before publication.
-  - If the request included `gpt_signals`: a failure to persist signals on the server does **not** change HTTP 202. The story is still accepted; `gpt_signals` may be missing from `story_signals` when the DB write fails — the server logs this and does not fail intake.
-- **HTTP 400:** likely missing/invalid v2 fields (`schema_version`, `identity_issuer`, `session_language`, `title`, `description`, `language`) or other `DOMAIN_ERROR` / domain validation from the gateway. Check pre-flight again; do not retry without fixing the input. Schema and field validation map to **400** (`error.code` typically `DOMAIN_ERROR`), not 422.
+#### 5.2.3 Story draft stash response handling (GIM-187 / GIM-188)
+
+Applies to **`postStoryDraftStash`** (`POST /story-drafts`) — user citizen path.
+
+- **HTTP 201:** draft stashed. Read `draft_id` from response `data` envelope (`{ "data": { "draft_id": "<opaque>" }, "trace_id": "..." }` per [API_REFERENCE §6.8](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md)). Do not retry on 201. **No story is created** — only an ephemeral draft for browser handoff. **User-facing next step** — apply §5.2.4 redirect copy, then §5.2.B redirect URL.
+- **HTTP 400:** likely missing/invalid v2 fields (`schema_version`, `session_language`, `title`, `description`, `language`) or other `DOMAIN_ERROR` / domain validation from the gateway. Check pre-flight again; do not retry without fixing the input. Schema and field validation map to **400** (`error.code` typically `DOMAIN_ERROR`), not 422.
 - **HTTP 401/403:** bearer issue; surface `error.code` / `error.message` from the envelope to the user without inventing auth state.
 - **HTTP 422 (`GEO_SCOPE_MISMATCH`):** `location_query` resolved outside the server geo scope (for demo: Estonia / Tallinn). Ask the user to clarify location within the supported region. Do not treat this as a schema error — schema/field problems are **400** (`DOMAIN_ERROR`).
 - **HTTP 5xx:** gateway error; report uncertainty to user; do not retry automatically.
 
-On any error response, read `error` as an object `{code, type, message, details}` and top-level `trace_id` (see §6.1). Do not expect `success`, `timestamp`, or `request_id` fields. **Do not** apply §5.2.4 on non-202 responses — error copy stays in this §5.2.3 block only.
+On any error response, read `error` as an object `{code, type, message, details}` and top-level `trace_id` (see §6.1). Do not expect `success`, `timestamp`, or `request_id` fields. **Do not** apply §5.2.4 redirect copy on non-201 responses — error copy stays in this §5.2.3 block only.
 
-#### 5.2.4 Adaptive post-submit message (GPT-UI REQ-42 / GIM-179)
+**Service-only legacy (`POST /intake/stories` — not GPT Actions):** direct HTTP scripts may still receive **HTTP 202** with `story_id` / `status`. That path is **not** the user interview flow. For 202 semantics on service intake, see historical §5.2.3 notes in git history (REQ-42 §5.2.4 doc-only below applies).
 
-**Activation:** **Only** after successful **HTTP 202** from `POST /intake/stories`. **MUST NOT** run on 400/401/422/5xx (those remain §5.2.3 above).
+#### 5.2.4 Redirect handoff message (user path) + service doc-only legacy (GIM-188 / GIM-191 / REQ-42)
+
+##### 5.2.4.A User path — redirect copy (replaces HTTP-202 post-submit for interviews)
+
+**Activation:** **Only** after successful **HTTP 201** from `postStoryDraftStash`. **MUST NOT** run on 400/401/422/5xx (those remain §5.2.3 above).
+
+**Purpose (D-SUBMIT-2 / D-SUBMIT-5):** Tell the user what happened (draft saved for browser finish), what did **not** happen (story **not** created yet), and what to do next (open SPA link). HTTP **202** and final story status arrive only in the **browser** after identity `/me` + phone gate (GW-DRAFT-02).
+
+**Inputs:** `draft_id` from stash response (verbatim); `comm_context` (`ui_lang`, `tone_preset`, `verbosity_level`, `cognitive_style` from [`bootstrap.md`](bootstrap.md) Step 4.5).
+
+**Mandatory structure (all modes):**
+
+1. **What happened** — draft saved securely for you to review and submit on the website (not a published story).
+2. **What did NOT happen** — the civic record is **not** created yet; GPT does not know approval/clustering outcome.
+3. **What next** — open the redirect link (§5.2.B); complete login/phone verification and submit in the browser.
+4. **No false claims** — per [`root.md`](root.md): do not say «story created», «accepted», «approved», «published», or «submitted to DOGEstonia» until the **browser** receives HTTP 202 (GPT never sees that response on the user path).
+
+**Style adaptation (`cognitive_style` + `tone_preset`):**
+
+| Mode | Rule |
+|------|------|
+| Citizen (`debug_mode = false`) | Adapt tone/structure per `cognitive_style` and `tone_preset`. **MUST** obey §5.2.0b forbidden-lexicon (L435). |
+| `cognitive_style = systemic` | Direct framing: draft stashed → finish on website → story exists only after browser submit. |
+| `cognitive_style = narrative` / warm `tone_preset` | Supportive wording; same facts; invite user to continue on the site. |
+| `mixed` | Neutral-clear structure with all four sections. |
+| God Mode (`debug_mode = true`) | May show `draft_id` and redirect URL explicitly. |
+
+**Optional (N3 — not required):** one-line note that the link/draft may expire (TTL — emergent **E5**).
+
+**Regression:** §5.2.3 error bullets and §5.2.0b Citizen forbidden-lexicon (L435) are **unchanged**.
+
+##### 5.2.4.B Service seed/sim path — doc-only (N1)
+
+`postStoryIntake` is **removed** from GPT Actions (D-SUBMIT-3). Service seed/sim intake via direct `POST /intake/stories` HTTP scripts (not ChatGPT Actions) may still return HTTP 202. The **REQ-42 adaptive post-submit** templates below remain **documentation-only** for operators maintaining those scripts — **no live GPT-Actions trigger** on the user interview path.
+
+**Legacy REQ-42 templates (service / doc-only — do not use after user stash 201):**
+
+**Activation (service scripts only):** after successful **HTTP 202** from `POST /intake/stories`.
 
 **Inputs:** `story_id` and `status` from response `data` envelope (verbatim — no re-labeling); `comm_context` (`ui_lang`, `tone_preset`, `verbosity_level`, `cognitive_style` from [`bootstrap.md`](bootstrap.md) Step 4.5).
 
@@ -580,7 +654,7 @@ On any error response, read `error` as an object `{code, type, message, details}
 | `status` | Meaning for user copy |
 |----------|----------------------|
 | `ready_for_profile` | Saved; may enter clustering; **may later** become a public Issue if patterns emerge — not now. |
-| `partial_ready` | Saved but narrative incomplete (per §5.2.3); needs more detail before it can progress — gently, without blame. |
+| `partial_ready` | Saved but narrative incomplete (per §5.2.3 service note); needs more detail before it can progress — gently, without blame. |
 
 **Style adaptation (`cognitive_style` + `tone_preset`):**
 
@@ -602,8 +676,6 @@ On any error response, read `error` as an object `{code, type, message, details}
 *`cognitive_style = narrative` · `partial_ready`:*
 > Thank you — your story is saved (`story_id: <id>`).
 > Status: `partial_ready`. It is recorded but still incomplete: more detail is needed before it can move forward. That is normal — you can add to it later.
-
-**Regression:** §5.2.3 error bullets (400/401/422/5xx) and §5.2.0b Citizen forbidden-lexicon (L435) are **unchanged** by this section.
 
 ---
 
@@ -633,7 +705,17 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
    - `error` is always an object `{code, type, message, details}`; parse `error.message` for user-facing text.
    - `trace_id` is always at the top level (not `request_id` or `timestamp`).
    - Story intake validation failures (`IntakeValidationError`) map to `code = "DOMAIN_ERROR"`, `type = "domain"` (not `VALIDATION_ERROR`). Full code table: API_REFERENCE §4.1.
-3. **Success Response** — Story intake (`SuccessEnvelope_StoryIntake`; API_REFERENCE §6.6):
+3. **Success Response** — Story draft stash (`postStoryDraftStash`; API_REFERENCE §6.8):
+   ```json
+   {
+     "data": {
+       "draft_id": "opaque-urlsafe-token"
+     },
+     "trace_id": "abc123"
+   }
+   ```
+   - HTTP **201** — no `story_id` or `status`; draft only. User path continues at §5.2.4.A + §5.2.B.
+4. **Success Response** — Story intake service channel (`POST /intake/stories` — not GPT Actions):
    ```json
    {
      "data": {
@@ -644,8 +726,8 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
      "trace_id": "abc123"
    }
    ```
-   - `status` is `"ready_for_profile"` or `"partial_ready"` only (server never returns `"received"`). Lifecycle semantics: §5.2.3.
-4. **Search Query / Response** — When implemented, per product OpenAPI only.
+   - `status` is `"ready_for_profile"` or `"partial_ready"` only (server never returns `"received"`). Service seed/sim only.
+5. **Search Query / Response** — When implemented, per product OpenAPI only.
 
 **For complete Issue schemas, see:** [`story-api-methods-reference.md`](story-api-methods-reference.md) and the imported Actions contract snapshot. Historical donor `api-methods-reference.md` was removed from runtime surface and is not SSOT.
 
@@ -678,7 +760,10 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 ### 7.5 Operator checklist
 
 - [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30).
-- [ ] §5.2.0b dual-mode preview shown: Citizen Mode default or God Mode with banner; «Submit Story» citizen copy (REQ-31).
+- [ ] §5.2.0b dual-mode preview shown: Citizen Mode default or God Mode with banner; browser-handoff citizen copy (REQ-31 + GPT-SUBMIT-01).
+- [ ] `postStoryDraftStash` used for user stories (not `POST /intake/stories` from Actions).
+- [ ] Redirect URL uses `/#/story/submit?draft_id=` (§5.2.B).
+- [ ] `submitter` omitted from stash body (GIM-191).
 - [ ] `trace_notes` includes artifact IDs/refs that justified the API call (REQ-30 §3).
 - [ ] `normalized_issue_payload` present for strict Issue writes.
 - [ ] No Actions-contract/SSOT edit without paired bump.
@@ -691,6 +776,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.3.9 | 2026-07-06 | **GPT-SUBMIT-01 / GIM-186…193:** browser-submit handoff — user path `postStoryDraftStash` (`POST /story-drafts`) + §5.2.B redirect; §5.2.3 `{draft_id}`/201; §5.2.4.A redirect copy; §5.2.4.B service doc-only legacy; omit `submitter` on stash; §5.2.2 item 17 `session_language`; `/intake/stories` service-only (not Actions). |
 | 0.3.8 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §5.2.1 `narrative.institution` row; §5.2.2 items 7–8 (demo-gate lift + post-demo i18n). Semantics unchanged. |
 | 0.3.7 | 2026-06-08 | **REQ-42 / GIM-179:** §5.2.4 adaptive post-submit (HTTP 202 only); structure what happened / not / next + `root.md` no-false-claims; both `ready_for_profile` + `partial_ready`; `cognitive_style` + Citizen/God rules; §5.2.3 error paths unchanged. |
 | 0.3.6 | 2026-06-07 | **REQ-41 / GIM-176:** §5.2.0b God Mode — trigger activation table (5 triggers + Reason enum); God-Mode-only, non-wire; single-evaluation rule reuses §5.2.2 items 13–15 / `trigger_activation_metadata`. Citizen forbidden-lexicon unchanged. |

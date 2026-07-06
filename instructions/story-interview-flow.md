@@ -5,8 +5,8 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.20 |
-| **Date** | 2026-06-09 |
+| **Version** | 0.21 |
+| **Date** | 2026-07-06 |
 | **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **REQ-38**, **REQ-43**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
 
 **Related modules:** [`story-data-model.md`](story-data-model.md) · [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) · [`safety-compliance.md`](safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
@@ -206,7 +206,7 @@ When the resident describes **absence of environment / ecosystem deficit** — n
 
 ### 7.5 Proactive story-intake offer (REQ-43 / GIM-183)
 
-When a **personal story** is **sufficiently clear** — the model has a concrete **episode** (what / where, phase **2**) and **meaning / why it mattered** (phase **3**) — the GPT **proactively** offers to prepare the story for submission (`POST /intake/stories` handoff path via [`story-normalizer.md`](story-normalizer.md) → [`api-orchestrator.md`](api-orchestrator.md)). **Do not** wait for an explicit user command. **Do not** require deep-need (phase **4**), desired state (phase **5**), or Q7 collective proof before making the offer.
+When a **personal story** is **sufficiently clear** — the model has a concrete **episode** (what / where, phase **2**) and **meaning / why it mattered** (phase **3**) — the GPT **proactively** offers to prepare the story for submission (**stash + browser redirect** handoff: `postStoryDraftStash` → `{SPA_BASE}/#/story/submit?draft_id=` via [`story-normalizer.md`](story-normalizer.md) → [`api-orchestrator.md`](api-orchestrator.md) §5.2). **Do not** wait for an explicit user command. **Do not** require deep-need (phase **4**), desired state (phase **5**), or Q7 collective proof before making the offer.
 
 **Offer rules:**
 
@@ -357,3 +357,4 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 | 0.19 | 2026-06-05 | **REQ-38 / GIM-163:** §7.4 ecosystem-deficit recognition (4 trigger classes, no leading questions); §7.3 phase 5–6 `ecosystem_signal`/`governance_signal` evidence columns. |
 | 0.20 | 2026-06-09 | **REQ-43 / GIM-182:** §5 Q7 → non-blocking optional signal; Q1–Q6 blocking table; personal story valid without collective proof; downstream clustering note. |
 | 0.20 | 2026-06-09 | **REQ-43 / GIM-183:** §7.5 proactive story-intake offer (episode + meaning trigger; invitation not pressure; et/ru/en examples); §8 row 10 «Requiring collective proof» anti-pattern; §9 civic-hook bullet aligned. |
+| 0.21 | 2026-07-06 | **GIM-194 / GPT-SUBMIT-01 propagation:** §7.5 handoff repointed from `POST /intake/stories` to stash + browser redirect (`postStoryDraftStash` §5.2). |

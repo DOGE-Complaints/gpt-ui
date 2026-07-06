@@ -10,13 +10,13 @@
 openapi: 3.1.0
 info:
   title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
-  version: "0.4.2"
+  version: "0.5.0"
   description: >
     Minimal subset for GPT Actions targeting story intake runtime (wire contract v2 + REQ-23 behavioral extensions).
-    REQ-31 (GIM-137): citizen-facing operation summary/description — human-readable labels; operationId unchanged (lockstep deferred).
+    GPT-SUBMIT-01 (GIM-190): user citizen path — POST /story-drafts (stash) only; postStoryIntake removed from Actions.
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
-    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.4.2); the runtime server
+    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.5.0); the runtime server
     tracks its own implementation version (currently 0.1.0 at GET /openapi.json). These are separate versioning
     axes and are NOT expected to be equal. Increment this version when operationId/method/path/required fields/
     response envelope/auth semantics change (see story-api-methods-reference.md §4 lockstep policy).
@@ -53,7 +53,9 @@ components:
 
     Submitter:
       type: object
-      required: [external_user_id, identity_issuer]
+      description: >
+        Omit entire block on user stash path (postStoryDraftStash) — author resolved at browser submit via identity /me (GW-DRAFT-02).
+        Include only for service seed/sim direct POST /intake/stories scripts (not GPT Actions).
       properties:
         external_user_id:
           type: string
@@ -156,7 +158,7 @@ components:
 
     StoryIntakeRequest:
       type: object
-      required: [schema_version, submitter, narrative]
+      required: [schema_version, narrative]
       properties:
         schema_version:
           type: string
@@ -166,6 +168,8 @@ components:
             citizen-facing discussion per api-orchestrator §5.2.0b (REQ-31).
         submitter:
           $ref: "#/components/schemas/Submitter"
+          description: >
+            Omit on user stash (GIM-191). Not required for postStoryDraftStash.
         narrative:
           $ref: "#/components/schemas/Narrative"
         origin:
@@ -184,6 +188,23 @@ components:
           $ref: "#/components/schemas/GptSignals"
           description: >
             Optional classification block (REQ-42). Use human labels in Citizen Mode; full block in God Mode.
+
+    StoryDraftStashResponseData:
+      type: object
+      required: [draft_id]
+      properties:
+        draft_id:
+          type: string
+          description: Opaque draft id for SPA redirect (API_REFERENCE §6.8).
+
+    SuccessEnvelope_StoryDraftStash:
+      type: object
+      required: [data, trace_id]
+      properties:
+        data:
+          $ref: "#/components/schemas/StoryDraftStashResponseData"
+        trace_id:
+          type: string
 
     StoryIntakeResponseData:
       type: object
@@ -247,15 +268,14 @@ components:
           type: string
 
 paths:
-  /intake/stories:
+  /story-drafts:
     post:
-      # X-Trace-Id and Idempotency-Key not defined — GPT Actions cannot set custom headers. Server auto-generates trace_id and uses SHA-256(body) as idempotency key.
-      operationId: postStoryIntake
-      summary: Send a citizen story to DOGEstonia for processing
+      operationId: postStoryDraftStash
+      summary: Stash a story draft for browser submit
       description: >
-        Submit the resident's story to DOGEstonia for intake and processing after interview
-        normalization and confirmation. Citizen-facing label; wire path POST /intake/stories
-        (operationId postStoryIntake retained for REQ-22 lockstep — re-import Actions after bump).
+        Stash the resident's validated StoryIntakeRequest after interview normalization and confirmation.
+        Returns draft_id for SPA redirect — no story is created. Same service Bearer as legacy intake.
+        User completes submit in browser (POST /story-drafts/{draft_id}/submit). Re-import Actions after bump.
       x-openai-isConsequential: true
       security:
         - GptActionsBearer: []
@@ -266,16 +286,14 @@ paths:
             schema:
               $ref: "#/components/schemas/StoryIntakeRequest"
       responses:
-        "202":
-          description: >
-            Story intake accepted. data.status is ready_for_profile (clustering) or
-            partial_ready (saved, not clustered until narrative complete).
+        "201":
+          description: Draft stashed; no story created.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SuccessEnvelope_StoryIntake"
+                $ref: "#/components/schemas/SuccessEnvelope_StoryDraftStash"
         "400":
-          description: Intake validation error
+          description: Stash validation error
           content:
             application/json:
               schema:

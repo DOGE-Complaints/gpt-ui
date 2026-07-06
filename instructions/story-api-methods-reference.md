@@ -1,12 +1,12 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.7 · 2026-06-09  
+**Version:** 1.8 · 2026-07-06  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
 This file is the **HTTP source of truth for story intake runtime** inside the instruction bundle. Import the deployed story intake OpenAPI into GPT Actions (or equivalent) and treat that imported contract as authoritative for `operationId`, paths, schemas, and security. Until the node publishes canonical OpenAPI, paths below are **candidates**; before production, reconcile with `GET /openapi.json` on the deployed API.
 
-**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.4.2** at current instruction alignment — REQ-31 metadata + REQ-23 on REQ-22 wire v2). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.5.0** at current instruction alignment — GPT-SUBMIT-01 stash handoff). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
 
 ---
 
@@ -14,7 +14,9 @@ This file is the **HTTP source of truth for story intake runtime** inside the in
 
 | operationId | Method | Path | Request contract | Success envelope | Purpose |
 |-------------|--------|------|------------------|------------------|---------|
-| `postStoryIntake` | POST | `/intake/stories` | `StoryIntakeRequest` | `SuccessEnvelope_StoryIntake` (`202`) | Send a citizen story to DOGEstonia for processing (REQ-31 citizen-facing label; operationId unchanged). |
+| `postStoryDraftStash` | POST | `/story-drafts` | `StoryIntakeRequest` (omit `submitter` on user path) | `SuccessEnvelope_StoryDraftStash` (`201`, `{draft_id}`) | Stash validated story for browser handoff (GPT-SUBMIT-01). |
+
+**Not in GPT Actions artifact:** `postStoryIntake` · `POST /intake/stories` — **service-only** seed/sim trusted channel (GW-DRAFT-04). Direct HTTP scripts only; not user citizen interviews from ChatGPT Actions.
 
 Additional operations (search/reference/update) — add only when runtime contract exists; mirror in this table and in imported Actions contract with one-to-one method/path lock.
 
@@ -25,8 +27,9 @@ Additional operations (search/reference/update) — add only when runtime contra
 | Field | Required | Source |
 |---|---:|---|
 | `schema_version` | yes | hard-coded `m2.story_intake_envelope.v2` |
-| `submitter.external_user_id` | yes | session/user context configured for runtime |
-| `submitter.identity_issuer` | yes | hard-coded `dogestonia.gpt.v1` (REQ-22 demo) |
+| `submitter` | **no (user stash)** | **Omit entire block** on `postStoryDraftStash` (GIM-191); browser submit resolves author via identity `/me`. Service `POST /intake/stories` scripts may include submitter. |
+| `submitter.external_user_id` | service-only | not on user stash path |
+| `submitter.identity_issuer` | service-only | not on user stash path |
 | `narrative.original_text` | yes | `canonical_payload.description[session_language]` |
 | `narrative.language` | yes | `normalization_metadata.detected_input_language` |
 | `narrative.session_language` | yes | `normalization_metadata.session_language` |
@@ -105,6 +108,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.8 | 2026-07-06 | **GPT-SUBMIT-01 / GIM-190:** `postStoryDraftStash` · `POST /story-drafts` · `201`/`{draft_id}`; remove `postStoryIntake` from Actions; omit `submitter` on stash; lock `info.version` **0.5.0**. |
 | 1.7 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §1 `narrative.institution` field lock. Semantics unchanged. |
 | 1.6 | 2026-05-31 | **REQ-31 / GIM-137:** citizen-facing purpose text for `postStoryIntake`; lock `info.version` **0.4.2** (summary/description human-readable; operationId unchanged — Actions re-import required). |
 | 1.5 | 2026-05-26 | **REQ-28 / GAP-YAML-08:** `narrative.institution` field lock updated with demo-gate note — always omit in demo scope (REQ-28 pre-flight #7); post-demo gate lifted by gateway REQ-43 (institution). |

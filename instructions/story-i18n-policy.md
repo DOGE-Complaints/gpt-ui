@@ -5,8 +5,8 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.4 |
-| **Date** | 2026-04-27 |
+| **Version** | 0.5 |
+| **Date** | 2026-07-06 |
 | **Traceability** | FR-M1-028…031 (session + trilingual fields); SPA field-shape alignment via [`story-data-model.md`](story-data-model.md) §4 |
 
 ---
@@ -60,9 +60,9 @@
 
 ---
 
-## 6.1 Story Intake wire v2 (REQ-22)
+## 6.1 Story Intake wire v2 (REQ-22) — stash payload
 
-For demo M2 **`POST /intake/stories`** (`m2.story_intake_envelope.v2`), the runtime contract requires:
+For demo M2 **user** story handoff, the stash payload (`postStoryDraftStash` / `POST /story-drafts`, `m2.story_intake_envelope.v2`) requires:
 
 1. `narrative.title` and `narrative.description` as **`{ et, ru, en }` objects** — map directly from `canonical_payload.title` / `.description` ([`api-orchestrator.md`](api-orchestrator.md) §5.2.1).
 2. `narrative.original_text` — primary-slot string from `canonical_payload.description[session_language]`.
@@ -77,11 +77,11 @@ Issue draft routes (`IssueCreateRequest.title` as a single string) remain out of
 
 ## 6.2 Demo language allowlist (D-11)
 
-For demo M2 Story Intake submission, `session_language` MUST be one of: `et`, `ru`, `en`.
+For demo M2 Story Intake **stash** (`postStoryDraftStash`), `session_language` MUST be one of: `et`, `ru`, `en`.
 
 - If `ui_lang` resolves to a language outside this set, the interview may proceed normally,
-  but the orchestrator MUST block `POST /intake/stories` and explain the limitation to the user.
-- This restriction applies only to the Story Intake submission step — the interview itself
+  but the orchestrator MUST block **stash** (§5.2.2 pre-flight) and explain the limitation to the user.
+- This restriction applies only to the Story Intake stash/submit step — the interview itself
   may be held in any language supported by the model.
 - Post-demo: expand allowlist per product decision; do not hardcode additional languages here
   without a lockstep update to the gateway allowlist.
@@ -96,3 +96,4 @@ For demo M2 Story Intake submission, `session_language` MUST be one of: `et`, `r
 | 0.2 | 2026-04-20 | Added §6 `session_language` in `normalization_metadata`. |
 | 0.3 | 2026-04-25 | Added §6.1 runtime single-string bridge for GIM-74. |
 | 0.4 | 2026-04-27 | Added §6.2 demo language allowlist for M2 Story Intake (`et` \| `ru` \| `en`); aligns with [`api-orchestrator.md`](api-orchestrator.md) §5.2.2 pre-flight (GIM-97). |
+| 0.5 | 2026-07-06 | **GIM-197 / GPT-SUBMIT-01 propagation:** §6.1/§6.2 repointed from `POST /intake/stories` user-path to `postStoryDraftStash` stash + §5.2.2 pre-flight block. |
