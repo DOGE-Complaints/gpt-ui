@@ -1,10 +1,10 @@
 # REQ-43: Proactive story-intake offer — личная история валидна без доказательства коллективности
 
-> **Назначение:** после завершённой **личной истории** GPT должен **сам** проактивно предложить подготовить её к подаче (`POST /intake/stories`) — **не требуя** доказать, что проблема системна или затрагивает других. Коллективность возникает **downstream** через честную кластеризацию похожих историй, а не через давление на пользователя «обобщить» или «говорить за других».
+> **Назначение:** после завершённой **личной истории** GPT должен **сам** проактивно предложить подготовить её к подаче — wire = **stash** `POST /story-drafts` → redirect `{SPA_BASE}/#/story/submit?draft_id=` (browser submit via SPA; см. [STORY-GPT-SUBMIT-01](../tasks/backlog-stories/story-submit-handoff/STORY-GPT-SUBMIT-01-redirect-handoff.md)) — **не требуя** доказать, что проблема системна или затрагивает других. Коллективность возникает **downstream** через честную кластеризацию похожих историй, а не через давление на пользователя «обобщить» или «говорить за других».
 > **Источник:** черновик `FR-M2-STORY-INTAKE-PROACTIVE-OFFER` (2026-06; raw REQ-43); продуктовый принцип «пользователь отвечает только за свой опыт».
-> **Технический контекст (verified по коду):** [`story-interview-flow.md`](../../instructions/story-interview-flow.md) §5 «seven questions» (L66–80) — **гейт** перед Phase 7: интервью «content-complete» только если отвечены **все 7** вопросов; **Q7 = «Is there evidence this is not a one-off?»** (L78) — коллективность/повторяемость, сейчас **обязательна**. Phase 6 «Civic generalization» (L105, §7.3 L176) исследует «один раз vs повторяемо». §8 anti-patterns (L211+) **не содержит** правила «не требовать коллективность» (row 2 «too-early classification» L214 и row 9 «observation» L221 — смежны, не покрывают). Проактивного предложения подать в коде **нет**. Архитектура story→cluster→Issue зафиксирована в [REQ-42](./REQ-42-adaptive-post-submission-confirmation-message.md). `observation` для improvement-without-harm — FR-M1-025 (L4, §8 row 9).
+> **Технический контекст (verified по коду, 2026-07-06):** [`story-interview-flow.md`](../../instructions/story-interview-flow.md) §5 Q7 — **non-blocking** (GIM-182); §7.5 — **проактивное предложение** stash+redirect при «эпизод+смысл» (GIM-183/194); §8 anti-pattern «не требовать коллективность» (GIM-184). Wire handoff: [`api-orchestrator.md`](../../instructions/api-orchestrator.md) §5.2 stash + §5.2.B redirect ([reconciliation](../docs/analysis/interview-gpt-submit-handoff-reconciliation-2026-07-06.md) D-SUBMIT-1…6). Архитектура story→cluster→Issue — [REQ-42](./REQ-42-adaptive-post-submission-confirmation-message.md). `observation` для improvement-without-harm — FR-M1-025 (§8 row 9).
 
-**Версия:** 1.0 · 2026-06-08
+**Версия:** 1.1 · 2026-07-06 (wire handoff sync — GAP-DOC-02)
 **Статус:** P3 Done (Awaiting Commits) · [`pkg-000023`](../docs/analysis/tasks/gpt-active-packages/pkg-000023-20260608-req43-proactive-story-intake-offer.yaml) (GIM-182…184 🟢) · [run-summary](../docs/analysis/tasks/run-reports/run-summary-20260609-req43-p3-execute.md)
 **Приоритет:** P2 (conversion / качество входа — снимает барьер подачи личных историй) — demo + post-demo (общее правило)
 **Тип:** GPT instruction update — `story-interview-flow.md` §5 (Q7 → non-blocking), §7 (proactive offer rule), §8 (новый anti-pattern)
@@ -24,9 +24,11 @@
 
 ---
 
-## 1. Текущее состояние (verified по коду 2026-06-08)
+## 1. Текущее состояние (verified по коду 2026-07-06)
 
-### 1.1 Q7 «not a one-off» — обязательный гейт полноты
+> **Doc-sync note:** секция 1.x описывала pre-REQ-43 baseline (2026-06-08). Реализация GIM-182…184 + GPT-SUBMIT-01 propagation (GIM-194) закрыла целевое состояние §2. Ниже — исходный baseline для истории; актуальный wire см. header «Технический контекст».
+
+### 1.1 Q7 «not a one-off» — обязательный гейт полноты (baseline 2026-06-08; fixed GIM-182)
 
 [`story-interview-flow.md`](../../instructions/story-interview-flow.md) §5 (L66–80): «An interview is **content-complete** for handoff to **Phase 7** only if the model can answer **all seven** questions … If any answer is missing or only guessed, treat the interview as **incomplete** … do not imply readiness for backend». Седьмой вопрос ([L78](../../instructions/story-interview-flow.md#L78)):
 
@@ -40,7 +42,7 @@
 
 Phase 6 ([L105](../../instructions/story-interview-flow.md#L105)): «Collective signal potential — Clear: one-off vs recurring». §3 (L58): «signal of **collective relevance** (for clusters … not 'flat tickets')». Сам по себе сбор сигнала корректен; проблема — когда он становится **требованием** доказать.
 
-### 1.3 Нет anti-pattern «не требовать коллективность» и нет проактивного предложения
+### 1.3 Нет anti-pattern «не требовать коллективность» и нет проактивного предложения (baseline 2026-06-08; fixed GIM-183/184 + §7.5 GIM-194)
 
 §8 anti-patterns ([L211–221](../../instructions/story-interview-flow.md#L211-L221)): row 2 (early classification), row 9 (observation misuse) — смежны, но **нет** правила «не требовать доказать коллективность / не заставлять говорить за других». Проактивного «хочешь, подготовлю к отправке?» в инструкциях **нет** — поток идёт phases → §5 gate → Phase 7 → handoff.
 
