@@ -56,12 +56,12 @@ sequenceDiagram
 | 1 | [`story-interview-flow.md`](../instructions/story-interview-flow.md) §7.5 | Проактивное предложение подать (эпизод + смысл; Q7 не блокирует) |
 | 2 | [`story-normalizer.md`](../instructions/story-normalizer.md) | `normalized_issue_payload` |
 | 3 | [`api-orchestrator.md`](../instructions/api-orchestrator.md) §5.2.0a–§5.2.2 | Admission, PII, preview, pre-flight (вкл. `session_language`) |
-| 4 | §5.2.1 | Transform → `StoryIntakeRequest` (**без** `submitter` на user path) |
+| 4 | §5.2.1 | Transform → `StoryDraftStashRequest` (единственный контракт stash) |
 | 5 | Actions `postStoryDraftStash` | `POST /story-drafts` → `{draft_id}` |
-| 6 | §5.2.3 + §5.2.4.A | Обработка 201, терминальная копи (не false claims) |
+| 6 | §5.2.3 + §5.2.4 | Обработка 201, терминальная копи (не false claims) |
 | 7 | §5.2.B | Ссылка `{SPA_BASE}/#/story/submit?draft_id=<id>` |
 
-**Не user-path:** `POST /intake/stories` — только service seed/sim скрипты, не ChatGPT Actions ([`story-api-methods-reference.md`](../instructions/story-api-methods-reference.md) §1).
+GPT Actions artifact содержит **только** `POST /story-drafts` — без `submitter`, без dual-path ([`story-api-methods-reference.md`](../instructions/story-api-methods-reference.md) §1).
 
 ---
 
@@ -194,10 +194,10 @@ https://dogestonia-tallinn.ee/#/story/submit?draft_id=abc-123-def
 
 | Шаг | Действие |
 |-----|----------|
-| 1 | Import [`custom-gpt-story-intake-actions.openapi.yaml`](./custom-gpt-story-intake-actions.openapi.yaml) v0.5.0 |
+| 1 | Import [`custom-gpt-story-intake-actions.openapi.yaml`](./custom-gpt-story-intake-actions.openapi.yaml) v0.6.0 |
 | 2 | `servers.url` = ваш gateway origin |
 | 3 | Authentication: Bearer = `SERVICE_API_TOKEN` |
-| 4 | Убедиться: в схеме **только** `/story-drafts`, нет user-path `POST /intake/stories` |
+| 4 | Убедиться: в схеме **только** `/story-drafts`, request schema = `StoryDraftStashRequest` (без `submitter`) |
 
 ### C. Smoke-проверка (ручная)
 
