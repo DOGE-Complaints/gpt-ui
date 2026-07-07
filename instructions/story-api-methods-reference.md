@@ -1,12 +1,12 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.8 · 2026-07-06  
+**Version:** 1.9 · 2026-07-07  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
 This file is the **HTTP source of truth for story intake runtime** inside the instruction bundle. Import the deployed story intake OpenAPI into GPT Actions (or equivalent) and treat that imported contract as authoritative for `operationId`, paths, schemas, and security. Until the node publishes canonical OpenAPI, paths below are **candidates**; before production, reconcile with `GET /openapi.json` on the deployed API.
 
-**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.5.0** at current instruction alignment — GPT-SUBMIT-01 stash handoff). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.6.0** at current instruction alignment — GPT-SUBMIT-02 single stash contract). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
 
 ---
 
@@ -14,22 +14,17 @@ This file is the **HTTP source of truth for story intake runtime** inside the in
 
 | operationId | Method | Path | Request contract | Success envelope | Purpose |
 |-------------|--------|------|------------------|------------------|---------|
-| `postStoryDraftStash` | POST | `/story-drafts` | `StoryIntakeRequest` (omit `submitter` on user path) | `SuccessEnvelope_StoryDraftStash` (`201`, `{draft_id}`) | Stash validated story for browser handoff (GPT-SUBMIT-01). |
-
-**Not in GPT Actions artifact:** `postStoryIntake` · `POST /intake/stories` — **service-only** seed/sim trusted channel (GW-DRAFT-04). Direct HTTP scripts only; not user citizen interviews from ChatGPT Actions.
+| `postStoryDraftStash` | POST | `/story-drafts` | `StoryDraftStashRequest` | `SuccessEnvelope_StoryDraftStash` (`201`, `{draft_id}`) | Stash validated story for browser handoff (GPT-SUBMIT-01 / GPT-SUBMIT-02). |
 
 Additional operations (search/reference/update) — add only when runtime contract exists; mirror in this table and in imported Actions contract with one-to-one method/path lock.
 
-### 1.1 `StoryIntakeRequest` field lock
+### 1.1 `StoryDraftStashRequest` field lock
 
-`StoryIntakeRequest` is aligned with runtime story intake contract and orchestrator story transform rules.
+`StoryDraftStashRequest` is aligned with runtime story intake contract and orchestrator story transform rules. **No `submitter` field** in the GPT Actions contract — author is resolved at browser submit via identity `/me` (GW-DRAFT-02).
 
 | Field | Required | Source |
 |---|---:|---|
 | `schema_version` | yes | hard-coded `m2.story_intake_envelope.v2` |
-| `submitter` | **no (user stash)** | **Omit entire block** on `postStoryDraftStash` (GIM-191); browser submit resolves author via identity `/me`. Service `POST /intake/stories` scripts may include submitter. |
-| `submitter.external_user_id` | service-only | not on user stash path |
-| `submitter.identity_issuer` | service-only | not on user stash path |
 | `narrative.original_text` | yes | `canonical_payload.description[session_language]` |
 | `narrative.language` | yes | `normalization_metadata.detected_input_language` |
 | `narrative.session_language` | yes | `normalization_metadata.session_language` |
@@ -108,6 +103,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 1.9 | 2026-07-07 | **GPT-SUBMIT-02 / GIM-201…202:** `StoryDraftStashRequest` rename; remove `submitter*` from field lock; remove service intake prose from §1; lock `info.version` **0.6.0**. |
 | 1.8 | 2026-07-06 | **GPT-SUBMIT-01 / GIM-190:** `postStoryDraftStash` · `POST /story-drafts` · `201`/`{draft_id}`; remove `postStoryIntake` from Actions; omit `submitter` on stash; lock `info.version` **0.5.0**. |
 | 1.7 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §1 `narrative.institution` field lock. Semantics unchanged. |
 | 1.6 | 2026-05-31 | **REQ-31 / GIM-137:** citizen-facing purpose text for `postStoryIntake`; lock `info.version` **0.4.2** (summary/description human-readable; operationId unchanged — Actions re-import required). |

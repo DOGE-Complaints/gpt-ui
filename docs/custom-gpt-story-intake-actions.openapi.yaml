@@ -10,13 +10,13 @@
 openapi: 3.1.0
 info:
   title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
-  version: "0.5.0"
+  version: "0.6.0"
   description: >
     Minimal subset for GPT Actions targeting story intake runtime (wire contract v2 + REQ-23 behavioral extensions).
-    GPT-SUBMIT-01 (GIM-190): user citizen path — POST /story-drafts (stash) only; postStoryIntake removed from Actions.
+    GPT-SUBMIT-02 (GIM-201): single stash contract — POST /story-drafts only; StoryDraftStashRequest (author at browser submit, GW-DRAFT-02).
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
-    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.5.0); the runtime server
+    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.6.0); the runtime server
     tracks its own implementation version (currently 0.1.0 at GET /openapi.json). These are separate versioning
     axes and are NOT expected to be equal. Increment this version when operationId/method/path/required fields/
     response envelope/auth semantics change (see story-api-methods-reference.md §4 lockstep policy).
@@ -50,19 +50,6 @@ components:
           type: string
         en:
           type: string
-
-    Submitter:
-      type: object
-      description: >
-        Omit entire block on user stash path (postStoryDraftStash) — author resolved at browser submit via identity /me (GW-DRAFT-02).
-        Include only for service seed/sim direct POST /intake/stories scripts (not GPT Actions).
-      properties:
-        external_user_id:
-          type: string
-        identity_issuer:
-          type: string
-          description: >
-            Namespace of submitter identity source. Demo GPT: dogestonia.gpt.v1 (REQ-22).
 
     Narrative:
       type: object
@@ -156,7 +143,7 @@ components:
           type: string
           nullable: true
 
-    StoryIntakeRequest:
+    StoryDraftStashRequest:
       type: object
       required: [schema_version, narrative]
       properties:
@@ -166,17 +153,13 @@ components:
           description: >
             Wire contract version (required). Shown in operator God Mode preview; minimize
             citizen-facing discussion per api-orchestrator §5.2.0b (REQ-31).
-        submitter:
-          $ref: "#/components/schemas/Submitter"
-          description: >
-            Omit on user stash (GIM-191). Not required for postStoryDraftStash.
         narrative:
           $ref: "#/components/schemas/Narrative"
         origin:
           $ref: "#/components/schemas/Origin"
           description: >
             Optional traceability sidecar. Always include origin.source='openai_gpt_action' in
-            every StoryIntakeRequest regardless of Citizen/God Mode. Do NOT omit from the API
+            every StoryDraftStashRequest regardless of Citizen/God Mode. Do NOT omit from the API
             request body — "omit from citizen summaries" means do not display origin fields in
             the conversational preview, not that the block should be absent from the request.
             (REQ-32 / REQ-31 §2.5.3 display vs transport.)
@@ -188,6 +171,8 @@ components:
           $ref: "#/components/schemas/GptSignals"
           description: >
             Optional classification block (REQ-42). Use human labels in Citizen Mode; full block in God Mode.
+      description: >
+        GPT Actions stash request body. Author resolved at browser submit (GW-DRAFT-02).
 
     StoryDraftStashResponseData:
       type: object
@@ -203,47 +188,6 @@ components:
       properties:
         data:
           $ref: "#/components/schemas/StoryDraftStashResponseData"
-        trace_id:
-          type: string
-
-    StoryIntakeResponseData:
-      type: object
-      required: [schema_version, story_id, status]
-      properties:
-        schema_version:
-          type: string
-          enum: [m2.story_intake_response.v1]
-        story_id:
-          type: string
-        # GAP-YAML-04 cross-spec drift note (closed-from-gpt-side 2026-05-26).
-        # Full server StoryLifecycleStatus enum (doge-complaints-gateway/src/core/domain/contracts.py:20-24) has 4 values:
-        #   accepted, partial_ready, ready_for_profile, clustered.
-        # For POST /intake/stories success response only TWO are reachable:
-        #   - services.py:187 creates record as ACCEPTED;
-        #   - services.py:276-285 immediately calls advance_story_readiness;
-        #   - services.py:352-358 locks transition ACCEPTED -> READY_FOR_PROFILE | PARTIAL_READY before HTTP return;
-        #   - handlers.py:214-220 returns final_story.lifecycle_status.value (post-advance) wrapped in SuccessEnvelope.
-        # Gateway runtime YAML (doge-complaints-gateway/docs/runtime-docs/api-reference/openapi.yaml:405-406) uses weaker
-        # `status: type: string` without enum — intentionally broader domain to accommodate future status values.
-        # This Actions YAML enum is endpoint-scoped (narrowed to actual reachable success-response values) — see
-        # GPT UI/docs/analysis/handoff-gateway-runtime-yaml-status-enum.md for full cross-spec analysis.
-        status:
-          type: string
-          enum: [ready_for_profile, partial_ready]
-          description: >
-            Intake lifecycle status for POST /intake/stories success response (API_REFERENCE §6.5–6.6).
-            Server never returns "received". Endpoint-scoped enum: full server StoryLifecycleStatus has 4 values
-            (accepted, partial_ready, ready_for_profile, clustered) but ACCEPTED is always advanced
-            (services.py:352-358) and CLUSTERED is post-cron — neither is reachable in this success envelope.
-            Gateway runtime YAML uses weaker `type: string` without enum (GAP-YAML-04 cross-spec drift; see
-            handoff-gateway-runtime-yaml-status-enum.md).
-
-    SuccessEnvelope_StoryIntake:
-      type: object
-      required: [data, trace_id]
-      properties:
-        data:
-          $ref: "#/components/schemas/StoryIntakeResponseData"
         trace_id:
           type: string
 
@@ -273,9 +217,9 @@ paths:
       operationId: postStoryDraftStash
       summary: Stash a story draft for browser submit
       description: >
-        Stash the resident's validated StoryIntakeRequest after interview normalization and confirmation.
-        Returns draft_id for SPA redirect — no story is created. Same service Bearer as legacy intake.
-        User completes submit in browser (POST /story-drafts/{draft_id}/submit). Re-import Actions after bump.
+        Stash the resident's validated StoryDraftStashRequest after interview normalization and confirmation.
+        Returns draft_id for SPA redirect — no story is created. User completes submit in browser
+        (POST /story-drafts/{draft_id}/submit). Re-import Actions after contract bump.
       x-openai-isConsequential: true
       security:
         - GptActionsBearer: []
@@ -284,7 +228,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/StoryIntakeRequest"
+              $ref: "#/components/schemas/StoryDraftStashRequest"
       responses:
         "201":
           description: Draft stashed; no story created.

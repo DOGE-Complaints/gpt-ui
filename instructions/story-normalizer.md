@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.14 |
-| **Date** | 2026-06-09 |
+| **Version** | 0.2.15 |
+| **Date** | 2026-07-07 |
 | **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
@@ -32,7 +32,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 ### 2.2 This instruction MUST NOT
 
 - **Call APIs or GPT Actions** — ever; orchestrator owns HTTP.
-- **Create transport request bodies** such as `IssueDraftCreateRequest`, `StoryIntakeRequest`, or `IssueCreateRequest`. This module emits only `normalized_issue_payload`; transport shaping belongs to [`api-orchestrator.md`](api-orchestrator.md) or a runtime bridge.
+- **Create transport request bodies** such as `IssueDraftCreateRequest`, `StoryDraftStashRequest`, or `IssueCreateRequest`. This module emits only `normalized_issue_payload`; transport shaping belongs to [`api-orchestrator.md`](api-orchestrator.md) (orchestrator builds `StoryDraftStashRequest` per §5.2.1).
 - **Ask the user** clarification or follow-up questions (same separation as the legacy normalizer reference: normalization is not a dialogue step). Missing data must have been resolved **upstream** (`ingest-validation`, interview flow, or gate **`needs_clarification`** loop), not here.
 - **Parse raw** multimodal input — belongs to ingest deep parsing / validation.
 - **Re-evaluate** structural completeness — belongs to [`ingest-validation.md`](ingest-validation.md).
@@ -220,8 +220,8 @@ Stable **references** to upstream work (opaque strings or objects — align with
 
 | Key | Purpose |
 |-----|---------|
-| `session_language` | **Required** for story-intake handoff: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](bootstrap.md) **`comm_context.ui_lang`** (see [`story-i18n-policy.md`](story-i18n-policy.md) §1–2). Maps to `StoryIntakeRequest.narrative.session_language`. |
-| `detected_input_language` | **Required** for wire v2: `et` \| `ru` \| `en` — auto-detected language of the user’s narrative text from deep parsing / validation (may differ from `session_language`). Maps to `StoryIntakeRequest.narrative.language` per REQ-22. Do not substitute `session_language` when the detected language differs. |
+| `session_language` | **Required** for story-intake handoff: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](bootstrap.md) **`comm_context.ui_lang`** (see [`story-i18n-policy.md`](story-i18n-policy.md) §1–2). Maps to `StoryDraftStashRequest.narrative.session_language` (orchestrator §5.2.1). |
+| `detected_input_language` | **Required** for wire v2: `et` \| `ru` \| `en` — auto-detected language of the user’s narrative text from deep parsing / validation (may differ from `session_language`). Maps to `StoryDraftStashRequest.narrative.language` per REQ-22. Do not substitute `session_language` when the detected language differs. |
 | `contains_pii` | **Required** for REQ-23 handoff: boolean — conservative PII scan on `original_text` / `description.*` (see §4.4). Read by [`api-orchestrator.md`](api-orchestrator.md) §5.2.0. |
 | `ingest_validation_report_ref` | Reference to the validation artifact used (id, hash, or short summary line). |
 | `safety_compliance_report_ref` | Reference to relevant safety checkpoint output for this handoff. |
@@ -277,7 +277,7 @@ When location is processed per §4.6, record extraction confidence under `normal
 | `location_source` | `explicit` \| `inferred` | `explicit` only when the resident **named or confirmed** the place in interview material (REQ-35 privacy baseline — not invented from context alone); `inferred` when derived from narrative context without direct location confirmation |
 | `confidence` | `LOW` \| `MEDIUM` \| `HIGH` | `HIGH` = explicit confirmation + unambiguous string; `MEDIUM` = confirmed but ambiguous or partial; `LOW` = inferred or weak signal |
 
-**Non-wire rule:** This object is **internal-only** — do **not** copy to `StoryIntakeRequest`, `canonical_payload`, or any top-level wire field. [`api-orchestrator.md`](api-orchestrator.md) does not consume it. Omit `location_extraction_metadata` entirely when `location_detected = false`.
+**Non-wire rule:** This object is **internal-only** — do **not** copy to `StoryDraftStashRequest`, `canonical_payload`, or any top-level wire field. [`api-orchestrator.md`](api-orchestrator.md) does not consume it. Omit `location_extraction_metadata` entirely when `location_detected = false`.
 
 #### 4.2.3 `trigger_activation_metadata` (REQ-41 / GIM-175)
 
@@ -306,7 +306,7 @@ When `ingest_validation_report.pre_submission_compliance_evidence` is available,
 
 **Reason enum (when `activated = false`):** `no-evidence` \| `runtime-unavailable` \| `omitted-by-rule`. Use `null` (or omit `reason`) when `activated = true`.
 
-**Non-wire rule:** Internal-only — do **not** copy to `StoryIntakeRequest` or wire envelope. Optionally mirror one-line summaries in `trace_notes` (e.g. `"trigger_audit: summary omitted-by-rule (REQ-41)"`) — free-text supplements only; structured truth lives in `trigger_activation_metadata`.
+**Non-wire rule:** Internal-only — do **not** copy to `StoryDraftStashRequest` or wire envelope. Optionally mirror one-line summaries in `trace_notes` (e.g. `"trigger_audit: summary omitted-by-rule (REQ-41)"`) — free-text supplements only; structured truth lives in `trigger_activation_metadata`.
 
 ### 4.3 `non_wire_metadata` (optional sidecar)
 
@@ -332,7 +332,7 @@ When `ingest_validation_report.pre_submission_compliance_evidence` is available,
 
 If nothing was collected or confirmed upstream **and** the narrative lacks sufficient subjective context, omit `non_wire_metadata`.
 
-`non_wire_metadata` is an **internal** sidecar only. [`api-orchestrator.md`](api-orchestrator.md) maps these three fields to wire `gpt_signals` (REQ-23 §2). Do **not** copy the `non_wire_metadata` object into `StoryIntakeRequest`.
+`non_wire_metadata` is an **internal** sidecar only. [`api-orchestrator.md`](api-orchestrator.md) maps these three fields to wire `gpt_signals` (REQ-23 §2). Do **not** copy the `non_wire_metadata` object into `StoryDraftStashRequest`.
 
 Allowed enum values (must match **gateway REQ-42 (gpt_signals)** when mapped to wire — [`42-gpt-signals-story-intake-extension.md`](../../doge-complaints-gateway/docs/requirements/42-gpt-signals-story-intake-extension.md); not GPT-UI REQ-42 adaptive post-submit):
 
@@ -390,7 +390,7 @@ Set `consistency_notes` when any of these apply:
 
 ### 4.6 `location_query` (REQ-26)
 
-Optional **top-level** string on `normalized_issue_payload` (sibling to `canonical_payload`, not inside it). Maps to `StoryIntakeRequest.narrative.location_query` via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. Server resolves non-empty values to geo ([`API_REFERENCE.md`](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) §6.3).
+Optional **top-level** string on `normalized_issue_payload` (sibling to `canonical_payload`, not inside it). Maps to `StoryDraftStashRequest.narrative.location_query` via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. Server resolves non-empty values to geo ([`API_REFERENCE.md`](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) §6.3).
 
 **Source data:** `location.freeform` from the ingest validation artifact ([`ingest-validation.md`](ingest-validation.md) report shape) after the user **confirmed** location in interview Phases 2–3 and [`story-interview-flow.md`](story-interview-flow.md) §7.2 affirmation.
 
@@ -464,6 +464,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.8 | 2026-06-05 | **REQ-38 / GIM-164:** §4.1 type-vs-axis orthogonality; §4.1a.1 ecosystem-deficit preferential classification + anti-collapse; expanded `ecosystem_signal` hints (`institutional_decline`, `mentor_shortage`, `community_fragmentation`, `replicable_model_needed`). |
 | 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
 | 0.2.10 | 2026-06-05 | **REQ-39 / GIM-167:** §4.6 rule 2 city-level canonicalization to `<City>, Estonia` (`Tallinn`, `Tallinna linn` examples); district/street strings preserved (`Kalamaja, Tallinn`). |
+| 0.2.15 | 2026-07-07 | **GPT-SUBMIT-02 reaudit / GIM-207:** N1 rename propagation — `StoryDraftStashRequest` in mapping/non-wire prose (lockstep OpenAPI v0.6.0 + orchestrator §5.2.1). |
 | 0.2.14 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §4.1 lift-gate note; §4.3 `institution_candidate` row. Semantics unchanged. |
 | 0.2.13 | 2026-06-07 | **REQ-41 / GIM-175:** §4.2.3 `trigger_activation_metadata` — five-trigger activation audit (`location`/`origin`/`summary`/`multi_axis_labels`/`gpt_signals`) with Reason enum; reuses REQ-40 evidence definitions; non-wire diagnostic source for God Mode. |
 | 0.2.12 | 2026-06-06 | **REQ-40 / GIM-172:** §4.3 explicit `severity_confidence` (`HIGH`/`MEDIUM`/`LOW`); `LOW` → omit `severity`; REQ-35 active determination preserved. |

@@ -6,6 +6,7 @@
 
 | Version | Date |
 |---------|------|
+| 0.8 | 2026-07-07 |
 | 0.7 | 2026-07-06 |
 | 0.6 | 2026-04-10 |
 | 0.5 | 2026-04-10 |
@@ -53,7 +54,7 @@ For **DOGEstonia / Issue** ingest when using the **strict** artifact discipline 
 
 This lifecycle describes **Module 1** execution only: strict Issue chain ending in `normalized_issue_payload` and Issues Actions/OpenAPI calls.
 
-For **Module 2** Story Intake (`StoryIntakeRequest`, wire `m2.story_intake_envelope.v2`), follow [`api-orchestrator.md`](api-orchestrator.md) §5.2 and [`story-api-methods-reference.md`](story-api-methods-reference.md). **User runtime handoff** is **stash** (`postStoryDraftStash`) + browser redirect to SPA — not direct `POST /intake/stories` from GPT Actions. Service seed/sim may use `POST /intake/stories` (direct HTTP, not Actions). Do not treat M1 Issue API success as M2 story-intake success, and do not merge their acceptance checks into one step.
+For **Module 2** Story Intake (`StoryDraftStashRequest`, wire `m2.story_intake_envelope.v2`), follow [`api-orchestrator.md`](api-orchestrator.md) §5.2 and [`story-api-methods-reference.md`](story-api-methods-reference.md). **User runtime handoff** is **stash** (`postStoryDraftStash`) + browser redirect to SPA. Do not treat M1 Issue API success as M2 story-intake success, and do not merge their acceptance checks into one step.
 
 ---
 
@@ -88,4 +89,5 @@ Until the node publishes canonical Issue OpenAPI — **explicit TBD**. After sch
 | 0.4 | 2026-04-10 | Added §2.1 mandatory Issue strict order (validation → safety → `issue-policy-gate` → normalization → API); related-files link to `story-policy-gate.md`. |
 | 0.5 | 2026-04-10 | Added pointers to [`story-normalizer.md`](story-normalizer.md) in §2 row 7, §2.1 step 4, intro; related-files. |
 | 0.6 | 2026-04-10 | Added normative shorthand cross-links `base` §1.5 / `ingest-validation` / `safety-compliance` Point 4 (Issue) on **`normalized_issue_payload`**. |
+| 0.8 | 2026-07-07 | **GIM-203 / GPT-SUBMIT-02 propagation:** §2.2 `StoryDraftStashRequest`; single stash user path — no service `/intake/stories` prose. |
 | 0.7 | 2026-07-06 | **GIM-196 / GPT-SUBMIT-01 propagation:** §2.2 M2 user path = `postStoryDraftStash` + browser redirect; `/intake/stories` service seed/sim only. |

@@ -5,8 +5,8 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.13 |
-| **Date** | 2026-06-05 |
+| **Version** | 0.14 |
+| **Date** | 2026-07-07 |
 | **Traceability** | REQ-36; [`story-label-taxonomy.md`](story-label-taxonomy.md) v0.2; [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md) |
 
 ---
@@ -75,7 +75,7 @@ Optional fields using subjective enums **`SEVERITY`**, **`IMPACT_ESTIMATION`**, 
 | `impact_estimation` | `LOCAL` \| `DISTRICT` \| `CITY` \| `NATIONAL` | Administrative scope of perceived impact (Estonia scale). Omit if unsure — **no `UNKNOWN` fallback for this field**. |
 | `problem_status` | `ONGOING` \| `RESOLVED` \| `RECURRING` \| `UNKNOWN` | How the resident frames the current state of the problem. `UNKNOWN` is valid **only** for this field; use when status was not clarified. |
 
-These fields are sent via the **`gpt_signals`** block in `StoryIntakeRequest` (REQ-23 §2 / gateway REQ-42 (gpt_signals) — [`42-gpt-signals-story-intake-extension.md`](../../doge-complaints-gateway/docs/requirements/42-gpt-signals-story-intake-extension.md); wire since OpenAPI v0.4.0 — `components.schemas.GptSignals` in [`custom-gpt-story-intake-actions.openapi.yaml`](../docs/custom-gpt-story-intake-actions.openapi.yaml)). Normalizer placement: `non_wire_metadata` sidecar in [`story-normalizer.md`](story-normalizer.md) §4.3 → orchestrator maps to root `gpt_signals` per [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. They are not required for §4.1 completeness; omit any field (or the whole `gpt_signals` block) when the value is absent or unclear.
+These fields are sent via the **`gpt_signals`** block in `StoryDraftStashRequest` (REQ-23 §2 / gateway REQ-42 (gpt_signals) — [`42-gpt-signals-story-intake-extension.md`](../../doge-complaints-gateway/docs/requirements/42-gpt-signals-story-intake-extension.md); wire since OpenAPI v0.4.0 — `components.schemas.GptSignals` in [`custom-gpt-story-intake-actions.openapi.yaml`](../docs/custom-gpt-story-intake-actions.openapi.yaml)). Normalizer placement: `non_wire_metadata` sidecar in [`story-normalizer.md`](story-normalizer.md) §4.3 → orchestrator maps to root `gpt_signals` per [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. They are not required for §4.1 completeness; omit any field (or the whole `gpt_signals` block) when the value is absent or unclear.
 
 ### 4.4 Not filled by GPT as facts without backend
 
@@ -133,4 +133,5 @@ Do not collect PII by default; do not store personal data in Issue content beyon
 | 0.10 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |
 | 0.11 | 2026-04-26 | Linked `labels` to controlled label taxonomy and forbade unknown/free-text/internal label values in canonical payload (GIM-86). |
 | 0.12 | 2026-05-25 | REQ-27: synced §4.3 subjective enums (`severity`, `impact_estimation`, `problem_status`) to server frozensets in [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L61–65 (uppercase `LOW/MEDIUM/HIGH/CRITICAL`, `LOCAL/DISTRICT/CITY/NATIONAL`, `ONGOING/RESOLVED/RECURRING/UNKNOWN`); removed stale «non-wire metadata / must not be sent» wording — REQ-23/REQ-42 already activated the wire `gpt_signals` block (OpenAPI v0.4.0) (GIM-122). |
+| 0.14 | 2026-07-07 | **GPT-SUBMIT-02 reaudit / GIM-208:** §4.3 wire name `StoryDraftStashRequest` (N1 lockstep with OpenAPI v0.6.0). |
 | 0.13 | 2026-06-05 | **REQ-36 / GIM-159:** §5 labels SoT cross-ref updated for expanded taxonomy v0.2 (new civic axes and promoted canonical scopes). |
