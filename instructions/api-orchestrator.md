@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.4.0 |
-| **Date** | 2026-07-07 |
-| **Traceability** | GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.5.0 |
+| **Date** | 2026-07-23 |
+| **Traceability** | GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -178,7 +178,7 @@ Do **not** copy instruction-only metadata (`normalization_metadata`, `label_extr
 
 1. `normalized_issue_payload.canonical_payload` exists and contains required fields for the active imported Actions contract.
 2. `normalization_metadata` contains refs to validation, safety, policy gate artifacts, and `session_language`.
-3. `canonical_payload.labels[]` contains only validated canonical labels from `story-label-taxonomy.md`; unknown, metadata-only, internal-only, and low-confidence candidates must stop before HTTP.
+3. `canonical_payload.taxonomy` (when present) preserves per-axis membership; `canonical_payload.labels[]` contains only validated canonical labels from `story-label-taxonomy.md`; unknown, metadata-only, internal-only, and low-confidence candidates must not enter flat `labels[]` — they may appear under `taxonomy` with the matching disposition. Stop before HTTP if required wire fields are invalid.
 4. No direct jump from gate package to HTTP is allowed; normalization is mandatory on strict Issue path.
 5. Build HTTP requests from `canonical_payload` plus OpenAPI/SSOT contract (`story-api-methods-reference.md`).
 6. The outgoing request body must not contain label extraction metadata, non-wire metadata, or backend-issued fields: `id`, `status`, `created_at`, `updated_at`, `arweave_txid`, `image_txid`, `image_hash`, `txid`.
@@ -266,13 +266,13 @@ After successful stash (`draft_id` in response `data`), redirect the user to the
 
 | Setting | Value |
 |---------|--------|
-| `SPA_BASE` (pilot default) | `https://dogestonia-tallinn.ee` |
+| `SPA_BASE` (pilot default) | `https://spa-app-tallinn-demo.up.railway.app` |
 | **Where to set** | ChatGPT → **Configure** → **Instructions** (top text field). Paste operator block from [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) **§4.1**. Do **not** edit `{SPA_BASE}` in this repo file for deploy — only the Instructions field in the GPT editor. |
-| Resolved example (with default) | `https://dogestonia-tallinn.ee/#/story/submit?draft_id=<draft_id>` |
+| Resolved example (with default) | `https://spa-app-tallinn-demo.up.railway.app/#/story/submit?draft_id=<draft_id>` |
 
 | Part | Rule |
 |------|------|
-| `SPA_BASE` | Public HTTPS **origin** of the deployed SPA (scheme + host, no path, no trailing `/`). Pilot default: `https://dogestonia-tallinn.ee`. Operator replaces after deploy. **Not** in SPA repo env — only ChatGPT Instructions. Full steps: [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) §4.1. Cross-ref emergent **E4** (`VITE_STORY_GPT_URL` = link **to** GPT from SPA, not SPA origin). |
+| `SPA_BASE` | Public HTTPS **origin** of the deployed SPA (scheme + host, no path, no trailing `/`). Pilot default: `https://spa-app-tallinn-demo.up.railway.app`. Operator replaces after deploy. **Not** in SPA repo env — only ChatGPT Instructions. Full steps: [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) §4.1. Cross-ref emergent **E4** (`VITE_STORY_GPT_URL` = link **to** GPT from SPA, not SPA origin). |
 | Hash route | SPA HashRouter canonical path **`/story/submit`** — [`storyHandoffFlowState.js`](../../spa-app/src/auth/storyHandoffFlowState.js) `STORY_SUBMIT_PATH` (SPA-ID-12). |
 | Query | `draft_id` = verbatim value from stash response `data.draft_id`. |
 
@@ -306,7 +306,12 @@ Build the `StoryDraftStashRequest` body **only** from `normalized_issue_payload`
       "en": "<canonical_payload.description.en>"
     },
     "canonical_type": "<canonical_payload.type — include only when normalizer produced a value>",
-    "canonical_labels": ["<canonical taxonomy label keys from canonical_payload.labels[]>"],
+    "taxonomy": {
+      "topic_domain": [{ "label": "transport", "disposition": "canonical" }],
+      "civic_signal": [{ "label": "city_for_people", "disposition": "canonical" }],
+      "risk_privacy_safety": [{ "label": "pii_present", "disposition": "internal" }]
+    },
+    "canonical_labels": ["<derived: disposition=canonical keys from taxonomy — or canonical_payload.labels[]>"],
     "summary": {
       "et": "<canonical_payload.summary.et>",
       "ru": "<canonical_payload.summary.ru>",
@@ -335,7 +340,7 @@ Build the `StoryDraftStashRequest` body **only** from `normalized_issue_payload`
 }
 ```
 
-Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (always omit in demo scope per REQ-28; post-demo: omit if incomplete i18n), `narrative.location_query` (absent or empty in normalizer output), `live_story_context` (no contradiction), `canonical_type` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string.
+Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (always omit in demo scope per REQ-28; post-demo: omit if incomplete i18n), `narrative.location_query` (absent or empty in normalizer output), `live_story_context` (no contradiction), `canonical_type` / `taxonomy` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string. Prefer `narrative.taxonomy` over flat `canonical_labels` when both could be set (GPT-TAX-01).
 
 **Field mapping table (REQ-22 / REQ-23 / REQ-25 / REQ-26 / D-03…D-08):**
 
@@ -348,7 +353,8 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `narrative.description` | `canonical_payload.description` (`{et, ru, en}`) | Yes | REQ-22 GAP-W-04 |
 | `narrative.original_text` | `canonical_payload.description[session_language]` | Yes | REQ-22 §2; primary-slot narrative for runtime |
 | `narrative.canonical_type` | `canonical_payload.type` | No | REQ-25: `complaint`, `observation`, `system_bug`, `absurdity`; only `complaint` / `system_bug` pass issue promotion gate ([`API_REFERENCE.md`](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md) §6.3); omit if absent |
-| `narrative.canonical_labels` | `canonical_payload.labels[]` | No | REQ-25: only canonical disposition labels from [`story-label-taxonomy.md`](story-label-taxonomy.md); exclude metadata-only / low-confidence; omit if empty |
+| `narrative.taxonomy` | `canonical_payload.taxonomy` | No | **GPT-TAX-01 / D-TAX-1 SoT:** object keyed by axis → `[{ label, disposition }]`. Preserve axis membership; include `internal` / `metadata_only` / etc. Omit empty axes. Gateway `parse_taxonomy_payload`. |
+| `narrative.canonical_labels` | derived from `canonical_payload.taxonomy` (canonical only) **or** `canonical_payload.labels[]` | No | **Deprecated / derived (GPT-TAX-01):** when `taxonomy` present, flatten keys with `disposition=canonical` only; else REQ-25 flat labels. Prefer `taxonomy`. |
 | `narrative.summary` | `canonical_payload.summary` (`{et, ru, en}`) | No | REQ-25: include only when **all three** slots are non-empty; if any slot empty — omit entire `summary` block (server `parse_required_i18n_dict` → HTTP 400 on partial) |
 | `narrative.location_query` | `normalized_issue_payload.location_query` (top-level) | No | REQ-26: freeform location string; server `geo_service.resolve_for_story()`; omit if absent, null, or empty after trim |
 | `origin.source` | Fixed: `openai_gpt_action` | **de-facto required** | Always include: this is the only way to track submission source. Value is fixed = `openai_gpt_action` for GPT Action runtime. Do not omit — `origin.source = null` in DB means the story cannot be attributed to the GPT channel. |
@@ -504,7 +510,16 @@ When `debug_mode = true`, prefix GPT responses that include submission preview w
 DEBUG MODE ACTIVE
 ```
 
-**Zero simplification (REQ-31 §2.4):** show the **full** draft `StoryDraftStashRequest` (and mapping notes) exactly as built for HTTP — including `schema_version`, `narrative`, `gpt_signals`, `origin`, `privacy`, `live_story_context`, labels, severity, and transport fields. Use a JSON block when helpful. **No** redaction, **no** citizen-style abstraction in this mode.
+**Zero simplification (REQ-31 §2.4):** show the **full** draft `StoryDraftStashRequest` (and mapping notes) exactly as built for HTTP — including `schema_version`, `narrative` (**with `narrative.taxonomy` per-axis block when present — GPT-TAX-01 / T04**), `gpt_signals`, `origin`, `privacy`, `live_story_context`, labels, severity, and transport fields. Use a JSON block when helpful. **No** redaction, **no** citizen-style abstraction in this mode.
+
+**Per-axis taxonomy diagnostics (GPT-TAX-01 / GIM-213):** When `narrative.taxonomy` is present, God Mode **MUST** show it in the JSON preview (do not collapse to flat `canonical_labels` only). Prefer a compact axis summary table after the JSON when helpful:
+
+| Axis | Labels (disposition) |
+|------|----------------------|
+| `topic_domain` | `transport` (canonical) |
+| `risk_privacy_safety` | `pii_present` (internal) |
+
+Citizen Mode continues to show human «Labels: …» only — never raw `taxonomy` keys.
 
 **Trigger activation table (REQ-41 / GIM-176 — God Mode only, non-wire):** After the JSON preview (or immediately before operator confirmation), show a diagnostic **markdown table** of extraction-trigger activation. **MUST NOT** show this table in Citizen Mode (`debug_mode = false`). **MUST NOT** include this table in the HTTP request body or `StoryDraftStashRequest`.
 
@@ -706,6 +721,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5.0 | 2026-07-23 | **GPT-TAX-01 / GIM-210+213:** §5.2.1 `narrative.taxonomy` mapping + example; `canonical_labels` deprecated/derived; §5.2.0b God Mode shows per-axis taxonomy. Lockstep OpenAPI **0.7.0**. |
 | 0.4.0 | 2026-07-07 | **GPT-SUBMIT-02 / GIM-201…206:** single stash contract — `StoryDraftStashRequest` rename; remove service `/intake/stories` rows; purge §5.2.1 submitter mapping; remove §5.2.4.B; §6.1 one success schema (201 `draft_id`); stash-relevant error example. Lockstep OpenAPI `info.version` **0.6.0**. |
 | 0.3.9 | 2026-07-06 | **GPT-SUBMIT-01 / GIM-186…193:** browser-submit handoff — user path `postStoryDraftStash` (`POST /story-drafts`) + §5.2.B redirect; §5.2.3 `{draft_id}`/201; §5.2.4.A redirect copy; §5.2.4.B service doc-only legacy; omit `submitter` on stash; §5.2.2 item 17 `session_language`; `/intake/stories` service-only (not Actions). |
 | 0.3.8 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §5.2.1 `narrative.institution` row; §5.2.2 items 7–8 (demo-gate lift + post-demo i18n). Semantics unchanged. |

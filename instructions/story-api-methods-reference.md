@@ -1,12 +1,12 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 1.9 · 2026-07-07  
+**Version:** 2.0 · 2026-07-23  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
 This file is the **HTTP source of truth for story intake runtime** inside the instruction bundle. Import the deployed story intake OpenAPI into GPT Actions (or equivalent) and treat that imported contract as authoritative for `operationId`, paths, schemas, and security. Until the node publishes canonical OpenAPI, paths below are **candidates**; before production, reconcile with `GET /openapi.json` on the deployed API.
 
-**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.6.0** at current instruction alignment — GPT-SUBMIT-02 single stash contract). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.7.0** at current instruction alignment — GPT-TAX-01 per-axis taxonomy). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
 
 ---
 
@@ -33,7 +33,8 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.summary` | no | `canonical_payload.summary`; omit entire block if any `et`/`ru`/`en` slot empty (REQ-25) |
 | `narrative.location_query` | no | `normalized_issue_payload.location_query` when user confirmed location (REQ-26); omit if absent |
 | `narrative.canonical_type` | no | `canonical_payload.type`; `complaint` / `system_bug` → issue promotion gate (REQ-25) |
-| `narrative.canonical_labels` | no | `canonical_payload.labels[]`; canonical disposition only per `story-label-taxonomy.md` (REQ-25) |
+| `narrative.taxonomy` | no | `canonical_payload.taxonomy` — per-axis `{ axis: [{ label, disposition }] }` (GPT-TAX-01 / D-TAX-1 SoT; OpenAPI `NarrativeTaxonomy`; gateway `parse_taxonomy_payload`). Omit empty axes. |
+| `narrative.canonical_labels` | no | **Deprecated / derived:** flatten `disposition=canonical` keys from `narrative.taxonomy` when present; else `canonical_payload.labels[]` (REQ-25 compat). Prefer `taxonomy`. |
 | `narrative.institution` | no | **Demo scope: always omit (REQ-28 pre-flight #7).** Post-demo: `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / gateway REQ-43 (institution)). |
 | `privacy.contains_pii` | no | `normalization_metadata.contains_pii` after §5.2.0 flow (REQ-23 §A) |
 | `privacy.redaction_requested` | no | user choice in api-orchestrator §5.2.0 |
@@ -103,6 +104,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 2.0 | 2026-07-23 | **GPT-TAX-01 / GIM-210:** `narrative.taxonomy` field lock; `canonical_labels` deprecated/derived; lock `info.version` **0.7.0**. |
 | 1.9 | 2026-07-07 | **GPT-SUBMIT-02 / GIM-201…202:** `StoryDraftStashRequest` rename; remove `submitter*` from field lock; remove service intake prose from §1; lock `info.version` **0.6.0**. |
 | 1.8 | 2026-07-06 | **GPT-SUBMIT-01 / GIM-190:** `postStoryDraftStash` · `POST /story-drafts` · `201`/`{draft_id}`; remove `postStoryIntake` from Actions; omit `submitter` on stash; lock `info.version` **0.5.0**. |
 | 1.7 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §1 `narrative.institution` field lock. Semantics unchanged. |

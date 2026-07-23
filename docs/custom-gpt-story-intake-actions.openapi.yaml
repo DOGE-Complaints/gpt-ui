@@ -10,16 +10,18 @@
 openapi: 3.1.0
 info:
   title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
-  version: "0.6.0"
+  version: "0.7.0"
   description: >
     Minimal subset for GPT Actions targeting story intake runtime (wire contract v2 + REQ-23 behavioral extensions).
     GPT-SUBMIT-02 (GIM-201): single stash contract — POST /story-drafts only; StoryDraftStashRequest (author at browser submit, GW-DRAFT-02).
+    GPT-TAX-01 (GIM-209): narrative.taxonomy per-axis SoT; canonical_labels deprecated/derived flat compat.
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
-    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.6.0); the runtime server
+    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.7.0); the runtime server
     tracks its own implementation version (currently 0.1.0 at GET /openapi.json). These are separate versioning
     axes and are NOT expected to be equal. Increment this version when operationId/method/path/required fields/
     response envelope/auth semantics change (see story-api-methods-reference.md §4 lockstep policy).
+    Axis/disposition enums lockstep with gateway GW-TAX-01 (TAXONOMY_AXIS_VALUES + LabelDisposition).
 
 servers:
   - url: https://dogestonia-tallinn.up.railway.app
@@ -50,6 +52,88 @@ components:
           type: string
         en:
           type: string
+
+    TaxonomyAxisEntry:
+      type: object
+      required: [label, disposition]
+      description: >
+        One label on a taxonomy axis (GPT-TAX-01 / D-TAX-1). disposition lockstep with gateway
+        LabelDisposition: canonical | metadata_only | needs_clarification | rejected | internal.
+      properties:
+        label:
+          type: string
+          description: Controlled taxonomy key (lowercase).
+        disposition:
+          type: string
+          enum:
+            - canonical
+            - metadata_only
+            - needs_clarification
+            - rejected
+            - internal
+          description: >
+            Wire disposition. internal = §6 internal-only labels (gateway filters from public surfaces).
+
+    NarrativeTaxonomy:
+      type: object
+      description: >
+        Per-axis taxonomy source of truth (GPT-TAX-01). Keys = TAXONOMY_AXIS_VALUES (13 axes,
+        gateway axes.py). Each axis maps to an array of TaxonomyAxisEntry. Omit empty axes.
+        Do not collapse axes into a flat list — axis membership is preserved on the wire.
+      properties:
+        topic_domain:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        service_object:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        location_context:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        failure_mode:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        issue_archetype_support:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        affected_scope:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        civic_signal:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        deep_need:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        desired_outcome:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        ecosystem_signal:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        governance_signal:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        risk_privacy_safety:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+        confidence_state:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaxonomyAxisEntry"
+      additionalProperties: false
 
     Narrative:
       type: object
@@ -86,10 +170,20 @@ components:
         canonical_type:
           type: string
           nullable: true
+        taxonomy:
+          $ref: "#/components/schemas/NarrativeTaxonomy"
+          description: >
+            GPT-TAX-01 / D-TAX-1 source of truth for labels by axis. Prefer this over
+            canonical_labels. Gateway parse_taxonomy_payload consumes this object.
         canonical_labels:
           type: array
           items:
             type: string
+          deprecated: true
+          description: >
+            DEPRECATED / DERIVED (GPT-TAX-01): flat list of disposition=canonical label keys
+            only, derived from narrative.taxonomy when present. Per-axis taxonomy is SoT.
+            Kept for backward compatibility with older consumers. Prefer taxonomy.
         institution:
           allOf:
             - $ref: "#/components/schemas/I18nText"

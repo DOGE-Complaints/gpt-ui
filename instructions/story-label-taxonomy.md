@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.1 |
-| **Date** | 2026-06-05 |
-| **Traceability** | FR-M1-026/027/044…051; REQ-36; [`story-data-model.md`](story-data-model.md), [`story-interview-flow.md`](story-interview-flow.md), [`ingest-validation.md`](ingest-validation.md), [`story-normalizer.md`](story-normalizer.md) |
+| **Version** | 0.2.2 |
+| **Date** | 2026-07-23 |
+| **Traceability** | FR-M1-026/027/044…051; REQ-36; GPT-TAX-01; [`story-data-model.md`](story-data-model.md), [`story-interview-flow.md`](story-interview-flow.md), [`ingest-validation.md`](ingest-validation.md), [`story-normalizer.md`](story-normalizer.md) |
 
 ---
 
@@ -47,6 +47,8 @@ This file defines how GPT may derive Issue labels from the story. It is an instr
 | `governance_signal` | Governance model, transparency, or ownership as part of the desired solution. | May produce canonical labels when supported. |
 | `risk_privacy_safety` | Safety, PII, minors, sensitive topics. | Internal metadata only. |
 | `confidence_state` | Label certainty and correction status. | Internal metadata only. |
+
+**Axis enum lockstep (GPT-TAX-01 / GW-TAX-01):** the 13 axis keys above **MUST** match gateway `TAXONOMY_AXIS_VALUES` in [`axes.py`](../../doge-complaints-gateway/src/core/taxonomy/axes.py). Do not invent alternate axis names on the wire.
 
 **Open decision (REQ-36 OD-1):** axis name `affected_scope` retained (not renamed to `affected_population`) to limit propagation across instruction modules.
 
@@ -286,7 +288,7 @@ Promoted axes (`affected_scope`, `deep_need`, `desired_outcome`) now have canoni
 
 ## 6. Internal-only labels
 
-These are not public/card labels and must not be copied into `canonical_payload.labels[]`.
+These are not public/card labels and must not be copied into `canonical_payload.labels[]`. On the wire (`canonical_payload.taxonomy` / `narrative.taxonomy`), place them under the matching axis (`risk_privacy_safety` or `confidence_state`) with **`disposition: "internal"`** (GPT-TAX-01 — gateway filters public surfaces).
 
 | Key | Use |
 |---|---|
@@ -318,14 +320,15 @@ When retaining label reasoning, use this conceptual shape in validation/normaliz
 }
 ```
 
-Allowed `disposition` values:
+Allowed `disposition` values (lockstep gateway `LabelDisposition` in [`disposition.py`](../../doge-complaints-gateway/src/core/taxonomy/disposition.py)):
 
 | Value | Meaning |
 |---|---|
-| `canonical` | Approved key and evidence supports inclusion in `canonical_payload.labels[]`. |
+| `canonical` | Approved key and evidence supports inclusion in `canonical_payload.labels[]` and public card surfaces. |
 | `metadata_only` | Useful reasoning signal, not a public/card label. |
 | `needs_clarification` | Plausible but not confirmed enough for canonical use. |
 | `rejected` | Removed due to user correction, conflict, or vocabulary mismatch. |
+| `internal` | §6 internal-only / safety-privacy keys; included in `taxonomy` wire; **not** in flat `labels[]`; gateway filters from public surfaces. |
 
 ---
 
@@ -333,6 +336,7 @@ Allowed `disposition` values:
 
 | Version | Date | Change |
 |---------|------|--------|
-| 0.1 | 2026-04-26 | Initial controlled label axes and canonical/internal disposition rules (GIM-85). |
-| 0.2 | 2026-06-05 | **REQ-36 / GIM-156…158:** expanded `topic_domain`, `civic_signal`, `service_object`; promoted `affected_scope`, `deep_need`, `desired_outcome`; new axes `ecosystem_signal`, `governance_signal`; OD-1/OD-2 documented in §3. |
+| 0.2.2 | 2026-07-23 | **GPT-TAX-01 / GIM-211+212:** disposition `internal`; axis/disposition lockstep notes vs GW-TAX-01. |
 | 0.2.1 | 2026-06-05 | **REQ-36 audit / GIM-161…162:** GAP-36-01 — dedup `small_business` removed; `visitors`/`public_users` demoted to §5; GAP-36-02 — disambiguated `brain_drain_signal` (civic) vs `brain_drain` (ecosystem capacity). |
+| 0.2 | 2026-06-05 | **REQ-36 / GIM-156…158:** expanded `topic_domain`, `civic_signal`, `service_object`; promoted `affected_scope`, `deep_need`, `desired_outcome`; new axes `ecosystem_signal`, `governance_signal`; OD-1/OD-2 documented in §3. |
+| 0.1 | 2026-04-26 | Initial controlled label axes and canonical/internal disposition rules (GIM-85). |

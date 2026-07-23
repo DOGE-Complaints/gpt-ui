@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.15 |
-| **Date** | 2026-07-07 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.16 |
+| **Date** | 2026-07-23 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -25,6 +25,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 - Run **only after** [`story-policy-gate.md`](story-policy-gate.md) has produced `policy_gate_result.status = "approved"` for the same ingest handoff (see [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) **§2.1**).
 - Emit **`normalized_issue_payload`** with:
   - **`canonical_payload`** — Issue fields aligned with [`story-data-model.md`](story-data-model.md) **§4.1** (`type`, `labels`, `title`, `description`, optional `summary`, optional `institution`; trilingual objects `{ et, ru, en }` per that file and [`story-i18n-policy.md`](story-i18n-policy.md)).
+  - **`canonical_payload.taxonomy`** (GPT-TAX-01) — per-axis object `{ axis: [{ label, disposition }] }` for all retained candidates (including `internal` / `metadata_only`); do **not** collapse axes. Flat `labels[]` remains derived (canonical only).
   - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
 - **Label extraction:** apply **all** taxonomy keys that genuinely apply to the story — one or more keys per applicable axis (`topic_domain`, `failure_mode`, `civic_signal`, `issue_archetype_support`) where evidence exists in the validated narrative. **Conservative** means: do not invent labels or apply low-confidence keys — it does **not** mean use only one label total.
 - Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)).
@@ -130,7 +131,8 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 | Field | Rule |
 |-------|------|
 | `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5. Apply **observation vs complaint decision rule** below. |
-| `labels` | String array; keys must be `canonical` labels allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. Apply **multi-axis** extraction per §2.1 — see rule below. |
+| `taxonomy` | **GPT-TAX-01 SoT:** object keyed by taxonomy axis (13 axes in [`story-label-taxonomy.md`](story-label-taxonomy.md) §3 / gateway `TAXONOMY_AXIS_VALUES`). Each axis → array of `{ "label", "disposition" }`. Group candidates from `label_extraction_metadata` **by axis** — never flatten away the axis. Include dispositions `canonical`, `metadata_only`, `needs_clarification`, `rejected`, and **`internal`** (for §6 internal-only keys). Omit empty axes. Orchestrator maps to `narrative.taxonomy`. |
+| `labels` | **Derived / compat:** string array of keys with `disposition = "canonical"` only (from `taxonomy` when present). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. Apply **multi-axis** extraction per §2.1 — see rule below. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }` when content is minimal (see **`summary` generation rule** below); orchestrator/UI use summary for card preview when present. |
 | `institution` | Optional `{ et, ru, en }` when interview/validation produced full trilingual institution text; **omit** if any slot is empty (REQ-23 §2.5). |
@@ -257,7 +259,19 @@ When validation supplies label reasoning, keep it under `normalization_metadata.
 }
 ```
 
-Only candidates with `disposition = "canonical"` and keys allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, or `rejected` disposition remain in metadata only.
+Only candidates with `disposition = "canonical"` and keys allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, `rejected`, or **`internal`** disposition remain out of flat `labels[]` but **MUST** be grouped into `canonical_payload.taxonomy[axis]` with their disposition preserved (GPT-TAX-01 — backend filters public surfaces).
+
+**Taxonomy emit rule (GPT-TAX-01):** Build `canonical_payload.taxonomy` from `label_extraction_metadata.candidates` (and equivalent confirmed keys) by grouping on `axis`. Example:
+
+```json
+{
+  "topic_domain": [{ "label": "transport", "disposition": "canonical" }],
+  "deep_need": [{ "label": "predictability", "disposition": "metadata_only" }],
+  "risk_privacy_safety": [{ "label": "pii_present", "disposition": "internal" }]
+}
+```
+
+Then derive `canonical_payload.labels[]` = all `label` values under any axis with `disposition = "canonical"` (order: axis table order in taxonomy §3, then label order within axis).
 
 #### 4.2.2 `location_extraction_metadata`
 
@@ -464,6 +478,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 | 0.2.8 | 2026-06-05 | **REQ-38 / GIM-164:** §4.1 type-vs-axis orthogonality; §4.1a.1 ecosystem-deficit preferential classification + anti-collapse; expanded `ecosystem_signal` hints (`institutional_decline`, `mentor_shortage`, `community_fragmentation`, `replicable_model_needed`). |
 | 0.2.9 | 2026-06-05 | **REQ-38 audit follow-up / GIM-166:** §4.1a.1 GAP-38-01 — removed duplicate «Ecosystem anti-collapse» (L205); canonical anti-collapse = item 2 + REQ-36 multi-axis rule below. |
 | 0.2.10 | 2026-06-05 | **REQ-39 / GIM-167:** §4.6 rule 2 city-level canonicalization to `<City>, Estonia` (`Tallinn`, `Tallinna linn` examples); district/street strings preserved (`Kalamaja, Tallinn`). |
+| 0.2.16 | 2026-07-23 | **GPT-TAX-01 / GIM-211:** emit `canonical_payload.taxonomy` per-axis (incl. `internal`); flat `labels[]` derived; disposition table lockstep. |
 | 0.2.15 | 2026-07-07 | **GPT-SUBMIT-02 reaudit / GIM-207:** N1 rename propagation — `StoryDraftStashRequest` in mapping/non-wire prose (lockstep OpenAPI v0.6.0 + orchestrator §5.2.1). |
 | 0.2.14 | 2026-06-09 | **REQ-43 audit follow-up / GIM-185:** gateway REQ-43 (institution) namespace qualifier — §4.1 lift-gate note; §4.3 `institution_candidate` row. Semantics unchanged. |
 | 0.2.13 | 2026-06-07 | **REQ-41 / GIM-175:** §4.2.3 `trigger_activation_metadata` — five-trigger activation audit (`location`/`origin`/`summary`/`multi_axis_labels`/`gpt_signals`) with Reason enum; reuses REQ-40 evidence definitions; non-wire diagnostic source for God Mode. |
