@@ -15,6 +15,7 @@ info:
     Minimal subset for GPT Actions targeting story intake runtime (wire contract v2 + REQ-23 behavioral extensions).
     GPT-SUBMIT-02 (GIM-201): single stash contract — POST /story-drafts only; StoryDraftStashRequest (author at browser submit, GW-DRAFT-02).
     GPT-TAX-01 (GIM-209): narrative.taxonomy per-axis SoT; canonical_labels deprecated/derived flat compat.
+    GPT-TAX-02 (GIM-232): TaxonomyAxisEntry.label is an English snake_case / SSOT token — not et/ru prose; no vocabulary HTTP 422.
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
     VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.7.0); the runtime server
@@ -62,7 +63,9 @@ components:
       properties:
         label:
           type: string
-          description: Controlled taxonomy key (lowercase).
+          description: >
+            English snake_case / taxonomy-SSOT token (GPT-TAX-02). Estonian or Russian
+            prose is not a wire label value. Not an HTTP 422 / server vocabulary enum.
         disposition:
           type: string
           enum:

@@ -33,7 +33,7 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.summary` | no | `canonical_payload.summary`; omit entire block if any `et`/`ru`/`en` slot empty (REQ-25) |
 | `narrative.location_query` | no | `normalized_issue_payload.location_query` when user confirmed location (REQ-26); omit if absent |
 | `narrative.canonical_type` | no | `canonical_payload.type`; `complaint` / `system_bug` → issue promotion gate (REQ-25) |
-| `narrative.taxonomy` | no | `canonical_payload.taxonomy` — per-axis `{ axis: [{ label, disposition }] }` (GPT-TAX-01 / D-TAX-1 SoT; OpenAPI `NarrativeTaxonomy`; gateway `parse_taxonomy_payload`). Omit empty axes. |
+| `narrative.taxonomy` | no | `canonical_payload.taxonomy` — per-axis `{ axis: [{ label, disposition }] }` (GPT-TAX-01 / D-TAX-1 SoT; OpenAPI `NarrativeTaxonomy`; gateway `parse_taxonomy_payload`). Omit empty axes. Each `label` is an **English** snake_case / taxonomy-SSOT token (GPT-TAX-02); Estonian or Russian prose is not a wire `label`. Unknown keys are **not** an HTTP 422 / server vocabulary reject. |
 | `narrative.canonical_labels` | no | **Deprecated / derived:** flatten `disposition=canonical` keys from `narrative.taxonomy` when present; else `canonical_payload.labels[]` (REQ-25 compat). Prefer `taxonomy`. |
 | `narrative.institution` | no | **Demo scope: always omit (REQ-28 pre-flight #7).** Post-demo: `canonical_payload.institution` when all `{et,ru,en}` non-empty (REQ-23 §2.5 / gateway REQ-43 (institution)). |
 | `privacy.contains_pii` | no | `normalization_metadata.contains_pii` after §5.2.0 flow (REQ-23 §A) |
@@ -104,6 +104,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 2.0.1 | 2026-08-21 | **GPT-TAX-02 / GIM-232:** `narrative.taxonomy` `label` = English snake_case / SSOT token; et/ru prose not a wire `label`; no HTTP 422 vocabulary reject. OpenAPI `info.version` remains **0.7.0** (description-only). |
 | 2.0 | 2026-07-23 | **GPT-TAX-01 / GIM-210:** `narrative.taxonomy` field lock; `canonical_labels` deprecated/derived; lock `info.version` **0.7.0**. |
 | 1.9 | 2026-07-07 | **GPT-SUBMIT-02 / GIM-201…202:** `StoryDraftStashRequest` rename; remove `submitter*` from field lock; remove service intake prose from §1; lock `info.version` **0.6.0**. |
 | 1.8 | 2026-07-06 | **GPT-SUBMIT-01 / GIM-190:** `postStoryDraftStash` · `POST /story-drafts` · `201`/`{draft_id}`; remove `postStoryIntake` from Actions; omit `submitter` on stash; lock `info.version` **0.5.0**. |
