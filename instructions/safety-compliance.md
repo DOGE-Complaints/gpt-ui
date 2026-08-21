@@ -207,6 +207,7 @@ Safety & Compliance MUST be activated at 4 key points in INGEST flow:
 - All PII must be redacted or removed before proceeding
 - Redactions must be documented in artifact
 - If PII cannot be redacted → decision = "block"
+- **GPT-PII-01:** unredacted §4.4 types → do **not** proceed to Actions / `postStoryDraftStash`. Orchestrator STOP on decline. Flags `privacy.*` are not a substitute. **No** backend AI PII reject on MVP. REQ-21 vault stays Deferred.
 
 **Reference:** Base Instruction Section 1.5 (Rule 2: Stop-the-Line Conditions)
 

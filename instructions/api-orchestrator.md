@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.5.4 |
+| **Version** | 0.5.5 |
 | **Date** | 2026-08-21 |
-| **Traceability** | GIM-238…239 (GPT-GUARD-01 P6: H7 sandbox OR-list aligned with fail-closed; no invent `test_mode`); GIM-233…237 (GPT-GUARD-01 fail-closed H5–H7 + H1–H4 residual / H8 not create-gate / no backend LLM for junk); GIM-226…230 (GPT-TAX-02 English label tokens before stash); GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Traceability** | GIM-240…245 (GPT-PII-01 zero PII on wire: decline→STOP; full-field re-scan; flags insufficient; V9/V10 residual; no backend AI PII reject); GIM-238…239 (GPT-GUARD-01 P6: H7 sandbox OR-list aligned with fail-closed; no invent `test_mode`); GIM-233…237 (GPT-GUARD-01 fail-closed H5–H7 + H1–H4 residual / H8 not create-gate / no backend LLM for junk); GIM-226…230 (GPT-TAX-02 English label tokens before stash); GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -362,8 +362,8 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `origin.conversation_id` | Active `conversation_id` from GPT Actions session context when the orchestrator runtime exposes it (thread / conversation id for this Custom GPT session) | No | **REQ-35:** populate when available for channel attribution; do **not** send `null`, empty string, or placeholder text — **omit** the `conversation_id` key entirely when the id is not available to the runtime (instruction cannot guarantee Actions context; fill when present). |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
 | `narrative.institution` | `canonical_payload.institution` (`{et, ru, en}`) | No | **Always omit in current demo scope (REQ-28)** — §5.2.2 pre-flight #7 institution demo-gate drops this field regardless of `canonical_payload` content; normalizer-layer enforcement in [`story-normalizer.md`](story-normalizer.md) §4.1. Post-demo (gateway REQ-43 (institution) lifted): omit only if any i18n slot empty (REQ-23 §2.5 secondary directive — pre-flight #8). |
-| `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A; omit entire `privacy` block when false/absent |
-| `privacy.redaction_requested` | User choice in §5.2.0 two-step flow | No | `true` only if user agreed to edit |
+| `privacy.contains_pii` | `normalization_metadata.contains_pii` (after §5.2.0 flow) | No | REQ-23 §A / GPT-PII-01: flag only — **never** authorizes HTTP; omit entire `privacy` block when false/absent **and** re-scan is clean |
+| `privacy.redaction_requested` | User agreed to edit in §5.2.0 | No | `true` only after clean re-scan; decline → STOP (not send) |
 | `gpt_signals.severity` | `non_wire_metadata.severity` | No | REQ-23 §B / gateway REQ-42 (gpt_signals); omit block if sidecar absent |
 | `gpt_signals.impact_estimation` | `non_wire_metadata.impact_estimation` | No | Enum per gateway REQ-42 (gpt_signals): `LOCAL`, `DISTRICT`, `CITY`, `NATIONAL`; omit field if unsure (no `UNKNOWN` fallback for this field — server frozenset [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L62 rejects with HTTP 400) |
 | `gpt_signals.problem_status` | `non_wire_metadata.problem_status` | No | Enum per gateway REQ-42 (gpt_signals) |
@@ -461,18 +461,43 @@ Do not call HTTP without this audit line when admission gate passes.
 
 If all items 1–5 pass **and** test/sandbox rule allows production submit → proceed to §5.2.0 PII pre-send (when applicable), then §5.2.0b dual-mode pre-submit preview, then §5.2.2 Story Intake pre-flight checks.
 
-#### 5.2.0 PII pre-send check (REQ-23 §1.3)
+#### 5.2.0 PII pre-send check (REQ-23 §1.3 / GPT-PII-01)
 
 Run **after** building the draft `StoryDraftStashRequest` mapping and **after** §5.2.0a admission gate passes; **before** §5.2.0b pre-submit preview and §5.2.2 pre-flight / HTTP.
 
-If `normalization_metadata.contains_pii` is `true`:
+**Zero-PII on wire (GPT-PII-01):** Before **every** `postStoryDraftStash`, the draft body wire text MUST NOT contain normalizer [`story-normalizer.md`](story-normalizer.md) §4.4 types (person name, address street+number, phone, email, personal ID). `privacy.contains_pii` and `privacy.redaction_requested` **never** authorize HTTP. Flags are **not** a substitute for scrub: either the text is clean, or there is no send.
 
-1. **Inform the user** which PII type(s) were detected in `original_text` / `description.*` and ask whether they want to remove them before submission.
-2. **If the user agrees to edit:** help edit the narrative, re-run [`story-normalizer.md`](story-normalizer.md) on the edited text, then set `privacy.contains_pii = true` and `privacy.redaction_requested = true`.
-3. **If the user declines:** set `privacy.contains_pii = true` and `privacy.redaction_requested = false`.
-4. Proceed to §5.2.0b dual-mode preview, then §5.2.2 pre-flight.
+**Scan set:** all narrative wire text on this draft (`original_text`, `title` / `description` / `summary` i18n) **and** text sidecars (`consistency_notes`, `location_query`, institution, free-text labels). Opaque submitter / HMAC / identity ids are **not** narrative PII.
 
-If `contains_pii` is `false` or absent: **omit** the entire `privacy` block; proceed to §5.2.0b dual-mode preview, then §5.2.2.
+If `normalization_metadata.contains_pii` is `true` **or** a scan of the scan set finds §4.4 types:
+
+1. **Inform the user** which PII type(s) were detected and ask whether they want to remove them before submission.
+2. **If the user agrees to edit:** help edit the narrative, re-run [`story-normalizer.md`](story-normalizer.md) on the edited text, then re-scan the scan set. Set `privacy.contains_pii = true` and `privacy.redaction_requested = true` only after the re-scan finds **no** §4.4 types. If types remain → **STOP** before HTTP.
+3. **If the user declines:** **STOP** before `postStoryDraftStash`. Do **not** call the Action. Do **not** set flags and proceed. (Tightening vs historical REQ-23 §1.3 decline→send; **do not** change REQ-23 file Status Done.)
+4. Minimal assent («ок», «отправь как есть», «send it anyway») is **not** consent to send PII. *(V7)*
+
+If `contains_pii` is `false` or absent: **omit** the entire `privacy` block **only after** the pre-HTTP re-scan of the scan set finds no §4.4 types. A miss (`contains_pii=false` / omitted `privacy` while PII remains) → **STOP**.
+
+**Fail-closed re-scan (GPT-PII-01 / V2+V4):** Immediately before every `postStoryDraftStash`, re-scan the scan set. Re-inject after «очистки», LLM miss, or omitted `privacy` → still **STOP** if §4.4 types are present. Do not invent a wire `test_mode` or backend PII-reject flag.
+
+**God Mode (V6):** JSON preview may show PII. Preview is **not** a send exemption. HTTP still requires zero §4.4 types.
+
+**MVP residual (GPT-PII-01):** Instruction-layer only. This does **not** add a backend AI PII reject or HTTP 422 PII semantics. Gateway `redact_pii` logs stay as-built (not persist scrub). REQ-21 vault stays Deferred.
+
+| Vector | MVP disposition | Notes |
+|--------|-----------------|-------|
+| **V1** | Closed (GPT) | Decline redact → STOP. |
+| **V2** | Closed (GPT) | Conservative detect + pre-HTTP re-scan. |
+| **V3** | Closed (GPT) | Full-field i18n scan. |
+| **V4** | Closed (GPT) | Re-scan immediately before HTTP. |
+| **V5** | Closed (GPT) | Sidecars in scan set. |
+| **V6** | Closed (GPT) | Preview ≠ send exemption. |
+| **V7** | Closed (GPT) | Minimal assent is not PII-send consent. |
+| **V8** | Closed (GPT) | Obfuscated identifiers = PII (normalizer §4.4). |
+| **V9** | Residual documented | Direct client `POST /story-drafts` bypasses GPT. Citizen path = Actions only. |
+| **V10** | Residual documented | SPA `submit` `body: {}` trusts stash; depends on V1–V8. |
+
+**No backend AI PII reject on MVP (cost):** Do not invent a server PII-LLM check or HTTP PII-reject code in these instructions. Citizen Actions enforcement is this §5.2.0 gate.
 
 #### 5.2.0b Dual-mode pre-submit preview — Citizen Mode / God Mode (REQ-31)
 
@@ -560,7 +585,7 @@ Citizen Mode continues to show human «Labels: …» only — never raw `taxonom
 
 **Single-evaluation rule (REQ-41 §2.1):** Populate Activated/Reason from **the same inputs** as §5.2.2 items 13–15 — `ingest_validation_report.pre_submission_compliance_evidence` plus the built draft — **not** a second independent assessment. When present, prefer displaying `normalization_metadata.trigger_activation_metadata` from [`story-normalizer.md`](story-normalizer.md) §4.2.3 (normalizer audit source). Reason values: `no-evidence`, `runtime-unavailable`, `omitted-by-rule` (REQ-41 §2.2). This table is **diagnostic only** — it does **not** block submit (enforcement remains REQ-40 items 13–15).
 
-God Mode does **not** bypass §5.2.0a, §5.2.0, or §5.2.2. After operator review and explicit confirmation → proceed to §5.2.2, then HTTP.
+God Mode does **not** bypass §5.2.0a, §5.2.0, or §5.2.2. JSON preview may contain PII; HTTP still requires zero §4.4 types (GPT-PII-01). Preview is **not** a send exemption. After operator review and explicit confirmation → proceed to §5.2.2, then HTTP only if the §5.2.0 re-scan is clean.
 
 ---
 
@@ -619,6 +644,8 @@ Run before every `postStoryDraftStash` (`POST /story-drafts`) call:
 17. **Stash `session_language` required (D-SUBMIT-4 / GIM-189):** `narrative.session_language` **must** be present and ∈ `{en, et, ru}` before stash. All i18n narrative fields (`title`, `description`, `summary` when present) must be populated for wire v2. If missing or invalid → **STOP**. Do not call HTTP. SPA preview reads `narrative_session_language` — default `en` when absent breaks et/ru UX ([`storyDraftPreview.js`](../../spa-app/src/services/storyDraftPreview.js)). Cross-ref emergent **E3** (gateway stash validation belt-and-suspenders).
 
 18. **English label tokens (GPT-TAX-02 / GIM-228):** For every `label` in `narrative.taxonomy` (all dispositions on the stash body) and derived `narrative.canonical_labels`: the value MUST be an English snake_case / taxonomy-SSOT token. If Estonian or Russian prose appears as a label value → **STOP** before `postStoryDraftStash` (return to normalizer) **or** remap to an English SSOT-style token then continue. English SSOT-style labels → OK. **Do not** treat unknown keys as HTTP 422 / server vocabulary reject. HTTP 422 remains `GEO_SCOPE_MISMATCH` only (§5.2.3). Keep the 13-axis GPT-TAX-01 mapping (do not drop axes).
+
+19. **Zero-PII re-scan (GPT-PII-01 / GIM-242):** Immediately before HTTP, re-scan the §5.2.0 scan set. If any §4.4 type remains → **STOP**. Do not call `postStoryDraftStash`. Flags do not override this check. **Do not** treat this as HTTP 422 PII reject.
 
 If all checks pass → proceed to `postStoryDraftStash` HTTP call.
 
@@ -734,6 +761,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 ### 7.5 Operator checklist
 
 - [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30) + standing pack (`policy_gate_result` approved only with self / personally affected; `NEIGHBOR_GOSSIP` STOP before stash). Gateway mission AI **not** required on MVP.
+- [ ] GPT-PII-01: decline redact → STOP; flags insufficient; pre-HTTP re-scan of all wire text; V9/V10 residual documented; **no** backend AI PII reject; REQ-21 vault Deferred. Distinct from GPT-GUARD-01 junk holes.
 - [ ] GPT-GUARD-01: H5–H7 fail-closed (missing artifacts / «отправь тест» / sandbox mis-use → STOP); H1–H4 residual documented; H8 `alpha_score` not a create-gate; **no** backend LLM for junk (distinct from GPT-PII-01).
 - [ ] §5.2.2 item 18 / Issue pre-flight 3a: wire `label` values are English tokens; et/ru prose STOP or remap before stash; **no** HTTP 422 vocabulary-reject AC.
 - [ ] §5.2.0b dual-mode preview shown: Citizen Mode default or God Mode with banner; browser-handoff citizen copy (REQ-31 + GPT-SUBMIT-01).
@@ -752,6 +780,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5.5 | 2026-08-21 | **GPT-PII-01 / GIM-240…243:** §5.2.0 decline redact → STOP; flags never authorize HTTP; full-field + sidecar re-scan before every stash; God Mode preview ≠ send exemption; V1–V8 Closed (GPT); V9/V10 residual; no backend AI PII reject; REQ-21 Deferred. REQ-23 file Status unchanged. §5.2.2 item 19. |
 | 0.5.4 | 2026-08-21 | **GPT-GUARD-01 / GIM-239:** §5.2.0a sandbox OR-list aligned with H7 fail-closed — exceptions only `environment == sandbox` or `authorized_tester` + `explicit_test_confirmation`; `payload.test_mode` not a production bypass (not in wire). et/ru/en STOP copies kept. No backend LLM / `INTAKE_NOT_SUBSTANTIVE` AC. |
 | 0.5.3 | 2026-08-21 | **GPT-GUARD-01 / GIM-233…235:** §5.2.0a fail-closed H5–H7 (artifacts / minimal assent / sandbox); H1–H4 residual documented; H8 not create-gate; no backend LLM for junk vs GPT-PII-01. REQ-30 items 1–5 and et/ru/en STOP copies kept. |
 | 0.5.2 | 2026-08-21 | **GPT-TAX-02 / GIM-228:** English label tokens — Issue pre-flight 3a + §5.2.2 item 18 STOP/remap et/ru prose before stash; no HTTP 422 vocabulary reject; 13-axis TAX-01 mapping kept. |

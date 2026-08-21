@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.17 |
+| **Version** | 0.2.18 |
 | **Date** | 2026-08-21 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -224,7 +224,7 @@ Stable **references** to upstream work (opaque strings or objects — align with
 |-----|---------|
 | `session_language` | **Required** for story-intake handoff: `et` \| `ru` \| `en` — MUST match the primary interview language from [`bootstrap.md`](bootstrap.md) **`comm_context.ui_lang`** (see [`story-i18n-policy.md`](story-i18n-policy.md) §1–2). Maps to `StoryDraftStashRequest.narrative.session_language` (orchestrator §5.2.1). |
 | `detected_input_language` | **Required** for wire v2: `et` \| `ru` \| `en` — auto-detected language of the user’s narrative text from deep parsing / validation (may differ from `session_language`). Maps to `StoryDraftStashRequest.narrative.language` per REQ-22. Do not substitute `session_language` when the detected language differs. |
-| `contains_pii` | **Required** for REQ-23 handoff: boolean — conservative PII scan on `original_text` / `description.*` (see §4.4). Read by [`api-orchestrator.md`](api-orchestrator.md) §5.2.0. |
+| `contains_pii` | **Required** for REQ-23 / GPT-PII-01 handoff: boolean — conservative PII scan of the §4.4 scan set (all narrative wire text + sidecars). Read by [`api-orchestrator.md`](api-orchestrator.md) §5.2.0. |
 | `ingest_validation_report_ref` | Reference to the validation artifact used (id, hash, or short summary line). |
 | `safety_compliance_report_ref` | Reference to relevant safety checkpoint output for this handoff. |
 | `policy_gate_ref` | At minimum: `policy_ref`, `rulebook_version`, and `policy_gate_result.status` copy or stable id. |
@@ -361,25 +361,32 @@ Allowed enum values (must match **gateway REQ-42 (gpt_signals)** when mapped to 
 
 If unsure about a value, prefer `UNKNOWN` for `problem_status` or omit that field from `non_wire_metadata`. `institution_candidate` is **only** populated when §4.1 demo-constraint suppressed a candidate from `canonical_payload.institution` — otherwise omit it.
 
-### 4.4 PII detection (REQ-23 §1.2)
+### 4.4 PII detection (REQ-23 §1.2 / GPT-PII-01)
 
-Scan `canonical_payload.description.*` and narrative text used for `original_text` mapping for personally identifiable information:
+Scan the **full scan set** on this draft for personally identifiable information — not only `original_text` / `description.*`:
+
+- narrative wire text: `original_text`; `canonical_payload.title.{et,ru,en}`; `canonical_payload.description.{et,ru,en}`; `canonical_payload.summary.{et,ru,en}` when present
+- text sidecars: `live_story_context.consistency_notes`; `location_query`; institution strings; free-text labels (non-enum prose)
+
+Do **not** treat opaque submitter ids, HMAC tokens, or identity phone hashes as narrative PII (GPT-PII-01 AC #5).
 
 | PII type | Examples |
 |----------|----------|
 | Person name | «Иван Петров», «Mari Tamm» |
 | Address | «Liivalaia 10-5», street + number |
-| Phone | `+372…`, national formats |
-| Email | `name@domain` |
+| Phone | `+372…`, national formats, digits with spaces (`5 55 12 34`) |
+| Email | `name@domain`, obfuscated (`name собака domain точка ee`) |
 | Personal identifier | ID-card, passport, national ID numbers |
+
+**Obfuscation (V8):** Treat spaced phones, «собака» / «at» / «точка» email disguises, and similar identifier hiding as PII.
 
 **Rules:**
 
 - If **high confidence** that any type is present → set `normalization_metadata.contains_pii = true`.
 - If **low confidence** → still set `contains_pii = true` (conservative).
-- If no PII detected → `contains_pii = false`.
+- If no PII detected in the scan set → `contains_pii = false`.
 
-Do **not** perform the user interaction here; [`api-orchestrator.md`](api-orchestrator.md) §5.2.0 runs the two-step edit flow before HTTP.
+Do **not** perform the user interaction here; [`api-orchestrator.md`](api-orchestrator.md) §5.2.0 runs edit-or-STOP before HTTP. Decline redact is **STOP** (not send-with-flags).
 
 ### 4.5 Consistency notes (REQ-23 §3.2)
 
@@ -459,6 +466,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2.18 | 2026-08-21 | **GPT-PII-01 / GIM-241:** §4.4 scan set = all narrative i18n wire text + sidecars; obfuscated identifiers = PII; opaque submitter/HMAC ids not narrative PII; decline interaction is orchestrator STOP. |
 | 0.2.17 | 2026-08-21 | **GPT-TAX-02 / GIM-227:** English token emit for `taxonomy[].label` and derived `labels[]`; et/ru prose remap or omit — not HTTP 422. |
 | 0.1 | 2026-04-10 | Initial scaffold: `normalized_issue_payload`, `canonical_payload`, `normalization_metadata`, Plain GPT, no API, no user questions; Issue SoT = `story-data-model.md` §4.1. |
 | 0.1.1 | 2026-04-10 | Added §6 cross-link to `base.md` §1.5 Issue artifact alignment. |
