@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.2 |
-| **Date** | 2026-07-23 |
-| **Traceability** | FR-M1-026/027/044…051; REQ-36; GPT-TAX-01; [`story-data-model.md`](story-data-model.md), [`story-interview-flow.md`](story-interview-flow.md), [`ingest-validation.md`](ingest-validation.md), [`story-normalizer.md`](story-normalizer.md) |
+| **Version** | 0.2.3 |
+| **Date** | 2026-08-21 |
+| **Traceability** | FR-M1-026/027/044…051; REQ-36; GPT-TAX-01; GPT-TAX-02 / GIM-226; [`story-data-model.md`](story-data-model.md), [`story-interview-flow.md`](story-interview-flow.md), [`ingest-validation.md`](ingest-validation.md), [`story-normalizer.md`](story-normalizer.md) |
 
 ---
 
@@ -27,6 +27,9 @@ This file defines how GPT may derive Issue labels from the story. It is an instr
 4. Do not place internal/safety/privacy labels into public/card labels.
 5. Do not use labels to imply official routing, institution responsibility, publication status, or backend acceptance.
 6. Unknown or low-confidence labels must be omitted from `canonical_payload.labels[]` and recorded as `metadata_only`, `needs_clarification`, or `rejected`.
+7. **English tokens on the wire (GPT-TAX-02):** every `label` value that leaves GPT on `canonical_payload.taxonomy` / derived `labels[]` / stash `narrative.taxonomy` MUST be an **English** token in snake_case / §4 SSOT style (e.g. `transport`, `city_for_people`). Do **not** emit Estonian or Russian prose as a `label` string. Map to a listed English key or omit / `needs_clarification`.
+8. There is **no** product AC that unknown keys MUST cause **HTTP 422** or a **server vocabulary reject**. GPT-side omit (rule 6) is sufficient. Do **not** activate GW-L10N-04 for this story. Gateway may accept any non-empty label string.
+9. **Exact key sync is secondary** to vector similarity / embeddings. Session-to-session label-string drift is acceptable; clustering does not require a shared HTTP enum.
 
 ---
 
@@ -336,6 +339,7 @@ Allowed `disposition` values (lockstep gateway `LabelDisposition` in [`dispositi
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2.3 | 2026-08-21 | **GPT-TAX-02 / GIM-226:** §2 English token wire labels (no et/ru prose); no HTTP 422 / server vocabulary-reject AC; exact key sync secondary to vector similarity. 13 axes lockstep unchanged. |
 | 0.2.2 | 2026-07-23 | **GPT-TAX-01 / GIM-211+212:** disposition `internal`; axis/disposition lockstep notes vs GW-TAX-01. |
 | 0.2.1 | 2026-06-05 | **REQ-36 audit / GIM-161…162:** GAP-36-01 — dedup `small_business` removed; `visitors`/`public_users` demoted to §5; GAP-36-02 — disambiguated `brain_drain_signal` (civic) vs `brain_drain` (ecosystem capacity). |
 | 0.2 | 2026-06-05 | **REQ-36 / GIM-156…158:** expanded `topic_domain`, `civic_signal`, `service_object`; promoted `affected_scope`, `deep_need`, `desired_outcome`; new axes `ecosystem_signal`, `governance_signal`; OD-1/OD-2 documented in §3. |

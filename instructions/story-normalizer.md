@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.16 |
-| **Date** | 2026-07-23 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.17 |
+| **Date** | 2026-08-21 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -273,6 +273,8 @@ Only candidates with `disposition = "canonical"` and keys allowed by [`story-lab
 
 Then derive `canonical_payload.labels[]` = all `label` values under any axis with `disposition = "canonical"` (order: axis table order in taxonomy §3, then label order within axis).
 
+**English token rule (GPT-TAX-02 / GIM-227):** Every `label` written into `canonical_payload.taxonomy[*][].label` and into derived `canonical_payload.labels[]` MUST be an **English** token (snake_case / [`story-label-taxonomy.md`](story-label-taxonomy.md) §4 style). If a candidate is Estonian or Russian prose, **remap** to the closest listed English key or omit / `needs_clarification` — do **not** leave et/ru prose on the wire. This is GPT-side correction, **not** HTTP 422 / server vocabulary reject.
+
 #### 4.2.2 `location_extraction_metadata`
 
 When location is processed per §4.6, record extraction confidence under `normalization_metadata.location_extraction_metadata`:
@@ -457,6 +459,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2.17 | 2026-08-21 | **GPT-TAX-02 / GIM-227:** English token emit for `taxonomy[].label` and derived `labels[]`; et/ru prose remap or omit — not HTTP 422. |
 | 0.1 | 2026-04-10 | Initial scaffold: `normalized_issue_payload`, `canonical_payload`, `normalization_metadata`, Plain GPT, no API, no user questions; Issue SoT = `story-data-model.md` §4.1. |
 | 0.1.1 | 2026-04-10 | Added §6 cross-link to `base.md` §1.5 Issue artifact alignment. |
 | 0.1.2 | 2026-04-10 | Added §5.1 concise narrative-layer projection table for `title` / `summary` / `description` / optional `institution`. |

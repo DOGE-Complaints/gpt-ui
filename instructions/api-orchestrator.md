@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.5.1 |
+| **Version** | 0.5.2 |
 | **Date** | 2026-08-21 |
-| **Traceability** | GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Traceability** | GIM-226…230 (GPT-TAX-02 English label tokens before stash); GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -179,6 +179,7 @@ Do **not** copy instruction-only metadata (`normalization_metadata`, `label_extr
 1. `normalized_issue_payload.canonical_payload` exists and contains required fields for the active imported Actions contract.
 2. `normalization_metadata` contains refs to validation, safety, policy gate artifacts, and `session_language`.
 3. `canonical_payload.taxonomy` (when present) preserves per-axis membership; `canonical_payload.labels[]` contains only validated canonical labels from `story-label-taxonomy.md`; unknown, metadata-only, internal-only, and low-confidence candidates must not enter flat `labels[]` — they may appear under `taxonomy` with the matching disposition. Stop before HTTP if required wire fields are invalid.
+3a. **English label tokens (GPT-TAX-02 / GIM-228):** every `label` on `canonical_payload.taxonomy` (wire-bound dispositions) and derived `labels[]` MUST be an English snake_case / taxonomy-SSOT token. If Estonian or Russian prose appears as a label value → **STOP** before HTTP (return to [`story-normalizer.md`](story-normalizer.md) to remap) **or** remap in-place to an English SSOT-style token, then continue. English SSOT-style labels → OK. **Do not** invent HTTP 422 / server vocabulary reject for unknown keys.
 4. No direct jump from gate package to HTTP is allowed; normalization is mandatory on strict Issue path.
 5. Build HTTP requests from `canonical_payload` plus OpenAPI/SSOT contract (`story-api-methods-reference.md`).
 6. The outgoing request body must not contain label extraction metadata, non-wire metadata, or backend-issued fields: `id`, `status`, `created_at`, `updated_at`, `arweave_txid`, `image_txid`, `image_hash`, `txid`.
@@ -595,6 +596,8 @@ Run before every `postStoryDraftStash` (`POST /story-drafts`) call:
 
 17. **Stash `session_language` required (D-SUBMIT-4 / GIM-189):** `narrative.session_language` **must** be present and ∈ `{en, et, ru}` before stash. All i18n narrative fields (`title`, `description`, `summary` when present) must be populated for wire v2. If missing or invalid → **STOP**. Do not call HTTP. SPA preview reads `narrative_session_language` — default `en` when absent breaks et/ru UX ([`storyDraftPreview.js`](../../spa-app/src/services/storyDraftPreview.js)). Cross-ref emergent **E3** (gateway stash validation belt-and-suspenders).
 
+18. **English label tokens (GPT-TAX-02 / GIM-228):** For every `label` in `narrative.taxonomy` (all dispositions on the stash body) and derived `narrative.canonical_labels`: the value MUST be an English snake_case / taxonomy-SSOT token. If Estonian or Russian prose appears as a label value → **STOP** before `postStoryDraftStash` (return to normalizer) **or** remap to an English SSOT-style token then continue. English SSOT-style labels → OK. **Do not** treat unknown keys as HTTP 422 / server vocabulary reject. HTTP 422 remains `GEO_SCOPE_MISMATCH` only (§5.2.3). Keep the 13-axis GPT-TAX-01 mapping (do not drop axes).
+
 If all checks pass → proceed to `postStoryDraftStash` HTTP call.
 
 #### 5.2.3 Story draft stash response handling (GIM-187 / GIM-188)
@@ -709,6 +712,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 ### 7.5 Operator checklist
 
 - [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30) + standing pack (`policy_gate_result` approved only with self / personally affected; `NEIGHBOR_GOSSIP` STOP before stash). Gateway mission AI **not** required on MVP.
+- [ ] §5.2.2 item 18 / Issue pre-flight 3a: wire `label` values are English tokens; et/ru prose STOP or remap before stash; **no** HTTP 422 vocabulary-reject AC.
 - [ ] §5.2.0b dual-mode preview shown: Citizen Mode default or God Mode with banner; browser-handoff citizen copy (REQ-31 + GPT-SUBMIT-01).
 - [ ] `postStoryDraftStash` used for user stories (only GPT Actions story path).
 - [ ] Redirect URL uses `/#/story/submit?draft_id=` (§5.2.B).
@@ -725,6 +729,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5.2 | 2026-08-21 | **GPT-TAX-02 / GIM-228:** English label tokens — Issue pre-flight 3a + §5.2.2 item 18 STOP/remap et/ru prose before stash; no HTTP 422 vocabulary reject; 13-axis TAX-01 mapping kept. |
 | 0.5.1 | 2026-08-21 | **GPT-MISSION-01 / GIM-218:** §5.2.0a standing pack via `policy_gate_result` (personal ACCEPT; `NEIGHBOR_GOSSIP` STOP before stash); MVP no gateway mission AI; junk/test STOP unchanged. |
 | 0.5.0 | 2026-07-23 | **GPT-TAX-01 / GIM-210+213:** §5.2.1 `narrative.taxonomy` mapping + example; `canonical_labels` deprecated/derived; §5.2.0b God Mode shows per-axis taxonomy. Lockstep OpenAPI **0.7.0**. |
 | 0.4.0 | 2026-07-07 | **GPT-SUBMIT-02 / GIM-201…206:** single stash contract — `StoryDraftStashRequest` rename; remove service `/intake/stories` rows; purge §5.2.1 submitter mapping; remove §5.2.4.B; §6.1 one success schema (201 `draft_id`); stash-relevant error example. Lockstep OpenAPI `info.version` **0.6.0**. |
