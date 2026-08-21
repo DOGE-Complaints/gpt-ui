@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.5.0 |
-| **Date** | 2026-07-23 |
-| **Traceability** | GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Version** | 0.5.1 |
+| **Date** | 2026-08-21 |
+| **Traceability** | GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -393,6 +393,10 @@ GPT **MUST NOT** call `postStoryDraftStash` unless the current conversation cont
 3. **`policy_gate_result`** — object exists; `status = "approved"`.  
    If missing or not approved — **STOP**. Do not call HTTP.
 
+   **Standing pack (GPT-MISSION-01 / GIM-218):** `approved` is valid for stash **only if** the gate applied [`story-policy-gate.md`](story-policy-gate.md) §7.1: personal stories (self / personally affected) **ACCEPT**; neighbor-gossip **REJECT** (`NEIGHBOR_GOSSIP` or any not-approved). If the draft is others' affairs without standing — **STOP** before `postStoryDraftStash`. Do **not** treat a personal story as `IRRELEVANT_NON_CIVIC`.
+
+   **MVP (story AC #5):** gateway mission-AI reject is **not** required on MVP. Enforcement seam is GPT policy-gate + interview + this admission. Do not invent a backend mission LLM check. Junk/test STOP below is unchanged.
+
 4. **`normalized_issue_payload`** — object exists; produced by [`story-normalizer.md`](story-normalizer.md) (not ad hoc assembly); contains at minimum:
    - `canonical_payload.type`
    - `canonical_payload.labels`
@@ -704,7 +708,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 ### 7.5 Operator checklist
 
-- [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30).
+- [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30) + standing pack (`policy_gate_result` approved only with self / personally affected; `NEIGHBOR_GOSSIP` STOP before stash). Gateway mission AI **not** required on MVP.
 - [ ] §5.2.0b dual-mode preview shown: Citizen Mode default or God Mode with banner; browser-handoff citizen copy (REQ-31 + GPT-SUBMIT-01).
 - [ ] `postStoryDraftStash` used for user stories (only GPT Actions story path).
 - [ ] Redirect URL uses `/#/story/submit?draft_id=` (§5.2.B).
@@ -721,6 +725,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5.1 | 2026-08-21 | **GPT-MISSION-01 / GIM-218:** §5.2.0a standing pack via `policy_gate_result` (personal ACCEPT; `NEIGHBOR_GOSSIP` STOP before stash); MVP no gateway mission AI; junk/test STOP unchanged. |
 | 0.5.0 | 2026-07-23 | **GPT-TAX-01 / GIM-210+213:** §5.2.1 `narrative.taxonomy` mapping + example; `canonical_labels` deprecated/derived; §5.2.0b God Mode shows per-axis taxonomy. Lockstep OpenAPI **0.7.0**. |
 | 0.4.0 | 2026-07-07 | **GPT-SUBMIT-02 / GIM-201…206:** single stash contract — `StoryDraftStashRequest` rename; remove service `/intake/stories` rows; purge §5.2.1 submitter mapping; remove §5.2.4.B; §6.1 one success schema (201 `draft_id`); stash-relevant error example. Lockstep OpenAPI `info.version` **0.6.0**. |
 | 0.3.9 | 2026-07-06 | **GPT-SUBMIT-01 / GIM-186…193:** browser-submit handoff — user path `postStoryDraftStash` (`POST /story-drafts`) + §5.2.B redirect; §5.2.3 `{draft_id}`/201; §5.2.4.A redirect copy; §5.2.4.B service doc-only legacy; omit `submitter` on stash; §5.2.2 item 17 `session_language`; `/intake/stories` service-only (not Actions). |

@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.5 |
-| **Date** | 2026-04-22 |
-| **Traceability** | FR-M1-039–043 (safety / gate alignment); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-data-model.md`](story-data-model.md); [`safety-compliance.md`](safety-compliance.md) |
+| **Version** | 0.6 |
+| **Date** | 2026-08-21 |
+| **Traceability** | FR-M1-039–043 (safety / gate alignment); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-data-model.md`](story-data-model.md); [`safety-compliance.md`](safety-compliance.md); GPT-MISSION-01 / GIM-216 (standing / anti-gossip) |
 
 ---
 
@@ -110,13 +110,17 @@ For DOGEstonia demo sessions where operator policy profile is explicitly set to 
 - `BLOCK`:
   - clear off-topic / non-civic content (`IRRELEVANT_NON_CIVIC`);
   - scam, phishing, spam, promo bait (`SCAM_OR_SPAM`);
-  - obscene/sexualized/trolling payload unrelated to civic issue intake (`OBSCENE_OR_TROLL`).
+  - obscene/sexualized/trolling payload unrelated to civic issue intake (`OBSCENE_OR_TROLL`);
+  - others' affairs without standing — neighbor gossip / склочничество (`NEIGHBOR_GOSSIP`).
 - `needs_clarification`:
   - weakly relevant but noisy content where civic intent is not explicit (`RELEVANCE_UNCLEAR`).
-- `approved`:
-  - content that is recognizably civic and can continue through strict chain.
+- `approved` (**ACCEPT**):
+  - **personal stories** with **standing** = self **or** personally affected (spouse, child, own pain, own parents) — valuable civic signal; **must not** map to `IRRELEVANT_NON_CIVIC`;
+  - content that is recognizably civic **or** a personal story with standing, and can continue through strict chain.
+- **Do not** require a formal civic-complaint frame. Narrow «only official civic complaint» is **wrong**: personal ≠ out of mission.
+- If an OP-DOC is pinned, it **must not** contradict these ACCEPT / REJECT classes for `demo_baseline`.
 
-This demo pack does not replace safety controls in [`safety-compliance.md`](safety-compliance.md); it is an admission filter before normalization.
+This demo pack does not replace safety controls in [`safety-compliance.md`](safety-compliance.md); it is an admission filter before normalization. Safety third-party PII does **not** replace standing (a parent may tell a child's story without passport data).
 
 ---
 
@@ -148,3 +152,4 @@ Document the effective mode in `reasons` (e.g. code `POLICY_DEGRADED_MODE`).
 | 0.3 | 2026-04-10 | Refined traceability and external template guidance in §3. |
 | 0.4 | 2026-04-21 | Added demo baseline gate profile (irrelevant/scam/spam/obscene filtering) with stable reason codes. |
 | 0.5 | 2026-04-22 | §3: pointer to human operator OP-DOC deployment checklist (`instruction-modules-index` Operator readiness); no change to gate logic. |
+| 0.6 | 2026-08-21 | **GPT-MISSION-01 / GIM-216:** §7.1 standing pack — personal stories ACCEPT (self / personally affected); `NEIGHBOR_GOSSIP` REJECT; keep `IRRELEVANT_NON_CIVIC` / `SCAM_OR_SPAM` / `OBSCENE_OR_TROLL`. |

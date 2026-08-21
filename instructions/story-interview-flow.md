@@ -5,8 +5,8 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.21 |
-| **Date** | 2026-07-06 |
+| **Version** | 0.22 |
+| **Date** | 2026-08-21 |
 | **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **REQ-38**, **REQ-43**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
 
 **Related modules:** [`story-data-model.md`](story-data-model.md) · [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) · [`safety-compliance.md`](safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
@@ -80,6 +80,8 @@ If any of **Q1–Q6** is **missing or only guessed**, treat the interview as **i
 | 7 | Is there evidence this is **not a one-off**? (one-off vs recurring) | Phase **6** | **No** — optional signal only; personal story valid without it |
 
 **Rule before Phase 7:** run **Q1–Q6** (with Q4–Q6 depth optional per **§7.5**) **before** the long summary / draft Issue framing. **Do not** block Phase 7 or intake solely because Q7 is unanswered. If **Q1–Q3** (minimum episode + meaning path) or required Q1–Q6 substance is incomplete — **do not** imply readiness for backend or “final” Issue text; stay in phases **2–6** or acknowledge incompleteness in one line, then invite correction.
+
+**Standing (GPT-MISSION-01 / GIM-217):** a **personal story** (self **or** personally affected: spouse, child, own parents, own pain) is **in-mission** and **must not** be treated as `IRRELEVANT_NON_CIVIC`. Neighbor gossip / others' affairs without personal standing is **out** — policy [`story-policy-gate.md`](story-policy-gate.md) §7.1 `NEIGHBOR_GOSSIP`; do **not** run §7.5 intake offer for that class. Q7 remains optional (not a civic-form gate). Do **not** require a formal civic-complaint frame.
 
 **Downstream “sufficient raw material” (no normalizer in this file):** completeness here means enough **substance** for projection into [`story-data-model.md`](story-data-model.md) narrative fields and §4.1 logical Issue — **enforcement** lives in **`ingest-validation.md`** (DOGEstonia / Issue track overlay) and **`base.md`** (INGEST Issue overlay). Align narrative completeness with validation and acceptance modules when wired.
 
@@ -215,6 +217,7 @@ When a **personal story** is **sufficiently clear** — the model has a concrete
 - **Do not** promise government or institutional outcomes (**§8** row 7; [`root.md`](root.md)).
 - If the user accepts, proceed toward **§7.2** Phase 7 confirmation; if they decline or want more depth, continue phases **4–6** without blocking.
 - Q7 remains **optional** — never re-open collective proof as a gate after this offer.
+- **Standing:** offer §7.5 only when the story is the user's own or they are personally affected. Do **not** treat personal stories as `IRRELEVANT_NON_CIVIC`. Do **not** offer stash/intake for neighbor-gossip without standing ([`story-policy-gate.md`](story-policy-gate.md) §7.1 REJECT `NEIGHBOR_GOSSIP`).
 
 **Example copy** (adapt to `session_language`; two short paragraphs — framing + invitation):
 
@@ -242,6 +245,7 @@ Operational **DO NOT** in Issue interview:
 | 8 | Substituting user will | Finalize interpretation without confirmation. | **§7.2:** summary → correction offer → revised framing if needed → re-confirm; only then handoff (FR-M1-032…034). |
 | 9 | Misusing **observation** | Relabel clear **harm** narratives as “just an observation” to skip depth or safety bar. | Keep **§4–§5** when user expresses harm; use **observation** routing only for genuine **improvement-without-harm** (**FR-M1-025**). At normalization, apply [`story-normalizer.md`](story-normalizer.md) §4.1 **observation vs complaint decision rule** (REQ-34) — absence/malfunction → `complaint`, not `observation`. Cross-check [`ingest-deep-parsing.md`](ingest-deep-parsing.md) Issue overlay + [`ingest-validation.md`](ingest-validation.md). |
 | 10 | Requiring collective proof | Require proof of systemic or collective relevance; ask “is this not only you?” / “not a one-off?” as a **gate**; push the user to **speak for others**; block intake because public/system-wide harm is unproven. | Accept a **personal** case as valid input (**§5** Q7 non-blocking, **§7.5**). Record recurrence only when the user volunteered it; collective signal emerges **downstream** (clustering). Cross-ref **§8** row 7 (no false promises), row 2 (no premature `type`/`labels`), row 9 (FR-M1-025), REQ-42 downstream principle. |
+| 11 | Personal = IRRELEVANT | Classify a personal story (self / personally affected) as `IRRELEVANT_NON_CIVIC`, or refuse because it is not a formal civic complaint. | **ACCEPT** standing personal stories; **REJECT** only neighbor-gossip without standing ([`story-policy-gate.md`](story-policy-gate.md) §7.1). Q7 is not a gate (**§5**, **§7.5**). |
 
 **Civic-outcomes alignment:** do not imply guaranteed government or institutional outcomes; civic signal ≠ promise of action.
 
@@ -358,3 +362,4 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 | 0.20 | 2026-06-09 | **REQ-43 / GIM-182:** §5 Q7 → non-blocking optional signal; Q1–Q6 blocking table; personal story valid without collective proof; downstream clustering note. |
 | 0.20 | 2026-06-09 | **REQ-43 / GIM-183:** §7.5 proactive story-intake offer (episode + meaning trigger; invitation not pressure; et/ru/en examples); §8 row 10 «Requiring collective proof» anti-pattern; §9 civic-hook bullet aligned. |
 | 0.21 | 2026-07-06 | **GIM-194 / GPT-SUBMIT-01 propagation:** §7.5 handoff repointed from `POST /intake/stories` to stash + browser redirect (`postStoryDraftStash` §5.2). |
+| 0.22 | 2026-08-21 | **GPT-MISSION-01 / GIM-217:** §5 standing (personal ≠ `IRRELEVANT`); §7.5 offer only with standing; §8 row 11 anti-pattern. Q7 non-blocking unchanged. |
