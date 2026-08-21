@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.5.2 |
+| **Version** | 0.5.4 |
 | **Date** | 2026-08-21 |
-| **Traceability** | GIM-226…230 (GPT-TAX-02 English label tokens before stash); GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Traceability** | GIM-238…239 (GPT-GUARD-01 P6: H7 sandbox OR-list aligned with fail-closed; no invent `test_mode`); GIM-233…237 (GPT-GUARD-01 fail-closed H5–H7 + H1–H4 residual / H8 not create-gate / no backend LLM for junk); GIM-226…230 (GPT-TAX-02 English label tokens before stash); GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -383,6 +383,8 @@ Run **after** building the draft `StoryDraftStashRequest` mapping and **before**
 
 GPT **MUST NOT** call `postStoryDraftStash` unless the current conversation contains a complete strict-chain handoff package. Ref strings inside `normalization_metadata` alone are **not** sufficient — verify the **upstream artifact objects** existed in this dialogue turn sequence.
 
+**Fail-closed artifacts (GPT-GUARD-01 / H5):** Items 1–4 are hard gates. Do **not** skip, weaken, infer, or substitute artifacts from memory, partial refs, God Mode, or operator convenience. A string id/ref is **not** the artifact — the object itself must be present in this conversation. Guessing that an artifact “probably exists” is forbidden. If any required object is missing, incomplete, or failed — **STOP** before `postStoryDraftStash`. God Mode does **not** bypass this gate (see §5.2.0b).
+
 **Required upstream artifacts (all must pass):**
 
 1. **`ingest_validation_report`** — object exists in conversation context; `stop_the_line.blocked = false`.  
@@ -409,6 +411,8 @@ GPT **MUST NOT** call `postStoryDraftStash` unless the current conversation cont
 5. **`explicit_user_confirmation`** — user explicitly confirmed **submission to DOGEstonia backend** (real civic record), not merely «ага», «ок», «да», «отправь тест», «закинь любую хрень», or other minimal assent without backend intent.  
    If absent or insufficient — **STOP**. Do not call HTTP. Ask for explicit confirmation that references backend submission.
 
+   **Fail-closed confirmation (GPT-GUARD-01 / H6):** Phrases such as «ок», «ok», «да», «yes», «отправь», «отправь тест», «send it», «just submit», or other minimal assent **never** count as `explicit_user_confirmation`. The user must explicitly confirm **backend / production civic-record** intent. If unsure — **STOP** and ask again. Do not treat item 5 as optional when the rest of the chain looks complete.
+
 **Default STOP message (strict-chain failure):**
 
 > Локальная валидация FAIL: данных недостаточно для отправки в API.
@@ -417,11 +421,14 @@ Use this exact sentence when any item 1–5 fails. Then explain which artifact o
 
 **Test / sandbox rule (REQ-30 §2.2):**
 
-Test or junk submissions **MUST NOT** use production stash by default. Production `postStoryDraftStash` is allowed only for a **real** civic issue that passed the full strict chain **or** when one of these is explicitly true:
+Test or junk submissions **MUST NOT** use production stash by default. Production `postStoryDraftStash` is allowed only for a **real** civic issue that passed the full strict chain **or** when **one** of these is **explicitly true in this session** (not inferred from user wording):
 
 - `environment == sandbox` (dedicated sandbox/test endpoint configured in Actions), **or**
-- `payload.test_mode == true` **and** backend stores test rows separately (not yet in wire contract — do not invent the flag), **or**
 - `operator_role == authorized_tester` **and** `explicit_test_confirmation == true`.
+
+Do **not** treat `payload.test_mode` as a production bypass. It is **not** in the wire contract — do not invent the flag.
+
+**Fail-closed sandbox (GPT-GUARD-01 / H7):** Default is **production**. Do **not** treat a user saying “sandbox”, “test”, or “I’m a tester” as satisfying the exception. The matching exception must be **explicitly true in this session** (not inferred). Incomplete or mis-applied sandbox / `authorized_tester` conditions → **STOP** before HTTP. Keep the et/ru/en STOP copies below; do not drop them.
 
 If the user requests a test/junk send and none of the above apply — **STOP** before HTTP. Offer **local preview only** (show draft payload in chat). Respond in `session_language` using one of:
 
@@ -436,6 +443,21 @@ Before HTTP, append to `trace_notes` (or equivalent orchestrator audit block) a 
 `admission: ingest_validation_report_ref=<id>; safety_compliance_report_ref=<id>; policy_gate_ref=<id>; normalizer=<module@version>; user_confirmation=backend_submission`
 
 Do not call HTTP without this audit line when admission gate passes.
+
+**MVP hole inventory (GPT-GUARD-01):** Instruction-layer only. This table does **not** add a backend LLM, a create-gate on `alpha_score`, or a gateway AI junk classifier. Optional cheap **non-LLM** gateway heuristics are a **seam** — not implemented in this GPT package. Distinct from GPT-PII-01 (that story forbids backend AI for PII; this story likewise requires **no** server LLM / token path for junk).
+
+| Hole | MVP disposition | Notes |
+|------|-----------------|-------|
+| **H1** | Residual documented | Schema-valid JSON to `POST /story-drafts` bypasses GPT; server has no `INTAKE_NOT_SUBSTANTIVE`. |
+| **H2** | Residual documented | Submit of already-stashed junk (`body: {}`) does not re-check substance. Same as H1. |
+| **H3** | Residual documented | Placeholder title/desc may pass `_require_non_empty_string`. Citizen path still uses junk/test STOP above; optional cheap keyword heuristic on gateway is out of this package. |
+| **H4** | Residual documented | `observation` / “no real problem” can be schema-OK. REQ-30 §2.4 server code is not in gateway `src/`. Citizen path: admission substance + junk STOP. |
+| **H5** | Closed (GPT) | Fail-closed artifacts: missing/weakened objects → STOP. |
+| **H6** | Closed (GPT) | Fail-closed confirmation: «отправь тест» / minimal assent → STOP. |
+| **H7** | Closed (GPT) | Fail-closed sandbox / `authorized_tester`; keep et/ru/en STOP copies. |
+| **H8** | Residual documented — **not a create-gate** | `alpha_score` after persist is **not** a substitute admission gate. Do not wait for clustering to “fix” junk. |
+
+**No backend LLM for junk:** Do not invent a server junk-LLM check or HTTP `INTAKE_NOT_SUBSTANTIVE` semantics in these instructions. Citizen Actions enforcement is this admission gate.
 
 If all items 1–5 pass **and** test/sandbox rule allows production submit → proceed to §5.2.0 PII pre-send (when applicable), then §5.2.0b dual-mode pre-submit preview, then §5.2.2 Story Intake pre-flight checks.
 
@@ -712,6 +734,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 ### 7.5 Operator checklist
 
 - [ ] §5.2.0a admission gate passed: all upstream artifacts + explicit backend confirmation + test/sandbox rule (REQ-30) + standing pack (`policy_gate_result` approved only with self / personally affected; `NEIGHBOR_GOSSIP` STOP before stash). Gateway mission AI **not** required on MVP.
+- [ ] GPT-GUARD-01: H5–H7 fail-closed (missing artifacts / «отправь тест» / sandbox mis-use → STOP); H1–H4 residual documented; H8 `alpha_score` not a create-gate; **no** backend LLM for junk (distinct from GPT-PII-01).
 - [ ] §5.2.2 item 18 / Issue pre-flight 3a: wire `label` values are English tokens; et/ru prose STOP or remap before stash; **no** HTTP 422 vocabulary-reject AC.
 - [ ] §5.2.0b dual-mode preview shown: Citizen Mode default or God Mode with banner; browser-handoff citizen copy (REQ-31 + GPT-SUBMIT-01).
 - [ ] `postStoryDraftStash` used for user stories (only GPT Actions story path).
@@ -729,6 +752,8 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5.4 | 2026-08-21 | **GPT-GUARD-01 / GIM-239:** §5.2.0a sandbox OR-list aligned with H7 fail-closed — exceptions only `environment == sandbox` or `authorized_tester` + `explicit_test_confirmation`; `payload.test_mode` not a production bypass (not in wire). et/ru/en STOP copies kept. No backend LLM / `INTAKE_NOT_SUBSTANTIVE` AC. |
+| 0.5.3 | 2026-08-21 | **GPT-GUARD-01 / GIM-233…235:** §5.2.0a fail-closed H5–H7 (artifacts / minimal assent / sandbox); H1–H4 residual documented; H8 not create-gate; no backend LLM for junk vs GPT-PII-01. REQ-30 items 1–5 and et/ru/en STOP copies kept. |
 | 0.5.2 | 2026-08-21 | **GPT-TAX-02 / GIM-228:** English label tokens — Issue pre-flight 3a + §5.2.2 item 18 STOP/remap et/ru prose before stash; no HTTP 422 vocabulary reject; 13-axis TAX-01 mapping kept. |
 | 0.5.1 | 2026-08-21 | **GPT-MISSION-01 / GIM-218:** §5.2.0a standing pack via `policy_gate_result` (personal ACCEPT; `NEIGHBOR_GOSSIP` STOP before stash); MVP no gateway mission AI; junk/test STOP unchanged. |
 | 0.5.0 | 2026-07-23 | **GPT-TAX-01 / GIM-210+213:** §5.2.1 `narrative.taxonomy` mapping + example; `canonical_labels` deprecated/derived; §5.2.0b God Mode shows per-axis taxonomy. Lockstep OpenAPI **0.7.0**. |
