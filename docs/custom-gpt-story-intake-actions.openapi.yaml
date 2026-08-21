@@ -225,13 +225,19 @@ components:
 
     Privacy:
       type: object
+      description: >
+        Optional risk flags only. They do not replace scrub and do not authorize
+        HTTP. GPT-PII-01: if normalizer §4.4 types remain in wire text, the GPT
+        MUST STOP before postStoryDraftStash. Not a server PII-reject / 422.
       properties:
         contains_pii:
           type: boolean
           default: false
+          description: Signal that PII was detected. Never a send permit.
         redaction_requested:
           type: boolean
           default: false
+          description: User agreed to edit. Never a send permit if §4.4 types remain.
 
     LiveStoryContext:
       type: object
