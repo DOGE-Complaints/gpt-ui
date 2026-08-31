@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.6 |
-| **Date** | 2026-08-21 |
-| **Traceability** | FR-M1-039–043 (safety / gate alignment); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-data-model.md`](story-data-model.md); [`safety-compliance.md`](safety-compliance.md); GPT-MISSION-01 / GIM-216 (standing / anti-gossip) |
+| **Version** | 0.9 |
+| **Date** | 2026-08-31 |
+| **Traceability** | FR-M1-039–043 (safety / gate alignment); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-data-model.md`](story-data-model.md); [`safety-compliance.md`](safety-compliance.md); GPT-MISSION-01 / GIM-216 (standing / anti-gossip); GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254 (inbound-validation pack overlay; README-only seams; lists not copied in core) |
 
 ---
 
@@ -105,20 +105,9 @@ Always prefer **conservative** interpretation when OP-DOC is ambiguous.
 
 ### 7.1 Demo baseline rule pack (when operator enables demo profile)
 
-For DOGEstonia demo sessions where operator policy profile is explicitly set to `demo_baseline`, apply this minimum admission matrix:
+**Process stays in this core file.** Domain reason codes / mission lists for the active node: read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s inbound-validation pack §1 (pack overlay — not the sole core model). Do **not** copy civic overlay lists here.
 
-- `BLOCK`:
-  - clear off-topic / non-civic content (`IRRELEVANT_NON_CIVIC`);
-  - scam, phishing, spam, promo bait (`SCAM_OR_SPAM`);
-  - obscene/sexualized/trolling payload unrelated to civic issue intake (`OBSCENE_OR_TROLL`);
-  - others' affairs without standing — neighbor gossip / склочничество (`NEIGHBOR_GOSSIP`).
-- `needs_clarification`:
-  - weakly relevant but noisy content where civic intent is not explicit (`RELEVANCE_UNCLEAR`).
-- `approved` (**ACCEPT**):
-  - **personal stories** with **standing** = self **or** personally affected (spouse, child, own pain, own parents) — valuable civic signal; **must not** map to `IRRELEVANT_NON_CIVIC`;
-  - content that is recognizably civic **or** a personal story with standing, and can continue through strict chain.
-- **Do not** require a formal civic-complaint frame. Narrow «only official civic complaint» is **wrong**: personal ≠ out of mission.
-- If an OP-DOC is pinned, it **must not** contradict these ACCEPT / REJECT classes for `demo_baseline`.
+For DOGEstonia demo sessions where operator policy profile is explicitly set to `demo_baseline`, apply the **admission matrix from the active inbound-validation pack §1** (`BLOCK` / `needs_clarification` / `approved` classes). Process: match evidence → pack reason code → gate outcome. If an OP-DOC is pinned, it **must not** contradict those ACCEPT / REJECT classes for `demo_baseline`.
 
 This demo pack does not replace safety controls in [`safety-compliance.md`](safety-compliance.md); it is an admission filter before normalization. Safety third-party PII does **not** replace standing (a parent may tell a child's story without passport data).
 
@@ -147,9 +136,12 @@ Document the effective mode in `reasons` (e.g. code `POLICY_DEGRADED_MODE`).
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.9 | 2026-08-31 | **GPT-SSR-01 / GIM-254:** §7.1 civic overlay lists removed — admission matrix lives in pack inbound-validation §1. |
+| 0.8 | 2026-08-31 | **GPT-SSR-01 / GIM-253:** §7.1 pack pointer README-only (no hardcoded civic pack path). |
 | 0.1 | 2026-04-10 | Initial scaffold: inputs/outputs, external SoT, no API, degraded mode. |
 | 0.2 | 2026-04-10 | Added trace + §4 pointer to lifecycle **§2.1** strict-chain order. |
 | 0.3 | 2026-04-10 | Refined traceability and external template guidance in §3. |
 | 0.4 | 2026-04-21 | Added demo baseline gate profile (irrelevant/scam/spam/obscene filtering) with stable reason codes. |
 | 0.5 | 2026-04-22 | §3: pointer to human operator OP-DOC deployment checklist (`instruction-modules-index` Operator readiness); no change to gate logic. |
+| 0.7 | 2026-08-31 | **GPT-SSR-01 / GIM-251:** §7.1 civic mission lists point at inbound-validation pack overlay; admission process unchanged. |
 | 0.6 | 2026-08-21 | **GPT-MISSION-01 / GIM-216:** §7.1 standing pack — personal stories ACCEPT (self / personally affected); `NEIGHBOR_GOSSIP` REJECT; keep `IRRELEVANT_NON_CIVIC` / `SCAM_OR_SPAM` / `OBSCENE_OR_TROLL`. |

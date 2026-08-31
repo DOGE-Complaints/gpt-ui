@@ -28,7 +28,7 @@ When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`st
 
 - [`story-interview-flow.md`](story-interview-flow.md) — civic interview phases 1–7 (**FR-M1** interview structure), four narrative layers (**FR-M1** layering), **§5 seven-question completeness** before treating dialogue as ready for Phase 7 summary / draft Issue framing.
 - [`story-data-model.md`](story-data-model.md) — §4.1 logical Issue fields (`type`, `labels`, trilingual `title` / `description`, optional `summary`, optional `institution`) for structural completeness toward the normalizer.
-- [`story-label-taxonomy.md`](story-label-taxonomy.md) — controlled label axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling.
+- [`story-label-taxonomy.md`](story-label-taxonomy.md) — controlled label axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling. Civic completeness vs pack required `signals.*` and domain label checklists: active inbound-validation pack ([`schema-packs/README.md`](schema-packs/README.md)).
 - [`story-i18n-policy.md`](story-i18n-policy.md) — **FR-M1-028…031**: session language, `{ et, ru, en }` drafts, fidelity vs translation polish.
 - [`story-api-methods-reference.md`](story-api-methods-reference.md) — HTTP SSOT (this module still **never** calls APIs).
 - [`story-policy-gate.md`](story-policy-gate.md) — **policy admission** after validation + safety; consumes `gate_request_package`, emits `policy_gate_result`.

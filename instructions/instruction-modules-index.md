@@ -2,15 +2,15 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.40 |
-| **Дата** | 2026-04-27 |
+| **Версия индекса** | 0.41 |
+| **Дата** | 2026-08-31 |
 | **Scope** | Runtime navigation map for DOGEstonia Issue instructions; no task/epic dependency in operational sections. |
 
 This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy donor content is removed from the active runtime surface.
 
 **For Custom GPT DOGEstonia ingest use Story track modules only** (`story-*`, `ingest-*`, `api-orchestrator.md` in Story mode). Legacy donor guardrails and review checklist: [`activity-legacy-paths-inventory.md`](activity-legacy-paths-inventory.md).
 
-Use this index together with [`story-data-model.md`](story-data-model.md), [`story-label-taxonomy.md`](story-label-taxonomy.md), [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md), [`story-policy-gate.md`](story-policy-gate.md), [`story-normalizer.md`](story-normalizer.md), and [`story-api-methods-reference.md`](story-api-methods-reference.md).
+Use this index together with [`story-data-model.md`](story-data-model.md), [`story-label-taxonomy.md`](story-label-taxonomy.md), [`schema-packs/README.md`](schema-packs/README.md), [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md), [`story-policy-gate.md`](story-policy-gate.md), [`story-normalizer.md`](story-normalizer.md), and [`story-api-methods-reference.md`](story-api-methods-reference.md).
 
 ---
 
@@ -26,6 +26,7 @@ Use this index together with [`story-data-model.md`](story-data-model.md), [`sto
 | [`story-policy-gate.md`](story-policy-gate.md) | Policy admission gate for Issue ingest (no HTTP calls). |
 | [`story-normalizer.md`](story-normalizer.md) | Builds `normalized_issue_payload` after gate approval. |
 | [`story-api-methods-reference.md`](story-api-methods-reference.md) | HTTP/OpenAPI reference for Issue actions and lockstep policy. |
+| [`schema-packs/README.md`](schema-packs/README.md) | Active node pack pair (`schema_id` / `schema_version`) + two swappable overlays (`data-model.md`, `inbound-validation.md`). Non-executable; gateway validates. |
 
 ---
 
@@ -55,7 +56,8 @@ with `base.md` as global constitution and `story-lifecycle-instructions.md` as c
 | Safety | [`safety-compliance.md`](safety-compliance.md) | `safety_compliance_report`; may BLOCK/REQUEST. |
 | Policy gate | [`story-policy-gate.md`](story-policy-gate.md) | `policy_gate_result`; admission decision only. |
 | Normalization | [`story-normalizer.md`](story-normalizer.md) | `normalized_issue_payload`; no user questions/API. |
-| API orchestration | [`api-orchestrator.md`](api-orchestrator.md) | The only module allowed to execute HTTP actions. |
+| API orchestration | [`api-orchestrator.md`](api-orchestrator.md) | The only module allowed to execute HTTP actions. Reads active pack pair; does not emit `schema_binding` until GPT-SSR-03. |
+| Schema pack overlay | [`schema-packs/README.md`](schema-packs/README.md) | Active `tallinn_civic`/`v1` pair; swap two files without core domain-field edits (REQ3-AC-016). |
 | Search flow | SEARCH-mode handoff via base/orchestrator contracts | Optional; activate only when Issue search operations exist in OpenAPI. |
 
 ---
@@ -64,6 +66,7 @@ with `base.md` as global constitution and `story-lifecycle-instructions.md` as c
 
 | Версия | Дата | Изменение |
 |--------|------|-----------|
+| 0.41 | 2026-08-31 | GPT-SSR-01: schema-packs active pair + two overlay files (non-executable projections). |
 | 0.40 | 2026-04-27 | Self-contained instruction surface: internal links use bare filenames only; removed external repository references from the runtime index. |
 | 0.39 | 2026-04-27 | Core functional-requirements filename aligned with demo M2 gap closure hygiene (GIM-99). |
 | 0.38 | 2026-04-27 | Removed `instructions/issue-*.md` symlink aliases; runtime modules live only as `story-*.md`. Historical rename notes kept in repository task docs outside this index. |

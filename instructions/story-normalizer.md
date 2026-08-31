@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.18 |
-| **Date** | 2026-08-21 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.21 |
+| **Date** | 2026-08-31 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`schema-packs/README.md`](schema-packs/README.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -28,7 +28,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
   - **`canonical_payload.taxonomy`** (GPT-TAX-01) — per-axis object `{ axis: [{ label, disposition }] }` for all retained candidates (including `internal` / `metadata_only`); do **not** collapse axes. Flat `labels[]` remains derived (canonical only).
   - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
 - **Label extraction:** apply **all** taxonomy keys that genuinely apply to the story — one or more keys per applicable axis (`topic_domain`, `failure_mode`, `civic_signal`, `issue_archetype_support`) where evidence exists in the validated narrative. **Conservative** means: do not invent labels or apply low-confidence keys — it does **not** mean use only one label total.
-- Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)).
+- Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)). Civic payload field names / geo canon for the **active node** come from the active [`schema-packs/`](schema-packs/README.md) data-model pack — not as the sole core model.
 
 ### 2.2 This instruction MUST NOT
 
@@ -130,7 +130,7 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 
 | Field | Rule |
 |-------|------|
-| `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5. Apply **observation vs complaint decision rule** below. |
+| `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5 (display enum). Pack `signals.canonical_type` / payload field shapes: read the **active data-model pack**. Apply **observation vs complaint decision rule** below. |
 | `taxonomy` | **GPT-TAX-01 SoT:** object keyed by taxonomy axis (13 axes in [`story-label-taxonomy.md`](story-label-taxonomy.md) §3 / gateway `TAXONOMY_AXIS_VALUES`). Each axis → array of `{ "label", "disposition" }`. Group candidates from `label_extraction_metadata` **by axis** — never flatten away the axis. Include dispositions `canonical`, `metadata_only`, `needs_clarification`, `rejected`, and **`internal`** (for §6 internal-only keys). Omit empty axes. Orchestrator maps to `narrative.taxonomy`. |
 | `labels` | **Derived / compat:** string array of keys with `disposition = "canonical"` only (from `taxonomy` when present). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. Apply **multi-axis** extraction per §2.1 — see rule below. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
@@ -174,23 +174,9 @@ Do **not** omit `civic_signal` labels because they seem "less obvious" — these
 
 #### 4.1a Label extraction hints (commonly under-applied keys)
 
-Use [`story-label-taxonomy.md`](story-label-taxonomy.md) as SSOT. When narrative evidence matches, include the key even if another topic_domain label is already present:
+**Process stays in this core file.** Axis / key lists for the **active node** live in the pack — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s data-model pack §5, plus [`story-label-taxonomy.md`](story-label-taxonomy.md) (pack include, Residual). Do **not** copy civic overlay tables here.
 
-| Label | Axis | Signals in the resident narrative |
-|-------|------|-----------------------------------|
-| `public_space` | topic_domain | площадь, парк, двор, детская площадка, пешеходная зона, набережная, общественное пространство, улица, сквер; if the story is about a shared physical place — apply |
-| `city_for_people` | civic_signal | «хотелось бы», «нужен», «должен быть», «пространство для», «удобный», «место для людей», «развитие»; if the story describes a desired city environment — apply |
-| `improvement_wish` | issue_archetype_support | story frames desired improvement rather than only broken infrastructure; if `type = observation` and context is positive aspiration — apply |
-| `equity_access` | civic_signal | children, elderly, people with disabilities, social groups, unequal access — apply when fair-access theme is present |
-| `culture` | topic_domain | культура, театр, музыка, музей, фестиваль, творчество, heritage, культурный центр, cultural centre — apply when the story is about cultural life or cultural capital, not only school curriculum |
-| `youth_development` | topic_domain | молодёжь, youth, подростки, youth centre, молодёжный центр, after-school, кружки — apply when youth programs or spaces are central, even if `education` also applies |
-| `science_and_research` | topic_domain | наука, STEM, исследования, лаборатория, научные школы, intellectual environment — apply when science/research culture is the theme |
-| `ecosystem_gap` | ecosystem_signal | нет среды, не хватает программ/менторов/пространств, ecosystem thin, institutional decline, loss of continuity — apply when the problem is absence of environment, not one broken object |
-| `institutional_decline` | ecosystem_signal | venues/programs closing, institutions weakening, «раньше было, теперь нет» at ecosystem scale |
-| `mentor_shortage` | ecosystem_signal | lack of mentors, tutors, guides across programs — not a single staffing ticket |
-| `community_fragmentation` | ecosystem_signal | weak community ties, participation breaking down, underused civic spaces |
-| `replicable_model_needed` | ecosystem_signal | resident describes a gap that a replicable civic model could fill |
-| `cooperative_model` | governance_signal | кооператив, community ownership, participatory governance, открытая модель — apply when governance/ownership model is part of the desired solution |
+Use [`story-label-taxonomy.md`](story-label-taxonomy.md) as SSOT. When narrative evidence matches, include the key even if another topic_domain label is already present.
 
 #### 4.1a.1 Ecosystem-deficit classification preference (REQ-38)
 
@@ -420,12 +406,8 @@ Optional **top-level** string on `normalized_issue_payload` (sibling to `canonic
 **Formation rules:**
 
 1. **Mandatory when location is confirmed (REQ-35):** If the resident named or confirmed a city, district, street, or landmark in any interview phase (and §7.2 affirmation applies), the normalizer **MUST** form `location_query` from the confirmed `location.freeform` material — do **not** omit solely because the field was optional upstream. The only grounds to omit are rules **3–5** below.
-2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script** (e.g. `Tallinn`, `Kalamaja, Tallinn`, `Tartu mnt 80, Tallinn`). The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)); Latin is more reliable for demo geo-resolve. Cyrillic is acceptable when the resident used it and Latin transliteration would distort meaning; Cyrillic expansion is a separate backend concern (REQ-46). Do **not** invent address detail beyond what the resident stated.
-   - **City-level canonicalization (REQ-39):** When the confirmed location is **city-level only** (resident named a city without street, district, or landmark detail), canonicalize to `<City>, Estonia` in Latin:
-     - `Tallinn` → `Tallinn, Estonia`
-     - `Tallinn, Estonia` → `Tallinn, Estonia` (already canonical)
-     - `Tallinna linn` → `Tallinn, Estonia`
-     When the string includes **district, street, or landmark** detail (e.g. `Kalamaja, Tallinn`, `Tartu mnt 80, Tallinn`), **preserve** that detail — do **not** collapse to city-only or strip finer granularity. Do **not** append `, Estonia` when it would simplify a more specific address the resident confirmed.
+2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script**. Apply the **active data-model pack** geo-formation rules: read [`schema-packs/README.md`](schema-packs/README.md), then that pack’s data-model §4. The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)). Do **not** invent address detail beyond what the resident stated. Do **not** keep a civic city table in this core file — the pack owns the canon.
+   - **City-level canonicalization (REQ-39):** When the confirmed location is **city-level only**, apply the pack’s city canon (civic instance: `<City>, Estonia` Latin mappings in the data-model pack §4). When the string includes **district, street, or landmark** detail, **preserve** that detail — do **not** collapse to city-only.
 3. If the user mentioned **multiple** locations without a single clear primary — pick the most specific / complaint-relevant one (D-02). Reflect ambiguity in `live_story_context.consistency_notes` (§4.5) when useful.
 4. If location was **not** confirmed or remains ambiguous after §7.2 — **omit** `location_query` (do not send null or `""`).
 5. Never emit a blank or whitespace-only string.
@@ -466,6 +448,9 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2.21 | 2026-08-31 | **GPT-SSR-01 / GIM-254:** §4.1a civic overlay table removed — lists live in pack / taxonomy include. |
+| 0.2.20 | 2026-08-31 | **GPT-SSR-01 / GIM-253:** §4.1a / §4.6 pack pointers README-only (no hardcoded civic pack path). |
+| 0.2.19 | 2026-08-31 | **GPT-SSR-01 / GIM-251:** §4.6 city canon + Latin preference → active data-model pack; §4.1 type/taxonomy weld points at pack payload fields; PII §4.4 unchanged. |
 | 0.2.18 | 2026-08-21 | **GPT-PII-01 / GIM-241:** §4.4 scan set = all narrative i18n wire text + sidecars; obfuscated identifiers = PII; opaque submitter/HMAC ids not narrative PII; decline interaction is orchestrator STOP. |
 | 0.2.17 | 2026-08-21 | **GPT-TAX-02 / GIM-227:** English token emit for `taxonomy[].label` and derived `labels[]`; et/ru prose remap or omit — not HTTP 422. |
 | 0.1 | 2026-04-10 | Initial scaffold: `normalized_issue_payload`, `canonical_payload`, `normalization_metadata`, Plain GPT, no API, no user questions; Issue SoT = `story-data-model.md` §4.1. |

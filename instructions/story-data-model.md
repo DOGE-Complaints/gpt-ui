@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.14 |
-| **Date** | 2026-07-07 |
-| **Traceability** | REQ-36; [`story-label-taxonomy.md`](story-label-taxonomy.md) v0.2; [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md) |
+| **Version** | 0.16 |
+| **Date** | 2026-08-31 |
+| **Traceability** | REQ-36; [`story-label-taxonomy.md`](story-label-taxonomy.md) v0.2; [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md); GPT-SSR-01 / GIM-251 / GIM-253 |
 
 ---
 
@@ -46,6 +46,8 @@ HTTP calls remain only in `api-orchestrator.md` per OpenAPI contract (epic M1-06
 ---
 
 ## 4. Downstream fields (UI alignment)
+
+Node payload field shapes (`signals.*`, `geo_intake`, geo formation) for the **active pack** live under [`schema-packs/README.md`](schema-packs/README.md) — follow that file’s active pair (data-model pack). This core file keeps the **display** Issue card contract (`ISSUE_TYPE` / i18n text). Do not treat civic `signals.*` names as the sole core model.
 
 Below is the **target display contract** for the product UI (mocks and dashboards). Enum types for `type` and `status` must match the canonical Issue enums **`ISSUE_TYPE`** and **`ISSUE_STATUS`** (same symbol names as the SPA type module in the main product repo).
 
@@ -121,6 +123,7 @@ Do not collect PII by default; do not store personal data in Issue content beyon
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.16 | 2026-08-31 | **GPT-SSR-01 / GIM-253:** §4 pack pointer README-only (no hardcoded civic pack path). |
 | 0.1 | 2026-04-10 | First draft; narrative-to-Issue mapping and UI mock alignment. |
 | 0.2 | 2026-04-10 | Link to [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md). |
 | 0.3 | 2026-04-10 | **English-only** instruction text (repo policy). |
@@ -133,5 +136,6 @@ Do not collect PII by default; do not store personal data in Issue content beyon
 | 0.10 | 2026-04-25 | Clarified subjective intake fields as non-wire metadata for current runtime contract (GIM-77). |
 | 0.11 | 2026-04-26 | Linked `labels` to controlled label taxonomy and forbade unknown/free-text/internal label values in canonical payload (GIM-86). |
 | 0.12 | 2026-05-25 | REQ-27: synced §4.3 subjective enums (`severity`, `impact_estimation`, `problem_status`) to server frozensets in [`contracts.py`](../../doge-complaints-gateway/src/core/intake/contracts.py) L61–65 (uppercase `LOW/MEDIUM/HIGH/CRITICAL`, `LOCAL/DISTRICT/CITY/NATIONAL`, `ONGOING/RESOLVED/RECURRING/UNKNOWN`); removed stale «non-wire metadata / must not be sent» wording — REQ-23/REQ-42 already activated the wire `gpt_signals` block (OpenAPI v0.4.0) (GIM-122). |
+| 0.15 | 2026-08-31 | **GPT-SSR-01 / GIM-251:** §4 pointer to active schema-packs data-model overlay; display `ISSUE_TYPE` remains core. |
 | 0.14 | 2026-07-07 | **GPT-SUBMIT-02 reaudit / GIM-208:** §4.3 wire name `StoryDraftStashRequest` (N1 lockstep with OpenAPI v0.6.0). |
 | 0.13 | 2026-06-05 | **REQ-36 / GIM-159:** §5 labels SoT cross-ref updated for expanded taxonomy v0.2 (new civic axes and promoted canonical scopes). |

@@ -5,8 +5,8 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.22 |
-| **Date** | 2026-08-21 |
+| **Version** | 0.25 |
+| **Date** | 2026-08-31 |
 | **Traceability** | FR-M1-007/013/017…018/022–023, **FR-M1-024…027**, **FR-M1-028…031**, **FR-M1-032…034**, **REQ-34**, **REQ-38**, **REQ-43**, **§9.10 FR-M1-039…043** safety alignment via [`safety-compliance.md`](safety-compliance.md); [`story-i18n-policy.md`](story-i18n-policy.md); [`story-label-taxonomy.md`](story-label-taxonomy.md); [`story-data-model.md`](story-data-model.md); [`ingest-validation.md`](ingest-validation.md); [`base.md`](base.md) |
 
 **Related modules:** [`story-data-model.md`](story-data-model.md) · [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) · [`safety-compliance.md`](safety-compliance.md) (DOGEstonia / Issue overlay, checkpoints → `issue-policy-gate`) — lifecycle describes **engineering** ingest-chain phases (1–8); this file describes **substantive** conversation phases (1–7).
@@ -169,16 +169,9 @@ Sources: **FR-M1-032**, **FR-M1-033**, **FR-M1-034**. This subsection is the **n
 
 ### 7.3 Label evidence capture (GIM-87)
 
-Labels are an **internal projection** from the mature story, not a questionnaire topic. During phases 2–6, collect evidence that later modules can map to [`story-label-taxonomy.md`](story-label-taxonomy.md), but do **not** ask the resident to choose labels or show taxonomy keys.
+**Process stays in this core file.** Axis names / phase→field lists for the **active node** are pack overlay — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s data-model pack §5. Do **not** copy civic overlay tables here.
 
-| Phase | Evidence to capture | Label axes supported |
-|---|---|---|
-| **2** Episode capture | What happened, object/service, place/context, concrete friction. | `topic_domain`, `service_object`, `location_context`, `failure_mode` |
-| **3** Emotion and meaning | What felt unfair, draining, unsafe, disrespectful, or confusing. | `deep_need`, `failure_mode`, `civic_signal` |
-| **4** Deeper need | Confirmed value/need such as predictability, respect, dignity, agency, fairness. | `deep_need` as metadata-only unless taxonomy later promotes it |
-| **5** Desired state | Better future scenario or specific improvement shape. | `desired_outcome`, `topic_domain`, `service_object`, `ecosystem_signal`, `governance_signal` |
-| **6** Civic generalization | Recurrence, others affected, system pattern, public cost. | `civic_signal`, `affected_scope`, `issue_archetype_support`, `ecosystem_signal` |
-| **Safety/limited-depth** | PII, minors, health, violence, or trust/safety limits. | `risk_privacy_safety` internal-only labels |
+Labels are an **internal projection** from the mature story, not a questionnaire topic. During phases 2–6, collect evidence that later modules can map to [`story-label-taxonomy.md`](story-label-taxonomy.md), but do **not** ask the resident to choose labels or show taxonomy keys.
 
 Operational rules:
 
@@ -189,16 +182,9 @@ Operational rules:
 
 ### 7.4 Ecosystem-deficit story recognition (REQ-38)
 
+**Process stays here.** Trigger classes / axis hints: read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s data-model pack §5. Do **not** copy civic overlay tables here.
+
 When the resident describes **absence of environment / ecosystem deficit** — not a single broken service object — capture evidence for downstream `ecosystem_signal` classification per [`story-label-taxonomy.md`](story-label-taxonomy.md) §4.9. Recognition uses **only what the resident already said**; do **not** ask leading taxonomy questions (same privacy baseline as REQ-35 §4.3 — no “Is this about ecosystem gap?” prompts).
-
-**Trigger classes** (non-exhaustive resident phrases):
-
-| Class | Resident signals (examples) | Downstream axis hints |
-|-------|----------------------------|------------------------|
-| **Absence of environment** | «негде», «нет места для», «раньше было, теперь нет», «нет среды», «nowhere for kids to…» | `ecosystem_gap`, `missing_infrastructure` |
-| **Institutional decline / continuity loss** | Closing venues, programs ending, mentor/teacher shortage, «used to have…» | `institutional_decline`, `mentor_shortage`, `loss_of_continuity` |
-| **Community fragmentation** | Weak ties, underused spaces, «people don’t gather anymore» | `community_fragmentation`, `underused_resources` |
-| **Replicable model desire** | «Should work in other districts too», «model for other neighbourhoods» | `replicable_model_needed`, `governance_signal` when ownership model is named |
 
 **Operational rules:**
 
@@ -340,6 +326,8 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.25 | 2026-08-31 | **GPT-SSR-01 / GIM-254:** §7.3–§7.4 civic overlay tables removed — lists live in pack. |
+| 0.24 | 2026-08-31 | **GPT-SSR-01 / GIM-253:** §7.3–§7.4 pack pointers README-only (no hardcoded civic pack path). |
 | 0.1 | 2026-04-10 | First scaffold; soft entry; phase table. |
 | 0.2 | 2026-04-10 | **English-only** instruction text (repo policy); no semantic change to phase model. |
 | 0.3 | 2026-04-10 | Added four psychological layers + seven-question completeness; gates before Phase 7. |
@@ -362,4 +350,5 @@ The user may **not** open with a complaint; latent signals include hidden wishes
 | 0.20 | 2026-06-09 | **REQ-43 / GIM-182:** §5 Q7 → non-blocking optional signal; Q1–Q6 blocking table; personal story valid without collective proof; downstream clustering note. |
 | 0.20 | 2026-06-09 | **REQ-43 / GIM-183:** §7.5 proactive story-intake offer (episode + meaning trigger; invitation not pressure; et/ru/en examples); §8 row 10 «Requiring collective proof» anti-pattern; §9 civic-hook bullet aligned. |
 | 0.21 | 2026-07-06 | **GIM-194 / GPT-SUBMIT-01 propagation:** §7.5 handoff repointed from `POST /intake/stories` to stash + browser redirect (`postStoryDraftStash` §5.2). |
+| 0.23 | 2026-08-31 | **GPT-SSR-01 / GIM-251:** §7.3–§7.4 civic axis tables are pack overlay; Phase 7 process unchanged. |
 | 0.22 | 2026-08-21 | **GPT-MISSION-01 / GIM-217:** §5 standing (personal ≠ `IRRELEVANT`); §7.5 offer only with standing; §8 row 11 anti-pattern. Q7 non-blocking unchanged. |
