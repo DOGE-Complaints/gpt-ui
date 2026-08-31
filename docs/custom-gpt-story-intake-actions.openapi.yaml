@@ -10,15 +10,17 @@
 openapi: 3.1.0
 info:
   title: DOGEstonia Bot API — Story Intake (Custom GPT Actions, draft)
-  version: "0.7.0"
+  version: "0.8.0"
   description: >
     Minimal subset for GPT Actions targeting story intake runtime (wire contract v2 + REQ-23 behavioral extensions).
     GPT-SUBMIT-02 (GIM-201): single stash contract — POST /story-drafts only; StoryDraftStashRequest (author at browser submit, GW-DRAFT-02).
     GPT-TAX-01 (GIM-209): narrative.taxonomy per-axis SoT; canonical_labels deprecated/derived flat compat.
     GPT-TAX-02 (GIM-232): TaxonomyAxisEntry.label is an English snake_case / SSOT token — not et/ru prose; no vocabulary HTTP 422.
+    GPT-SSR-02 (GIM-256…260): required root schema_binding + optional geo_detail (gateway-named only; REQ-45).
+    Operator: re-import Custom GPT Actions after this contract bump (unlike pack-only Instruction upload).
     All operations use Bearer when GPT_ACTIONS_BEARER_SECRET is set.
     Lockstep: operationId/method/path/request/response/auth/version parity with story-api-methods-reference.md.
-    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.7.0); the runtime server
+    VERSION DUAL-TRACKING: this file tracks GPT behavioral contract version (0.8.0); the runtime server
     tracks its own implementation version (currently 0.1.0 at GET /openapi.json). These are separate versioning
     axes and are NOT expected to be equal. Increment this version when operationId/method/path/required fields/
     response envelope/auth semantics change (see story-api-methods-reference.md §4 lockstep policy).
@@ -83,6 +85,8 @@ components:
         Per-axis taxonomy source of truth (GPT-TAX-01). Keys = TAXONOMY_AXIS_VALUES (13 axes,
         gateway axes.py). Each axis maps to an array of TaxonomyAxisEntry. Omit empty axes.
         Do not collapse axes into a flat list — axis membership is preserved on the wire.
+        Residual (GPT-SSR-02 / T06): the 13 civic axes remain for MVP civic lockstep.
+        Multi-node soften (legal_process / mobility_observation) is a follow-up story — not this contract.
       properties:
         topic_domain:
           type: array
@@ -246,9 +250,88 @@ components:
           type: string
           nullable: true
 
+    SchemaBinding:
+      type: object
+      additionalProperties: false
+      required: [schema_id, schema_version, structured_payload]
+      description: >
+        Required root sidecar (gateway schema_binding / contracts.py SchemaBinding).
+        schema_id + schema_version are the semantic pack pair (e.g. tallinn_civic / v1)
+        and MUST NOT equal the envelope identifier m2.story_intake_envelope.v2
+        (gateway rejects equality). Absent / empty / null → 4xx. Optional profile_id /
+        profile_version. Unknown keys rejected.
+      properties:
+        schema_id:
+          type: string
+          description: Node pack id. Gateway-named only (contracts.py schema_id).
+        schema_version:
+          type: string
+          description: >
+            Semantic pack version (e.g. v1). Must not equal envelope schema_version
+            m2.story_intake_envelope.v2.
+        structured_payload:
+          type: object
+          additionalProperties: true
+          description: >
+            Pack JSON Schema object. Not a wire home for pack geo_intake / merge /
+            mirror_to_payload (node config only).
+        profile_id:
+          type: string
+          nullable: true
+        profile_version:
+          type: string
+          nullable: true
+
+    GeoDetailAddress:
+      type: object
+      additionalProperties: false
+      description: >
+        Optional address block (gateway GeoDetailAddress). Use at most one of house,
+        house_range, or houses[] (XOR). Unknown keys rejected.
+      properties:
+        country:
+          type: string
+        region:
+          type: string
+        settlement:
+          type: string
+        district:
+          type: string
+        street:
+          type: string
+        house:
+          type: string
+        house_range:
+          type: string
+        houses:
+          type: array
+          items:
+            type: string
+
+    GeoDetail:
+      type: object
+      additionalProperties: false
+      description: >
+        Optional root sidecar (gateway geo_detail / GeoDetail). latitude and longitude
+        must be provided together when either is sent. Pack geo_intake / merge /
+        mirror_to_payload are node config only — not wire properties.
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+        address:
+          $ref: "#/components/schemas/GeoDetailAddress"
+        normalized_label:
+          type: string
+        confidence:
+          type: number
+        provider:
+          type: string
+
     StoryDraftStashRequest:
       type: object
-      required: [schema_version, narrative]
+      required: [schema_version, narrative, schema_binding]
       properties:
         schema_version:
           type: string
@@ -258,6 +341,17 @@ components:
             citizen-facing discussion per api-orchestrator §5.2.0b (REQ-31).
         narrative:
           $ref: "#/components/schemas/Narrative"
+        schema_binding:
+          $ref: "#/components/schemas/SchemaBinding"
+          description: >
+            Required semantic binding sidecar. MUST be present on the HTTP body.
+            Citizen conversational preview MAY omit binding fields (REQ-31/32 display vs
+            transport); do not omit from the Actions request.
+        geo_detail:
+          $ref: "#/components/schemas/GeoDetail"
+          description: >
+            Optional geo sidecar. Omit the key when unused. Not a substitute for
+            narrative.location_query.
         origin:
           $ref: "#/components/schemas/Origin"
           description: >
@@ -276,6 +370,7 @@ components:
             Optional classification block (REQ-42). Use human labels in Citizen Mode; full block in God Mode.
       description: >
         GPT Actions stash request body. Author resolved at browser submit (GW-DRAFT-02).
+        GPT-SSR-02: schema_binding required; geo_detail optional. Gateway-named tokens only.
 
     StoryDraftStashResponseData:
       type: object
@@ -332,6 +427,29 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/StoryDraftStashRequest"
+            example:
+              schema_version: m2.story_intake_envelope.v2
+              schema_binding:
+                schema_id: tallinn_civic
+                schema_version: v1
+                structured_payload:
+                  signals:
+                    civic_domain: example
+                    failure_pattern: example
+              narrative:
+                original_text: Example stash body for Actions import.
+                language: en
+                session_language: en
+                title:
+                  et: Naide
+                  ru: Primer
+                  en: Example
+                description:
+                  et: Naide
+                  ru: Primer
+                  en: Example
+              origin:
+                source: openai_gpt_action
       responses:
         "201":
           description: Draft stashed; no story created.
