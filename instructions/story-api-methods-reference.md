@@ -1,6 +1,6 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 2.1 · 2026-08-31  
+**Version:** 2.1.1 · 2026-08-31  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
@@ -35,7 +35,7 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `narrative.title` | yes | `canonical_payload.title` object `{et, ru, en}` |
 | `narrative.description` | yes | `canonical_payload.description` object `{et, ru, en}` |
 | `narrative.summary` | no | `canonical_payload.summary`; omit entire block if any `et`/`ru`/`en` slot empty (REQ-25) |
-| `narrative.location_query` | no | `normalized_issue_payload.location_query` when user confirmed location (REQ-26); omit if absent |
+| `narrative.location_query` | no | `normalized_issue_payload.location_query` when pack `geo_intake.mode` requires it **or** the resident gave a place (MAY omit when mode is `optional`); omit if absent |
 | `narrative.canonical_type` | no | `canonical_payload.type`; `complaint` / `system_bug` → issue promotion gate (REQ-25) |
 | `narrative.taxonomy` | no | `canonical_payload.taxonomy` — per-axis `{ axis: [{ label, disposition }] }` (GPT-TAX-01 / D-TAX-1 SoT; OpenAPI `NarrativeTaxonomy`; gateway `parse_taxonomy_payload`). Omit empty axes. Each `label` is an **English** snake_case / taxonomy-SSOT token (GPT-TAX-02); Estonian or Russian prose is not a wire `label`. Unknown keys are **not** an HTTP 422 / server vocabulary reject. |
 | `narrative.canonical_labels` | no | **Deprecated / derived:** flatten `disposition=canonical` keys from `narrative.taxonomy` when present; else `canonical_payload.labels[]` (REQ-25 compat). Prefer `taxonomy`. |
@@ -78,7 +78,7 @@ Minimal Actions body fragment. Binding pair matches active pack `tallinn_civic` 
 }
 ```
 
-`geo_detail` is omitted here (optional). Do not emit instruction-layer stash until GPT-SSR-03.
+`geo_detail` is omitted here (optional; civic instance `geo_intake.mode` = `optional`). Orchestrator **MUST** emit `schema_binding` on the instruction-layer stash (GPT-SSR-03). OpenAPI `info.version` stays **0.8.0** — do not reopen the schema in this story.
 
 ---
 
@@ -138,6 +138,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 2.1.1 | 2026-08-31 | **GPT-SSR-03 / GIM-265:** instruction emit pointer — orchestrator MUST stash `schema_binding`. OpenAPI `info.version` stays **0.8.0** (no schema reopen). Location_query row: pack `geo_intake.mode`. |
 | 2.1 | 2026-08-31 | **GPT-SSR-02 / GIM-256…260:** required `schema_binding` + optional `geo_detail` (gateway-named only). Lock `info.version` **0.8.0**. Operator: re-import Actions after publish. Residual: NarrativeTaxonomy 13 civic axes remain (T06). |
 | 2.0.2 | 2026-08-21 | **GPT-PII-01 / GIM-243:** `privacy.*` flags do not replace scrub or authorize HTTP; decline→STOP. OpenAPI `info.version` remains **0.7.0** (description-only). No HTTP 422 PII reject. |
 | 2.0.1 | 2026-08-21 | **GPT-TAX-02 / GIM-232:** `narrative.taxonomy` `label` = English snake_case / SSOT token; et/ru prose not a wire `label`; no HTTP 422 vocabulary reject. OpenAPI `info.version` remains **0.7.0** (description-only). |
