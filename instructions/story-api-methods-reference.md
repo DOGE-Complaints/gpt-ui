@@ -1,12 +1,14 @@
 # Story Intake API — SSOT reference (DOGEstonia / GPT Actions)
 
-**Version:** 2.0.2 · 2026-08-21  
+**Version:** 2.1 · 2026-08-31  
 **Scope:** Story-first runtime intake API SSOT  
 **HTTP executor module:** [`api-orchestrator.md`](api-orchestrator.md)
 
 This file is the **HTTP source of truth for story intake runtime** inside the instruction bundle. Import the deployed story intake OpenAPI into GPT Actions (or equivalent) and treat that imported contract as authoritative for `operationId`, paths, schemas, and security. Until the node publishes canonical OpenAPI, paths below are **candidates**; before production, reconcile with `GET /openapi.json` on the deployed API.
 
-**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.7.0** at current instruction alignment — GPT-TAX-01 per-axis taxonomy). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+**Lock:** track `info.version` on the imported OpenAPI and this document’s **Version** line together (`info.version` is **0.8.0** at current instruction alignment — GPT-SSR-02 required `schema_binding` + optional `geo_detail`). When a live node is available, prefer locking to `GET /openapi.json` for story routes.
+
+**Operator:** after publishing this contract, **re-import Custom GPT Actions**. Pack-only Instruction uploads do not pick up OpenAPI changes.
 
 ---
 
@@ -25,6 +27,8 @@ Additional operations (search/reference/update) — add only when runtime contra
 | Field | Required | Source |
 |---|---:|---|
 | `schema_version` | yes | hard-coded `m2.story_intake_envelope.v2` |
+| `schema_binding` | yes | gateway `SchemaBinding`: `schema_id` + `schema_version` (semantic pack pair, **not** the envelope string) + `structured_payload`; optional `profile_id` / `profile_version`. MUST be on the HTTP body (AC-GPT-BIND-01). Citizen preview MAY omit display (REQ-31/32 display vs transport) — do not omit from the Actions request. |
+| `geo_detail` | no | optional gateway `GeoDetail`: `latitude`/`longitude` together; `address` with house XOR (`house` \| `house_range` \| `houses[]`); `normalized_label` / `confidence` / `provider`. Pack `geo_intake` / `merge` / `mirror_to_payload` are **not** wire keys. |
 | `narrative.original_text` | yes | `canonical_payload.description[session_language]` |
 | `narrative.language` | yes | `normalization_metadata.detected_input_language` |
 | `narrative.session_language` | yes | `normalization_metadata.session_language` |
@@ -45,6 +49,36 @@ Additional operations (search/reference/update) — add only when runtime contra
 | `origin` | no | traceability sidecar |
 
 The request must not contain backend-issued fields (`id`, `status`, timestamps, txids), raw `non_wire_metadata`, or other instruction-internal metadata not accepted by runtime schema.
+
+### 1.2 Sample stash JSON (`schema_binding` on the wire)
+
+Minimal Actions body fragment. Binding pair matches active pack `tallinn_civic` / `v1`. `structured_payload.signals.*` keys are pack field names (not invented OpenAPI tokens). Citizen conversational preview may hide `schema_binding`; the HTTP request MUST include it.
+
+```json
+{
+  "schema_version": "m2.story_intake_envelope.v2",
+  "schema_binding": {
+    "schema_id": "tallinn_civic",
+    "schema_version": "v1",
+    "structured_payload": {
+      "signals": {
+        "civic_domain": "example",
+        "failure_pattern": "example"
+      }
+    }
+  },
+  "narrative": {
+    "original_text": "Example stash body for Actions import.",
+    "language": "en",
+    "session_language": "en",
+    "title": { "et": "Naide", "ru": "Primer", "en": "Example" },
+    "description": { "et": "Naide", "ru": "Primer", "en": "Example" }
+  },
+  "origin": { "source": "openai_gpt_action" }
+}
+```
+
+`geo_detail` is omitted here (optional). Do not emit instruction-layer stash until GPT-SSR-03.
 
 ---
 
@@ -104,6 +138,7 @@ Also record lock source: live `GET /openapi.json` or repository snapshot.
 
 | Version | Date | Change |
 |---------|------|--------|
+| 2.1 | 2026-08-31 | **GPT-SSR-02 / GIM-256…260:** required `schema_binding` + optional `geo_detail` (gateway-named only). Lock `info.version` **0.8.0**. Operator: re-import Actions after publish. Residual: NarrativeTaxonomy 13 civic axes remain (T06). |
 | 2.0.2 | 2026-08-21 | **GPT-PII-01 / GIM-243:** `privacy.*` flags do not replace scrub or authorize HTTP; decline→STOP. OpenAPI `info.version` remains **0.7.0** (description-only). No HTTP 422 PII reject. |
 | 2.0.1 | 2026-08-21 | **GPT-TAX-02 / GIM-232:** `narrative.taxonomy` `label` = English snake_case / SSOT token; et/ru prose not a wire `label`; no HTTP 422 vocabulary reject. OpenAPI `info.version` remains **0.7.0** (description-only). |
 | 2.0 | 2026-07-23 | **GPT-TAX-01 / GIM-210:** `narrative.taxonomy` field lock; `canonical_labels` deprecated/derived; lock `info.version` **0.7.0**. |
