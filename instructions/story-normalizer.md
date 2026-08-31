@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.21 |
+| **Version** | 0.2.22 |
 | **Date** | 2026-08-31 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`schema-packs/README.md`](schema-packs/README.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254; GPT-SSR-03 / GIM-268; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`schema-packs/README.md`](schema-packs/README.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -403,11 +403,11 @@ Optional **top-level** string on `normalized_issue_payload` (sibling to `canonic
 
 **Source data:** `location.freeform` from the ingest validation artifact ([`ingest-validation.md`](ingest-validation.md) report shape) after the user **confirmed** location in interview Phases 2–3 and [`story-interview-flow.md`](story-interview-flow.md) §7.2 affirmation.
 
-**Formation rules:**
+**Formation rules (apply pack geo formation):**
 
-1. **Mandatory when location is confirmed (REQ-35):** If the resident named or confirmed a city, district, street, or landmark in any interview phase (and §7.2 affirmation applies), the normalizer **MUST** form `location_query` from the confirmed `location.freeform` material — do **not** omit solely because the field was optional upstream. The only grounds to omit are rules **3–5** below.
-2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script**. Apply the **active data-model pack** geo-formation rules: read [`schema-packs/README.md`](schema-packs/README.md), then that pack’s data-model §4. The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)). Do **not** invent address detail beyond what the resident stated. Do **not** keep a civic city table in this core file — the pack owns the canon.
-   - **City-level canonicalization (REQ-39):** When the confirmed location is **city-level only**, apply the pack’s city canon (civic instance: `<City>, Estonia` Latin mappings in the data-model pack §4). When the string includes **district, street, or landmark** detail, **preserve** that detail — do **not** collapse to city-only.
+1. **Delegate to pack `geo_intake.mode`:** Read [`schema-packs/README.md`](schema-packs/README.md), then that pack’s data-model §3–§4. If mode is **`optional`** (civic instance current value): **MAY** form `location_query` when the resident confirmed a place; **do not MUST** force it. If mode is `require_location_or_detail`, form `location_query` **or** leave geo to orchestrator `geo_detail` (one of the two must be non-empty). If mode is `require_detail`, `location_query` remains optional; structured `geo_detail` is orchestrator’s SHALL. The only grounds to omit a formed string are rules **3–5** below. Do **not** keep a civic city table in this core file.
+2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script**. Apply the **active data-model pack** geo-formation rules (pack data-model §4). The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)). Do **not** invent address detail beyond what the resident stated.
+   - **City-level canonicalization (REQ-39):** When the confirmed location is **city-level only**, apply the pack’s city canon. When the string includes **district, street, or landmark** detail, **preserve** that detail — do **not** collapse to city-only.
 3. If the user mentioned **multiple** locations without a single clear primary — pick the most specific / complaint-relevant one (D-02). Reflect ambiguity in `live_story_context.consistency_notes` (§4.5) when useful.
 4. If location was **not** confirmed or remains ambiguous after §7.2 — **omit** `location_query` (do not send null or `""`).
 5. Never emit a blank or whitespace-only string.
@@ -448,6 +448,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2.22 | 2026-08-31 | **GPT-SSR-03 / GIM-268:** §4.6 = apply pack geo formation; MUST-when-confirmed reconciled with pack `geo_intake.mode=optional` (MAY emit; do not force). Omit/blank core rules 3–5 kept. |
 | 0.2.21 | 2026-08-31 | **GPT-SSR-01 / GIM-254:** §4.1a civic overlay table removed — lists live in pack / taxonomy include. |
 | 0.2.20 | 2026-08-31 | **GPT-SSR-01 / GIM-253:** §4.1a / §4.6 pack pointers README-only (no hardcoded civic pack path). |
 | 0.2.19 | 2026-08-31 | **GPT-SSR-01 / GIM-251:** §4.6 city canon + Latin preference → active data-model pack; §4.1 type/taxonomy weld points at pack payload fields; PII §4.4 unchanged. |

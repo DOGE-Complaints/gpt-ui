@@ -56,7 +56,7 @@ with `base.md` as global constitution and `story-lifecycle-instructions.md` as c
 | Safety | [`safety-compliance.md`](safety-compliance.md) | `safety_compliance_report`; may BLOCK/REQUEST. |
 | Policy gate | [`story-policy-gate.md`](story-policy-gate.md) | `policy_gate_result`; admission decision only. |
 | Normalization | [`story-normalizer.md`](story-normalizer.md) | `normalized_issue_payload`; no user questions/API. |
-| API orchestration | [`api-orchestrator.md`](api-orchestrator.md) | The only module allowed to execute HTTP actions. Reads active pack pair; does not emit `schema_binding` until GPT-SSR-03. |
+| API orchestration | [`api-orchestrator.md`](api-orchestrator.md) | The only module allowed to execute HTTP actions. Reads active pack pair; **MUST** emit `schema_binding` (GPT-SSR-03). |
 | Schema pack overlay | [`schema-packs/README.md`](schema-packs/README.md) | Active `tallinn_civic`/`v1` pair; swap two files without core domain-field edits (REQ3-AC-016). |
 | Search flow | SEARCH-mode handoff via base/orchestrator contracts | Optional; activate only when Issue search operations exist in OpenAPI. |
 

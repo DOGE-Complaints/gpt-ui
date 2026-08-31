@@ -3,9 +3,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.5.7 |
+| **Version** | 0.5.8 |
 | **Date** | 2026-08-31 |
-| **Traceability** | GIM-253 (GPT-SSR-01 P6: README-only pack seams; no civic path in core); GIM-247…251 (GPT-SSR-01 active schema pack read + geo_intake.mode hook; envelope v2 unchanged; no schema_binding emit); GIM-240…245 (GPT-PII-01 zero PII on wire: decline→STOP; full-field re-scan; flags insufficient; V9/V10 residual; no backend AI PII reject); GIM-238…239 (GPT-GUARD-01 P6: H7 sandbox OR-list aligned with fail-closed; no invent `test_mode`); GIM-233…237 (GPT-GUARD-01 fail-closed H5–H7 + H1–H4 residual / H8 not create-gate / no backend LLM for junk); GIM-226…230 (GPT-TAX-02 English label tokens before stash); GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
+| **Traceability** | GIM-265…272 (GPT-SSR-03: MUST emit schema_binding from README active pair; structured_payload from pack; geo_intake.mode-aware geo_detail / location_query; civic examples in pack); GIM-253 (GPT-SSR-01 P6: README-only pack seams; no civic path in core); GIM-247…251 (GPT-SSR-01 active schema pack read + geo_intake.mode hook; envelope v2 unchanged); GIM-240…245 (GPT-PII-01 zero PII on wire: decline→STOP; full-field re-scan; flags insufficient; V9/V10 residual; no backend AI PII reject); GIM-238…239 (GPT-GUARD-01 P6: H7 sandbox OR-list aligned with fail-closed; no invent `test_mode`); GIM-233…237 (GPT-GUARD-01 fail-closed H5–H7 + H1–H4 residual / H8 not create-gate / no backend LLM for junk); GIM-226…230 (GPT-TAX-02 English label tokens before stash); GIM-216…220 (GPT-MISSION-01 standing / anti-gossip via policy_gate); GIM-209…214 (GPT-TAX-01 per-axis `narrative.taxonomy`); GIM-201…206 (GPT-SUBMIT-02 single stash contract — no `submitter`, no service intake in Actions); GIM-186…193 (GPT-SUBMIT-01 browser-submit stash+redirect); GIM-185 (gateway REQ-43 (institution) namespace qualifier — §5.2.1 row + §5.2.2 items 7–8); GPT-UI REQ-42 / GIM-179 (§5.2.4 redirect copy); REQ-41 / GIM-176 (§5.2.0b God Mode trigger activation table); REQ-40 / GIM-174 (§5.2.2 item 15 qualified evidence paths); REQ-40 / GIM-171 (§5.2.2 items 13+ compliance); REQ-35 / GIM-154 (`origin.conversation_id` guidance); REQ-32 / GIM-142 (`origin.source` sending + transport vs display); REQ-31 / GIM-136 (§5.2.0b dual-mode preview); GIM-139 (Citizen preview Destination); REQ-30 / GIM-133 (§5.2.0a admission gate); GIM-135 (§5.2 execution order); GIM-28 (§5.2.2 pre-flight); REQ-23 (§5.2.0 PII); REQ-18 / REQ-22 (Story Intake wire) |
 
 ### DOGEstonia — Story Intake API track
 
@@ -292,6 +292,15 @@ Build the `StoryDraftStashRequest` body **only** from `normalized_issue_payload`
 ```json
 {
   "schema_version": "m2.story_intake_envelope.v2",
+  "schema_binding": {
+    "schema_id": "<schema-packs/README.md active schema_id>",
+    "schema_version": "<README active schema_version — not envelope id>",
+    "structured_payload": {
+      "signals": {
+        "<pack required signal keys>": "<from pack data-model / normalizer handoff — no invent>"
+      }
+    }
+  },
   "narrative": {
     "original_text": "<canonical_payload.description[session_language]>",
     "language": "<normalization_metadata.detected_input_language>",
@@ -308,9 +317,7 @@ Build the `StoryDraftStashRequest` body **only** from `normalized_issue_payload`
     },
     "canonical_type": "<canonical_payload.type — include only when normalizer produced a value>",
     "taxonomy": {
-      "topic_domain": [{ "label": "transport", "disposition": "canonical" }],
-      "civic_signal": [{ "label": "city_for_people", "disposition": "canonical" }],
-      "risk_privacy_safety": [{ "label": "pii_present", "disposition": "internal" }]
+      "<axis from pack / taxonomy include>": [{ "label": "<English SSOT token>", "disposition": "canonical" }]
     },
     "canonical_labels": ["<derived: disposition=canonical keys from taxonomy — or canonical_payload.labels[]>"],
     "summary": {
@@ -341,13 +348,17 @@ Build the `StoryDraftStashRequest` body **only** from `normalized_issue_payload`
 }
 ```
 
-Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (always omit in demo scope per REQ-28; post-demo: omit if incomplete i18n), `narrative.location_query` (absent or empty in normalizer output), `live_story_context` (no contradiction), `canonical_type` / `taxonomy` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string. Prefer `narrative.taxonomy` over flat `canonical_labels` when both could be set (GPT-TAX-01).
+Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no sidecar), `narrative.institution` (always omit in demo scope per REQ-28; post-demo: omit if incomplete i18n), `narrative.location_query` (absent or empty in normalizer output **and** pack `geo_intake.mode` does not require it), `geo_detail` (omit when pack mode is `optional` and no structured geo was collected), `live_story_context` (no contradiction), `canonical_type` / `taxonomy` / `canonical_labels` (normalizer did not produce), `summary` (any `et`/`ru`/`en` slot empty — omit the **entire** `summary` object, not individual keys). Never send `consistency_notes` as empty string. Prefer `narrative.taxonomy` over flat `canonical_labels` when both could be set (GPT-TAX-01). **Never omit `schema_binding`.** Civic taxonomy / city examples live in the active pack — do not weld instance labels into this core demo.
 
 **Field mapping table (REQ-22 / REQ-23 / REQ-25 / REQ-26 / D-03…D-08):**
 
 | `StoryDraftStashRequest` field | Source in `normalized_issue_payload` | Required | Decision |
 |---|---|---|---|
 | `schema_version` | Hard-coded: `"m2.story_intake_envelope.v2"` | Yes | Story Intake envelope contract (`contracts.py`). This is the **envelope** id — not the pack semantic `schema_version`. |
+| `schema_binding.schema_id` | Active pair in [`schema-packs/README.md`](schema-packs/README.md) | Yes | **MUST** (AC-GPT-BIND-01). Semantic pack id. Do not hard-code a civic name here. |
+| `schema_binding.schema_version` | README active `schema_version` | Yes | Pack semantic version — **not** envelope `m2.story_intake_envelope.v2`. |
+| `schema_binding.structured_payload` | Active data-model pack §2 / normalizer handoff | Yes | Object. Keys ⊆ pack payload (`signals.*`, optional `geo.*`). Fill pack-required signal fields when the pack lists them. No invent OpenAPI tokens. Narrative-first: structured is **additional** (AC-GPT-REQ3-04). |
+| `geo_detail` | Interview geo parts when pack `geo_intake.mode` requires or the resident gave structured geo | No | Gateway `GeoDetail` only. **MAY** omit when mode is `optional`. **SHALL** emit non-empty `geo_detail` when mode is `require_detail`. Pack `merge` / `mirror_to_payload` are **not** wire keys. |
 | `narrative.language` | `normalization_metadata.detected_input_language` | Yes | REQ-22 GAP-W-05; language of user narrative input |
 | `narrative.session_language` | `normalization_metadata.session_language` | Yes | REQ-22 GAP-W-03 |
 | `narrative.title` | `canonical_payload.title` (`{et, ru, en}`) | Yes | REQ-22 GAP-W-04; direct object mapping |
@@ -357,9 +368,9 @@ Omit optional blocks when not applicable: `privacy` (no PII), `gpt_signals` (no 
 | `narrative.taxonomy` | `canonical_payload.taxonomy` | No | **GPT-TAX-01 / D-TAX-1 SoT:** object keyed by axis → `[{ label, disposition }]`. Preserve axis membership; include `internal` / `metadata_only` / etc. Omit empty axes. Gateway `parse_taxonomy_payload`. |
 | `narrative.canonical_labels` | derived from `canonical_payload.taxonomy` (canonical only) **or** `canonical_payload.labels[]` | No | **Deprecated / derived (GPT-TAX-01):** when `taxonomy` present, flatten keys with `disposition=canonical` only; else REQ-25 flat labels. Prefer `taxonomy`. |
 | `narrative.summary` | `canonical_payload.summary` (`{et, ru, en}`) | No | REQ-25: include only when **all three** slots are non-empty; if any slot empty — omit entire `summary` block (server `parse_required_i18n_dict` → HTTP 400 on partial) |
-| `narrative.location_query` | `normalized_issue_payload.location_query` (top-level) | No | REQ-26: freeform location string; server `geo_service.resolve_for_story()`; omit if absent, null, or empty after trim. Formation canon comes from the **active data-model pack**; this core only applies pack `geo_intake.mode`. |
+| `narrative.location_query` | `normalized_issue_payload.location_query` (top-level) | No | REQ-26: freeform location string; server `geo_service.resolve_for_story()`; omit if absent, null, or empty after trim **when** pack `geo_intake.mode` is `optional`. Formation canon comes from the **active data-model pack**; this core applies pack `geo_intake.mode`. |
 
-**Active schema pack (GPT-SSR-01 / GIM-253):** before stash mapping, **read** [`schema-packs/README.md`](schema-packs/README.md) for the active `schema_id` / `schema_version` pair, then open the two files named there. Apply that pack’s `geo_intake.mode` to geo gate **shape** (optional vs require — emit of `schema_binding` / `geo_detail` is GPT-SSR-03, not this story). Do **not** hard-code civic field names or civic pack paths in this core file. Envelope `schema_version` stays `m2.story_intake_envelope.v2`. PII / admission process unchanged.
+**Active schema pack (GPT-SSR-03 / GIM-265…270):** before stash mapping, **read** [`schema-packs/README.md`](schema-packs/README.md) for the active `schema_id` / `schema_version` pair, then open the two files named there. **MUST** emit matching `schema_binding` on every `StoryDraftStashRequest`. Fill `structured_payload` from that pack’s data-model (no invent keys). Apply pack `geo_intake.mode` to geo **emit and pre-flight** (`optional` / `require_location_or_detail` / `require_detail` — full matrix in the pack). Do **not** hard-code civic field names or civic pack paths in this core file. Envelope `schema_version` stays `m2.story_intake_envelope.v2`. PII / admission process unchanged.
 | `origin.source` | Fixed: `openai_gpt_action` | **de-facto required** | Always include: this is the only way to track submission source. Value is fixed = `openai_gpt_action` for GPT Action runtime. Do not omit — `origin.source = null` in DB means the story cannot be attributed to the GPT channel. |
 | `origin.conversation_id` | Active `conversation_id` from GPT Actions session context when the orchestrator runtime exposes it (thread / conversation id for this Custom GPT session) | No | **REQ-35:** populate when available for channel attribution; do **not** send `null`, empty string, or placeholder text — **omit** the `conversation_id` key entirely when the id is not available to the runtime (instruction cannot guarantee Actions context; fill when present). |
 | `origin.tool_call_id` | Tool invocation id when submit runs inside a tool call | No | |
@@ -544,13 +555,13 @@ Would you like to submit?
 
 **Confirmation copy:** prefer **«Continue on website»** / **«Submit on DOGEstonia website»** (or equivalent in `session_language`) — user will finish submit in the browser. **MUST NOT** label the user-facing step as `postStoryDraftStash` or expose HTTP path/method names. **MUST NOT** promise «story created» before browser submit.
 
-**Transport fields vs display fields (REQ-32):** Citizen Mode controls what is *shown* to the user, not what is *sent* in the API request. **`origin`**, `schema_version`, `gpt_signals` — always included in the `StoryDraftStashRequest` body with `origin.source = "openai_gpt_action"`; never described to the citizen in conversational preview unless God Mode is active.
+**Transport fields vs display fields (REQ-32):** Citizen Mode controls what is *shown* to the user, not what is *sent* in the API request. **`origin`**, `schema_version`, `schema_binding`, `gpt_signals` — always included in the `StoryDraftStashRequest` body with `origin.source = "openai_gpt_action"`; never described to the citizen in conversational preview unless God Mode is active.
 
 **Transport abstraction:** describe fields by **purpose**, not wire names. Examples:
 
 - «Category: Complaint» — not `canonical_type=complaint`
 - «Labels: …» — not `canonical_labels=[…]`
-- Do **not** describe `schema_version`, `identity_issuer`, `gpt_signals`, `origin`, or raw envelope fields to the citizen unless God Mode is active.
+- Do **not** describe `schema_version`, `schema_binding`, `identity_issuer`, `gpt_signals`, `origin`, or raw envelope fields to the citizen unless God Mode is active.
 
 If the user confirms submission in Citizen Mode → proceed to §5.2.2, then HTTP when checks pass.
 
@@ -564,14 +575,14 @@ When `debug_mode = true`, prefix GPT responses that include submission preview w
 DEBUG MODE ACTIVE
 ```
 
-**Zero simplification (REQ-31 §2.4):** show the **full** draft `StoryDraftStashRequest` (and mapping notes) exactly as built for HTTP — including `schema_version`, `narrative` (**with `narrative.taxonomy` per-axis block when present — GPT-TAX-01 / T04**), `gpt_signals`, `origin`, `privacy`, `live_story_context`, labels, severity, and transport fields. Use a JSON block when helpful. **No** redaction, **no** citizen-style abstraction in this mode.
+**Zero simplification (REQ-31 §2.4):** show the **full** draft `StoryDraftStashRequest` (and mapping notes) exactly as built for HTTP — including `schema_version`, **`schema_binding` (transport — AC-GPT-BIND-01)**, `geo_detail` when present, `narrative` (**with `narrative.taxonomy` per-axis block when present — GPT-TAX-01 / T04**), `gpt_signals`, `origin`, `privacy`, `live_story_context`, labels, severity, and transport fields. Use a JSON block when helpful. **No** redaction, **no** citizen-style abstraction in this mode.
 
 **Per-axis taxonomy diagnostics (GPT-TAX-01 / GIM-213):** When `narrative.taxonomy` is present, God Mode **MUST** show it in the JSON preview (do not collapse to flat `canonical_labels` only). Prefer a compact axis summary table after the JSON when helpful:
 
 | Axis | Labels (disposition) |
 |------|----------------------|
-| `topic_domain` | `transport` (canonical) |
-| `risk_privacy_safety` | `pii_present` (internal) |
+| `<axis from pack / taxonomy include>` | `<English SSOT token>` (canonical) |
+| `<internal axis>` | `<internal token>` (internal) |
 
 Citizen Mode continues to show human «Labels: …» only — never raw `taxonomy` keys.
 
@@ -632,12 +643,20 @@ Run before every `postStoryDraftStash` (`POST /story-drafts`) call:
 
 12. If `narrative.institution` is present (post-demo only — see item 7) but `narrative.location_query` is omitted while validation/`canonical_payload` narrative still contains an explicit address the user confirmed — add an informational line to `trace_notes` (not stop-the-line). REQ-26 §2.3.
 
-13. **Location coverage (REQ-40 / GIM-171):** If `ingest_validation_report.pre_submission_compliance_evidence.location.confirmed = true` **and** `narrative.location_query` is absent or empty after trim → **STOP**. Do not call HTTP. Message: confirmed location in validation evidence but `location_query` is missing — re-run [`story-normalizer.md`](story-normalizer.md) §4.6 and rebuild the draft before submit. (Blocking upgrade for confirmed-location; item 12 remains informational for the narrow post-demo institution case.)
+13. **Location / geo coverage (REQ-40 / GIM-171 / GPT-SSR-03):** Read pack `geo_intake.mode` from the active data-model pack. Apply this decision table (confirmed place from `ingest_validation_report.pre_submission_compliance_evidence.location.confirmed`, no `geo_detail`, no `location_query`):
+
+    | Mode | Confirmed place, no `geo_detail`, no `location_query` | Action |
+    |------|------------------------------------------------------|--------|
+    | `optional` | OK | Proceed (MAY still emit if the resident gave a place) |
+    | `require_location_or_detail` | FAIL | **STOP** — collect one of the two |
+    | `require_detail` | FAIL if no `geo_detail` | **STOP** — need structured `geo_detail` |
+
+    `optional` does **not** force `location_query`. If FAIL → do not call HTTP. Message: pack geo mode not satisfied — collect the missing geo part, re-run [`story-normalizer.md`](story-normalizer.md) §4.6 (apply pack geo formation), and rebuild the draft. (Item 12 remains informational for the narrow post-demo institution case.)
 
 14. **Single-label collapse (REQ-40):** If `pre_submission_compliance_evidence.multi_axis_evidence.domain_count ≥ 2` (or `axes_detected` length ≥ 2) **and** `narrative.canonical_labels` contains exactly one key → append a **validation warning** to `trace_notes` (not STOP): `"compliance: multi-domain evidence but single canonical label (REQ-33 multi-axis)"`.
 
 15. **Missing-trigger compliance pass (REQ-40):** Before HTTP, using `ingest_validation_report.pre_submission_compliance_evidence` and the built draft, collect expected-but-missing triggers:
-    - **FAIL (stop-the-line):** confirmed location + missing `location_query` (item 13); `origin.source` missing, null, or empty string.
+    - **FAIL (stop-the-line):** pack `geo_intake.mode` FAIL per item 13; `origin.source` missing, null, or empty string; `schema_binding` missing/empty per item 20.
     - **Warning (`trace_notes` only):** `pre_submission_compliance_evidence.narrative_sufficient_for_summary = true` but `narrative.summary` absent; multi-axis evidence with single label (item 14); `pre_submission_compliance_evidence.subjective_signal_present = true` but `gpt_signals` absent.
     Prefix each finding `compliance:` in `trace_notes`; FAIL on an item overrides warning for the same field.
 
@@ -649,6 +668,8 @@ Run before every `postStoryDraftStash` (`POST /story-drafts`) call:
 
 19. **Zero-PII re-scan (GPT-PII-01 / GIM-242):** Immediately before HTTP, re-scan the §5.2.0 scan set. If any §4.4 type remains → **STOP**. Do not call `postStoryDraftStash`. Flags do not override this check. **Do not** treat this as HTTP 422 PII reject.
 
+20. **`schema_binding` MUST (GPT-SSR-03 / AC-GPT-BIND-01):** `schema_binding` must be present with non-empty `schema_id`, `schema_version` (semantic pack pair from README — **not** envelope id), and object `structured_payload`. If missing or empty → **STOP**. Do not call HTTP. Rebuild from the active pack pair. God Mode shows this block as transport; Citizen Mode does not describe it.
+
 If all checks pass → proceed to `postStoryDraftStash` HTTP call.
 
 #### 5.2.3 Story draft stash response handling (GIM-187 / GIM-188)
@@ -658,7 +679,7 @@ Applies to **`postStoryDraftStash`** (`POST /story-drafts`) — user citizen pat
 - **HTTP 201:** draft stashed. Read `draft_id` from response `data` envelope (`{ "data": { "draft_id": "<opaque>" }, "trace_id": "..." }` per [API_REFERENCE §6.8](../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md)). Do not retry on 201. **No story is created** — only an ephemeral draft for browser handoff. **User-facing next step** — apply §5.2.4 redirect copy, then §5.2.B redirect URL.
 - **HTTP 400:** likely missing/invalid v2 fields (`schema_version`, `session_language`, `title`, `description`, `language`) or other `DOMAIN_ERROR` / domain validation from the gateway. Check pre-flight again; do not retry without fixing the input. Schema and field validation map to **400** (`error.code` typically `DOMAIN_ERROR`), not 422.
 - **HTTP 401/403:** bearer issue; surface `error.code` / `error.message` from the envelope to the user without inventing auth state.
-- **HTTP 422 (`GEO_SCOPE_MISMATCH`):** `location_query` resolved outside the server geo scope (for demo: Estonia / Tallinn). Ask the user to clarify location within the supported region. Do not treat this as a schema error — schema/field problems are **400** (`DOMAIN_ERROR`).
+- **HTTP 422 (`GEO_SCOPE_MISMATCH`):** `location_query` resolved outside the **pack-declared geo scope** (copy and city list live in the active data-model / inbound-validation pack — not in this core file). Ask the user to clarify location within that supported region. Do not treat this as a schema error — schema/field problems are **400** (`DOMAIN_ERROR`). HTTP handling stays here; scope **copy** is pack-owned.
 - **HTTP 5xx:** gateway error; report uncertainty to user; do not retry automatically.
 
 On any error response, read `error` as an object `{code, type, message, details}` and top-level `trace_id` (see §6.1). Do not expect `success`, `timestamp`, or `request_id` fields. **Do not** apply §5.2.4 redirect copy on non-201 responses — error copy stays in this §5.2.3 block only.
@@ -782,6 +803,7 @@ Request/response shapes are defined in the imported Actions contract and SSOT ma
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.5.8 | 2026-08-31 | **GPT-SSR-03 / GIM-265…270:** MUST emit `schema_binding` from README active pair; `structured_payload` from pack; mode-aware geo pre-flight (item 13 + item 20); civic examples / GEO_SCOPE copy → pack; PII item 19 + GUARD H5–H7 unchanged. OpenAPI 0.8.0 not reopened. |
 | 0.5.7 | 2026-08-31 | **GPT-SSR-01 / GIM-253:** §5.2.1 pack seams README-only — no hardcoded civic pack path; follow README active pair then those two files. Envelope v2 unchanged; no OpenAPI `schema_binding` / `geo_detail`. |
 | 0.5.6 | 2026-08-31 | **GPT-SSR-01 / GIM-251:** §5.2.1 read active pack from `schema-packs/README.md`; geo gate shape parameterized by pack `geo_intake.mode`; envelope v2 unchanged; no OpenAPI `schema_binding` / `geo_detail` (SSR-02/03). |
 | 0.5.5 | 2026-08-21 | **GPT-PII-01 / GIM-240…243:** §5.2.0 decline redact → STOP; flags never authorize HTTP; full-field + sidecar re-scan before every stash; God Mode preview ≠ send exemption; V1–V8 Closed (GPT); V9/V10 residual; no backend AI PII reject; REQ-21 Deferred. REQ-23 file Status unchanged. §5.2.2 item 19. |

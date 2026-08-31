@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 1.1 |
+| **Version** | 1.2 |
 | **Date** | 2026-08-31 |
-| **Traceability** | GPT-SSR-01 / GIM-249 / GIM-254; REQ-45; gateway `schema-packs/tallinn_civic/v1/` |
+| **Traceability** | GPT-SSR-03 / GIM-267…270; GPT-SSR-01 / GIM-249 / GIM-254; REQ-45; gateway `schema-packs/tallinn_civic/v1/` |
 | **Binding pair** | `schema_id=tallinn_civic`, `schema_version=v1` |
 | **Gateway SSOT** | `doge-complaints-gateway/schema-packs/tallinn_civic/v1/pack.json` + `payload.schema.json` |
 
@@ -40,7 +40,7 @@ Projection of gateway `payload.schema.json`. Root object requires `signals`. Add
 
 All optional per `field_policy`: `district`, `settlement`, `region`, `country`, `street`, `house`, `house_range`, `houses` (array of strings).
 
-Do not invent OpenAPI sidecar names here (`schema_binding` / `geo_detail` = GPT-SSR-02).
+Do not invent OpenAPI sidecar names here (`schema_binding` / `geo_detail` = GPT-SSR-02 wire tokens). Orchestrator **MUST** emit `schema_binding.structured_payload` using these keys (GPT-SSR-03). Required for this civic instance: `signals.civic_domain`, `signals.failure_pattern`.
 
 ## 3. `geo_intake` (from gateway `pack.json`)
 
@@ -50,11 +50,33 @@ Do not invent OpenAPI sidecar names here (`schema_binding` / `geo_detail` = GPT-
 | `merge` | `true` |
 | `mirror_to_payload` | `true` |
 
-Core orchestrator **reads** `geo_intake.mode` to parameterize geo gate shape. Emit of `geo_detail` / `location_query` = GPT-SSR-03.
+`merge` and `mirror_to_payload` are **gateway-side** (authoritative merge / payload mirror). They are **not** OpenAPI / stash wire keys. GPT documents them here only.
 
-## 4. Geo formation (moved from core normalizer §4.6)
+### 3.1 Mode matrix (GPT emit)
 
-Process (when to form / omit `location_query`) stays in [`story-normalizer.md`](../../../story-normalizer.md) §4.6. **City canon and Latin preference for this pack** live here:
+| `geo_intake.mode` | GPT SHALL | Civic `tallinn_civic/v1` |
+|------------------|-----------|---------------------------|
+| `optional` | MAY omit `geo_detail` and `location_query` | **Current pack value** |
+| `require_location_or_detail` | non-empty `location_query` **or** `geo_detail` | — |
+| `require_detail` | non-empty `geo_detail` | — |
+
+### 3.2 Decision table (confirmed place, no `geo_detail`, no `location_query`)
+
+| Mode | Action |
+|------|--------|
+| `optional` | Proceed (MAY still emit if resident gave place) |
+| `require_location_or_detail` | STOP — collect one of the two |
+| `require_detail` | STOP if no `geo_detail` |
+
+Core orchestrator **reads** `geo_intake.mode` and applies this table at pre-flight. HTTP 422 handling stays in orchestrator; **scope copy** for this instance is below.
+
+### 3.3 GEO_SCOPE copy (this civic instance)
+
+Demo geo scope: **Estonia / Tallinn**. When the gateway returns HTTP 422 `GEO_SCOPE_MISMATCH`, ask the resident to clarify a place **inside this pack’s scope** (Tallinn / Estonia). Core orchestrator must not hard-code this copy.
+
+## 4. Geo formation (owned by this pack; core applies)
+
+Process (when to form / omit `location_query` per **mode**) stays in [`story-normalizer.md`](../../../story-normalizer.md) §4.6 as «apply pack geo formation». **City canon and Latin preference for this pack** live here:
 
 **Format — prefer Latin script:** freeform `<street/place>, <city>` in Latin (e.g. `Tallinn`, `Kalamaja, Tallinn`, `Tartu mnt 80, Tallinn`). Cyrillic is acceptable when the resident used it and Latin transliteration would distort meaning.
 
@@ -65,6 +87,8 @@ Process (when to form / omit `location_query`) stays in [`story-normalizer.md`](
 - `Tallinna linn` → `Tallinn, Estonia`
 
 When the string includes district, street, or landmark detail, **preserve** that detail — do not collapse to city-only. Do not append `, Estonia` when it would simplify a more specific address the resident confirmed.
+
+**Reconcile with `mode=optional`:** this pack does **not** require `location_query` when a place is confirmed. Core MUST NOT force `location_query` for this instance. MAY still form it when the resident gave a place.
 
 ## 5. Interview overlay notes (phase → axes + ecosystem)
 
@@ -97,3 +121,29 @@ Exact vs civic clustering: gateway pack `exact_lenses` (e.g. `civic_domain_micro
 **Decision:** keep [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) as SSOT for 13-axis label keys; this pack **includes** it by reference (do **not** migrate the whole file into the pack in this story). Pack-owned vocabulary may replace the include in a later story.
 
 Allowed canonical labels for this instance = keys listed in `story-label-taxonomy.md` with disposition `canonical`.
+
+## 7. Civic stash examples (moved from core orchestrator)
+
+Core demo JSON uses generic placeholders. **This pack** owns civic instance examples:
+
+```json
+{
+  "taxonomy": {
+    "topic_domain": [{ "label": "transport", "disposition": "canonical" }],
+    "civic_signal": [{ "label": "city_for_people", "disposition": "canonical" }],
+    "risk_privacy_safety": [{ "label": "pii_present", "disposition": "internal" }]
+  },
+  "schema_binding": {
+    "schema_id": "tallinn_civic",
+    "schema_version": "v1",
+    "structured_payload": {
+      "signals": {
+        "civic_domain": "example",
+        "failure_pattern": "example"
+      }
+    }
+  }
+}
+```
+
+God Mode axis-summary examples for this instance may use the same labels. Do not copy these tokens into core orchestrator as the only demo body.

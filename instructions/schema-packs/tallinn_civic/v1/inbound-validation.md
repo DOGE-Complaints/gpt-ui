@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 1.1 |
+| **Version** | 1.2 |
 | **Date** | 2026-08-31 |
-| **Traceability** | GPT-SSR-01 / GIM-250 / GIM-254; REQ3-GPT-002; SEC-001 |
+| **Traceability** | GPT-SSR-03 / GIM-270; GPT-SSR-01 / GIM-250 / GIM-254; REQ3-GPT-002; SEC-001 |
 | **Binding pair** | `schema_id=tallinn_civic`, `schema_version=v1` |
 
 **SEC-001:** Gateway Schema Runtime remains authoritative. This pack is a **non-executable projection**. Do not call APIs from this file. Do not duplicate OpenAPI request bodies.
@@ -46,3 +46,7 @@ Do **not** encode HTTP Action schemas here.
 ## 4. No leading taxonomy questions (privacy baseline)
 
 Do not ask the resident to pick labels or confirm taxonomy keys mid-interview. Capture evidence in phases; map to pack axes after Phase 7 affirmation. Same privacy baseline as REQ-35 §4.3 / interview-flow §7.3–§7.4.
+
+## 5. GEO_SCOPE_MISMATCH copy (this civic instance)
+
+When orchestrator handles HTTP 422 `GEO_SCOPE_MISMATCH`, use this **pack copy**: the demo geo scope is Estonia / Tallinn. Ask the resident to clarify a place inside that region. Core orchestrator keeps HTTP handling only — it must not weld this city list.

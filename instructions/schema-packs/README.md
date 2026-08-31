@@ -33,7 +33,7 @@ To point this Custom GPT at another node pack:
 
 1. Add or replace **two files** under `schema-packs/<new_schema_id>/<new_schema_version>/data-model.md` and `inbound-validation.md` (projections of that node’s gateway pack).
 2. Update **this README** active pair (`schema_id`, `schema_version`) to match the node `NODE_SCHEMA_ID` / `NODE_SCHEMA_VERSION`.
-3. Align the **emitted binding pair** with the new active pair (emit itself = GPT-SSR-03 — document only here).
+3. Align the **emitted binding pair** with the new active pair (orchestrator MUST emit — GPT-SSR-03).
 4. Upload **Instructions** (core + new pack files). Pack `.md` only → **no Actions re-import**.
 5. OpenAPI / Actions re-import **only** when the Actions schema changes (GPT-SSR-02).
 
@@ -44,7 +44,7 @@ To point this Custom GPT at another node pack:
 | 1 | Interview phases / Phase 7 affirmation process | Unchanged in `story-interview-flow.md`; field lists come from the data-model pack. |
 | 2 | Envelope id | Still `m2.story_intake_envelope.v2` in orchestrator / OpenAPI. |
 | 3 | Active pair | Read from this README — not hardcoded civic names in core. |
-| 4 | Geo gate shape | Parameterized by pack `geo_intake.mode` (emit = SSR-03). |
+| 4 | Geo gate shape | Parameterized by pack `geo_intake.mode` (orchestrator emit + pre-flight = SSR-03). |
 | 5 | PII / admission process | Unchanged in normalizer / orchestrator. |
 | 6 | Domain field names (`signals.*`, city canon, civic axes) | Live in the two pack files, not as the sole core model. |
 
@@ -60,6 +60,6 @@ If a swap requires editing orchestrator / interview-flow **for domain field name
 ## Out of this file
 
 - OpenAPI `schema_binding` / `geo_detail` wire tokens — GPT-SSR-02.
-- Stash emit of binding / geo — GPT-SSR-03.
+- Stash emit of binding / geo — GPT-SSR-03 (**done**: orchestrator MUST emit matching pair).
 - Gateway validate / Schema Runtime.
 - Marketplace / §30 extraction.
