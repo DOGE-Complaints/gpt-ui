@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 1.2 |
-| **Date** | 2026-08-31 |
-| **Traceability** | GPT-SSR-03 / GIM-267…270; GPT-SSR-01 / GIM-249 / GIM-254; REQ-45; gateway `schema-packs/tallinn_civic/v1/` |
+| **Version** | 1.3 |
+| **Date** | 2026-09-01 |
+| **Traceability** | GPT-SSR-03 / GIM-267…270 / GIM-273; GPT-SSR-01 / GIM-249 / GIM-254; REQ-45; gateway `schema-packs/tallinn_civic/v1/` |
 | **Binding pair** | `schema_id=tallinn_civic`, `schema_version=v1` |
 | **Gateway SSOT** | `doge-complaints-gateway/schema-packs/tallinn_civic/v1/pack.json` + `payload.schema.json` |
 
@@ -41,6 +41,19 @@ Projection of gateway `payload.schema.json`. Root object requires `signals`. Add
 All optional per `field_policy`: `district`, `settlement`, `region`, `country`, `street`, `house`, `house_range`, `houses` (array of strings).
 
 Do not invent OpenAPI sidecar names here (`schema_binding` / `geo_detail` = GPT-SSR-02 wire tokens). Orchestrator **MUST** emit `schema_binding.structured_payload` using these keys (GPT-SSR-03). Required for this civic instance: `signals.civic_domain`, `signals.failure_pattern`.
+
+### 2.3 Pack-required signal value source (GPT-SSR-03 / GIM-273)
+
+Do **not** invent enum values. Do **not** use the §7 JSON `"example"` strings as a source. Gateway `payload.schema.json` is string `minLength: 1` (read-only; GPT does not edit it).
+
+Copy already-extracted English snake_case tokens from `canonical_payload.taxonomy` (GPT-TAX-01). Use the first `disposition=canonical` label on the named axis:
+
+| Pack required key | Source axis (copy, no invent) |
+|-------------------|-------------------------------|
+| `signals.civic_domain` | `topic_domain` |
+| `signals.failure_pattern` | `failure_mode` |
+
+If that axis has no canonical label, **omit** the key. Core normalizer §4.7 copies into `structured_payload_handoff`; orchestrator item 20 **STOP**s when a pack-required key is missing or empty after trim. Gateway `exact_lenses` (`civic_domain_micro`, `failure_pattern_micro`) are clustering hints — not value sources.
 
 ## 3. `geo_intake` (from gateway `pack.json`)
 

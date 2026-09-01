@@ -5,9 +5,9 @@
 
 | Document field | Value |
 |----------------|--------|
-| **Version** | 0.2.22 |
-| **Date** | 2026-08-31 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254; GPT-SSR-03 / GIM-268; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`schema-packs/README.md`](schema-packs/README.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Version** | 0.2.23 |
+| **Date** | 2026-09-01 |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254; GPT-SSR-03 / GIM-268 / GIM-273; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`schema-packs/README.md`](schema-packs/README.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -26,6 +26,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
 - Emit **`normalized_issue_payload`** with:
   - **`canonical_payload`** — Issue fields aligned with [`story-data-model.md`](story-data-model.md) **§4.1** (`type`, `labels`, `title`, `description`, optional `summary`, optional `institution`; trilingual objects `{ et, ru, en }` per that file and [`story-i18n-policy.md`](story-i18n-policy.md)).
   - **`canonical_payload.taxonomy`** (GPT-TAX-01) — per-axis object `{ axis: [{ label, disposition }] }` for all retained candidates (including `internal` / `metadata_only`); do **not** collapse axes. Flat `labels[]` remains derived (canonical only).
+  - **`structured_payload_handoff`** (GPT-SSR-03 / GIM-273) — pack-required `signals.*` copies from existing taxonomy tokens (§4.7); orchestrator maps this into `schema_binding.structured_payload`.
   - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
 - **Label extraction:** apply **all** taxonomy keys that genuinely apply to the story — one or more keys per applicable axis (`topic_domain`, `failure_mode`, `civic_signal`, `issue_archetype_support`) where evidence exists in the validated narrative. **Conservative** means: do not invent labels or apply low-confidence keys — it does **not** mean use only one label total.
 - Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)). Civic payload field names / geo canon for the **active node** come from the active [`schema-packs/`](schema-packs/README.md) data-model pack — not as the sole core model.
@@ -414,6 +415,17 @@ Optional **top-level** string on `normalized_issue_payload` (sibling to `canonic
 
 **Do not** place `location_query` inside `canonical_payload` or `normalization_metadata`.
 
+### 4.7 Pack-required `signals.*` handoff (GPT-SSR-03 / GIM-273)
+
+Optional **top-level** object `structured_payload_handoff` on `normalized_issue_payload` (sibling to `canonical_payload`, not inside it). Maps to `StoryDraftStashRequest.schema_binding.structured_payload` via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. This module does **not** build HTTP.
+
+1. **Read pack overlay:** [`schema-packs/README.md`](schema-packs/README.md), then that pack’s data-model §2 (required keys + source table). Do **not** hard-code civic field names in this core file.
+2. **Copy, do not invent:** for each pack-required `signals.*` key, copy the first `disposition=canonical` English snake_case `label` from the pack-named taxonomy axis already present on `canonical_payload.taxonomy`. Do **not** invent enum values, civic tokens, or placeholders (`example`, `unknown`, `n/a`, empty string).
+3. **Omit if no source:** if the named axis has no canonical label → **omit** that key. Orchestrator item 20 **STOP**s when a pack-required key is missing or empty after trim (return here; do not guess).
+4. Optional pack `signals.*` / `geo.*` keys: copy only when an existing artifact already has a matching token; otherwise omit. Keys ⊆ pack payload. Narrative-first: this object is **additional** to `canonical_payload` (AC-GPT-REQ3-04).
+
+**Do not** place `structured_payload_handoff` inside `canonical_payload` or `normalization_metadata`.
+
 ---
 
 ## 5. Narrative layers alignment (brief)
@@ -448,6 +460,7 @@ Narrative layers described in [`story-data-model.md`](story-data-model.md) §3 f
 
 | Version | Date | Change |
 |---------|------|--------|
+| 0.2.23 | 2026-09-01 | **GPT-SSR-03 / GIM-273:** §4.7 pack-required `signals.*` handoff from existing taxonomy tokens (pack overlay names axes); no invented enum. |
 | 0.2.22 | 2026-08-31 | **GPT-SSR-03 / GIM-268:** §4.6 = apply pack geo formation; MUST-when-confirmed reconciled with pack `geo_intake.mode=optional` (MAY emit; do not force). Omit/blank core rules 3–5 kept. |
 | 0.2.21 | 2026-08-31 | **GPT-SSR-01 / GIM-254:** §4.1a civic overlay table removed — lists live in pack / taxonomy include. |
 | 0.2.20 | 2026-08-31 | **GPT-SSR-01 / GIM-253:** §4.1a / §4.6 pack pointers README-only (no hardcoded civic pack path). |
