@@ -1,3 +1,4 @@
+**ARCHIVED** — superseded by literal `pack.json` + `payload.schema.json` + `taxonomy.json` + `interview-overlay.md` (GPT-SSR-09). Original v1.3 preserved below.
 # Pack data-model — `tallinn_civic` / `v1`
 
 **Product:** DOGEstonia — Module 1 (GPT instruction overlay)  
