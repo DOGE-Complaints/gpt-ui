@@ -2,8 +2,8 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.41 |
-| **Дата** | 2026-08-31 |
+| **Версия индекса** | 0.42 |
+| **Date** | 2026-09-01 |
 | **Scope** | Runtime navigation map for DOGEstonia Issue instructions; no task/epic dependency in operational sections. |
 
 This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy donor content is removed from the active runtime surface.
@@ -26,7 +26,7 @@ Use this index together with [`story-data-model.md`](story-data-model.md), [`sto
 | [`story-policy-gate.md`](story-policy-gate.md) | Policy admission gate for Issue ingest (no HTTP calls). |
 | [`story-normalizer.md`](story-normalizer.md) | Builds `normalized_issue_payload` after gate approval. |
 | [`story-api-methods-reference.md`](story-api-methods-reference.md) | HTTP/OpenAPI reference for Issue actions and lockstep policy. |
-| [`schema-packs/README.md`](schema-packs/README.md) | Active node pack pair (`schema_id` / `schema_version`) + two swappable overlays (`data-model.md`, `inbound-validation.md`). Non-executable; gateway validates. |
+| [`schema-packs/README.md`](schema-packs/README.md) | Active node pack pair (`schema_id` / `schema_version`) + wave-2 bundle: `pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, `interview-overlay.md`. Non-executable JSON; gateway validates. |
 
 ---
 

@@ -169,7 +169,7 @@ Sources: **FR-M1-032**, **FR-M1-033**, **FR-M1-034**. This subsection is the **n
 
 ### 7.3 Label evidence capture (GIM-87)
 
-**Process stays in this core file.** Axis names / phase→field lists for the **active node** are pack overlay — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s data-model pack §5. Do **not** copy civic overlay tables here.
+**Process stays in this core file.** Axis names / phase→field lists for the **active node** are pack overlay — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s **`interview-overlay.md`**. Do **not** copy civic overlay tables here.
 
 Labels are an **internal projection** from the mature story, not a questionnaire topic. During phases 2–6, collect evidence that later modules can map to [`story-label-taxonomy.md`](story-label-taxonomy.md), but do **not** ask the resident to choose labels or show taxonomy keys.
 
@@ -182,7 +182,7 @@ Operational rules:
 
 ### 7.4 Ecosystem-deficit story recognition (REQ-38)
 
-**Process stays here.** Trigger classes / axis hints: read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s data-model pack §5. Do **not** copy civic overlay tables here.
+**Process stays here.** Trigger classes / axis hints: read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s **`interview-overlay.md`**. Do **not** copy civic overlay tables here.
 
 When the resident describes **absence of environment / ecosystem deficit** — not a single broken service object — capture evidence for downstream `ecosystem_signal` classification per [`story-label-taxonomy.md`](story-label-taxonomy.md) §4.9. Recognition uses **only what the resident already said**; do **not** ask leading taxonomy questions (same privacy baseline as REQ-35 §4.3 — no “Is this about ecosystem gap?” prompts).
 

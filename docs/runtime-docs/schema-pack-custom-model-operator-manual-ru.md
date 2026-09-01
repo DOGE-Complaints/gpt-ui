@@ -45,30 +45,32 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 
 ---
 
-## 3. Два файла: что писать куда
+## 3. Pack bundle: что писать куда (wave 2 — GPT-SSR-09)
 
 Layout для любой ноды:
 
 ```text
 GPT UI/instructions/schema-packs/<schema_id>/<schema_version>/
-  data-model.md           ← модель
-  inbound-validation.md   ← правила валидации / domain lists
+  pack.json                 ← COPY gateway (field_policy, geo_intake, clustering)
+  payload.schema.json       ← COPY gateway (signals/geo shape)
+  taxonomy.json             ← COPY gateway (axes + axis_to_signal_map)
+  inbound-validation.md     ← content / admission rules (dual contour)
+  interview-overlay.md      ← geo canon, phase→axes, ecosystem cues
+  archive/data-model.v*.md  ← archived MD projection (не SSOT)
 ```
 
 Плюс правка active pair в [`schema-packs/README.md`](../../instructions/schema-packs/README.md).
 
-### 3.1 `data-model.md` — модель
+### 3.1 JSON pack files — модель (read-only)
 
-Сюда кладём **проекцию** gateway `pack.json` + `payload.schema.json` понятным языком для GPT:
+Сюда **byte-identical copy** gateway `pack.json` + `payload.schema.json` + `taxonomy.json`:
 
-- Binding pair (`schema_id`, `schema_version`).
-- Форма `structured_payload`: какие `signals.*` / `geo.*`, что **required**.
-- Откуда брать значения required signals (для civic: из taxonomy axes — см. data-model §2.3; **не invent** enum).
-- `geo_intake.mode` и матрица emit (`optional` / `require_location_or_detail` / `require_detail`).
-- Geo formation / city canon **этой** ноды.
-- Примеры civic stash (если нужны) — в паке, не в core orchestrator.
+- Binding pair (`schema_id`, `schema_version`) — в `pack.json`.
+- Required `signals.*` / optional `geo.*` — `field_policy` + `payload.schema.json`.
+- `geo_intake.mode` и матрица emit.
+- `axis_to_signal_map` — **`taxonomy.json`** (не MD §2.3).
 
-Файл **не** валидатор и **не** OpenAPI. Gateway validate = SEC-001.
+Файлы **не** валидатор и **не** OpenAPI. Gateway validate = SEC-001. Core orchestrator/normalizer **читают JSON**, не archived `data-model.md`.
 
 ### 3.2 `inbound-validation.md` — правила валидации контента ноды
 
@@ -78,6 +80,10 @@ GPT UI/instructions/schema-packs/<schema_id>/<schema_version>/
 - Label / multi-axis чеклисты с отсылкой к taxonomy.
 - Pack-required fields before stash (дополнительно к core §4.1).
 - GEO_SCOPE copy текста для жителя при 422.
+
+### 3.3 `interview-overlay.md` — interview guidance
+
+Geo formation canon, phase→axes tables, ecosystem-deficit cues, demo stash examples. **Не** дублирует JSON shape — см. §3.1.
 
 **Process** (когда BLOCK vs approve) остаётся в ядре:
 
@@ -90,7 +96,7 @@ GPT UI/instructions/schema-packs/<schema_id>/<schema_version>/
 
 ## 4. Active pair и `schema_binding`
 
-Перед stash orchestrator **читает** README, открывает два файла пары, и **MUST** положить в HTTP:
+Перед stash orchestrator **читает** README, открывает **`pack.json`** + **`payload.schema.json`** (+ normalizer handoff / overlay), и **MUST** положить в HTTP:
 
 ```json
 "schema_binding": {
@@ -117,7 +123,7 @@ Citizen Mode может **не показывать** binding в разгово�
 
 Цель: указать GPT на другой gateway pack (`NODE_SCHEMA_ID` / `NODE_SCHEMA_VERSION`).
 
-### Шаг 1 — copy-paste gateway JSON (v2 — GPT-SSR-04 + SSR-05)
+### Шаг 1 — copy-paste gateway JSON (v3 — GPT-SSR-09)
 
 **Default policy:** byte-identical copy from gateway SSOT.
 
@@ -127,8 +133,9 @@ Citizen Mode может **не показывать** binding в разгово�
    - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/payload.schema.json`
    - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/taxonomy.json`
 3. **Optional diff-check** перед upload: `cmp` все три файла с gateway (должны совпадать байт-в-байт).
-4. Сохранить или обновить `inbound-validation.md` (content rules — dual contour, SSR-06).
+4. Сохранить или обновить `inbound-validation.md` + **`interview-overlay.md`** (content + interview guidance).
 5. **Не** перепроецировать JSON→MD вручную. **Не** re-import Actions, если менялись только JSON/MD.
+6. **Не** использовать archived `data-model.md` как SSOT — только JSON + overlay.
 
 > **Gateway prerequisite:** on-disk `taxonomy.json` SSOT — [GW-SSR-26/28/29](../../../../doge-complaints-gateway/docs/tasks/backlog-stories/semantic-schema-runtime/INDEX.md) Done on gateway side.
 
@@ -147,7 +154,7 @@ Citizen Mode может **не показывать** binding в разгово�
 
 ### Шаг 3 — загрузить Instructions в Custom GPT
 
-Загрузить **ядро** + **README** + **pack artifacts** (`pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, interim `data-model.md` if still present).
+Загрузить **ядро** + **README** + **pack artifacts** (`pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, `interview-overlay.md`).
 
 Если менялись **только** pack files и README → **Actions re-import не нужен**.
 

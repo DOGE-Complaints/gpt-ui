@@ -29,7 +29,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
   - **`structured_payload_handoff`** (GPT-SSR-03 / GIM-273) — pack-required `signals.*` copies from existing taxonomy tokens (§4.7); orchestrator maps this into `schema_binding.structured_payload`.
   - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
 - **Label extraction:** apply **all** taxonomy keys that genuinely apply to the story — one or more keys per applicable axis (`topic_domain`, `failure_mode`, `civic_signal`, `issue_archetype_support`) where evidence exists in the validated narrative. **Conservative** means: do not invent labels or apply low-confidence keys — it does **not** mean use only one label total.
-- Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)). Civic payload field names / geo canon for the **active node** come from the active [`schema-packs/`](schema-packs/README.md) data-model pack — not as the sole core model.
+- Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)). Civic payload field names / geo canon for the **active node** come from the active [`schema-packs/`](schema-packs/README.md) **`pack.json`** + **`payload.schema.json`** + **`interview-overlay.md`** — not as the sole core model.
 
 ### 2.2 This instruction MUST NOT
 
@@ -131,7 +131,7 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 
 | Field | Rule |
 |-------|------|
-| `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5 (display enum). Pack `signals.canonical_type` / payload field shapes: read the **active data-model pack**. Apply **observation vs complaint decision rule** below. |
+| `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5 (display enum). Pack `signals.canonical_type` / payload field shapes: read the active **`payload.schema.json`**. Apply **observation vs complaint decision rule** below. |
 | `taxonomy` | **GPT-TAX-01 SoT:** object keyed by taxonomy axis (13 axes in [`story-label-taxonomy.md`](story-label-taxonomy.md) §3 / gateway `TAXONOMY_AXIS_VALUES`). Each axis → array of `{ "label", "disposition" }`. Group candidates from `label_extraction_metadata` **by axis** — never flatten away the axis. Include dispositions `canonical`, `metadata_only`, `needs_clarification`, `rejected`, and **`internal`** (for §6 internal-only keys). Omit empty axes. Orchestrator maps to `narrative.taxonomy`. |
 | `labels` | **Derived / compat:** string array of keys with `disposition = "canonical"` only (from `taxonomy` when present). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. Apply **multi-axis** extraction per §2.1 — see rule below. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
@@ -175,7 +175,7 @@ Do **not** omit `civic_signal` labels because they seem "less obvious" — these
 
 #### 4.1a Label extraction hints (commonly under-applied keys)
 
-**Process stays in this core file.** Axis / key lists for the **active node** live in the pack — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s data-model pack §5, plus [`story-label-taxonomy.md`](story-label-taxonomy.md) (pack include, Residual). Do **not** copy civic overlay tables here.
+**Process stays in this core file.** Axis / key lists for the **active node** live in the pack — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s **`interview-overlay.md`** + [`taxonomy.json`](schema-packs/README.md), plus [`story-label-taxonomy.md`](story-label-taxonomy.md) (narrative glossary). Do **not** copy civic overlay tables here.
 
 Use [`story-label-taxonomy.md`](story-label-taxonomy.md) as SSOT. When narrative evidence matches, include the key even if another topic_domain label is already present.
 
@@ -406,8 +406,8 @@ Optional **top-level** string on `normalized_issue_payload` (sibling to `canonic
 
 **Formation rules (apply pack geo formation):**
 
-1. **Delegate to pack `geo_intake.mode`:** Read [`schema-packs/README.md`](schema-packs/README.md), then that pack’s data-model §3–§4. If mode is **`optional`** (civic instance current value): **MAY** form `location_query` when the resident confirmed a place; **do not MUST** force it. If mode is `require_location_or_detail`, form `location_query` **or** leave geo to orchestrator `geo_detail` (one of the two must be non-empty). If mode is `require_detail`, `location_query` remains optional; structured `geo_detail` is orchestrator’s SHALL. The only grounds to omit a formed string are rules **3–5** below. Do **not** keep a civic city table in this core file.
-2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script**. Apply the **active data-model pack** geo-formation rules (pack data-model §4). The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)). Do **not** invent address detail beyond what the resident stated.
+1. **Delegate to pack `geo_intake.mode`:** Read [`schema-packs/README.md`](schema-packs/README.md), then that pack’s **`pack.json`** `geo_intake` + **`interview-overlay.md`** geo formation. If mode is **`optional`** (civic instance current value): **MAY** form `location_query` when the resident confirmed a place; **do not MUST** force it. If mode is `require_location_or_detail`, form `location_query` **or** leave geo to orchestrator `geo_detail` (one of the two must be non-empty). If mode is `require_detail`, `location_query` remains optional; structured `geo_detail` is orchestrator’s SHALL. The only grounds to omit a formed string are rules **3–5** below. Do **not** keep a civic city table in this core file.
+2. **Format — prefer Latin script (REQ-35):** freeform string, preferably `<street/place>, <city>` in **Latin script**. Apply the **active pack** [`interview-overlay.md`](schema-packs/README.md) geo-formation rules. The backend applies `normalize_location_query()` (lowercase) before geo-resolve ([`doge-complaints-gateway/src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)). Do **not** invent address detail beyond what the resident stated.
    - **City-level canonicalization (REQ-39):** When the confirmed location is **city-level only**, apply the pack’s city canon. When the string includes **district, street, or landmark** detail, **preserve** that detail — do **not** collapse to city-only.
 3. If the user mentioned **multiple** locations without a single clear primary — pick the most specific / complaint-relevant one (D-02). Reflect ambiguity in `live_story_context.consistency_notes` (§4.5) when useful.
 4. If location was **not** confirmed or remains ambiguous after §7.2 — **omit** `location_query` (do not send null or `""`).
@@ -419,7 +419,7 @@ Optional **top-level** string on `normalized_issue_payload` (sibling to `canonic
 
 Optional **top-level** object `structured_payload_handoff` on `normalized_issue_payload` (sibling to `canonical_payload`, not inside it). Maps to `StoryDraftStashRequest.schema_binding.structured_payload` via [`api-orchestrator.md`](api-orchestrator.md) §5.2.1. This module does **not** build HTTP.
 
-1. **Read pack overlay:** [`schema-packs/README.md`](schema-packs/README.md), then that pack’s data-model §2 (required keys + source table). Do **not** hard-code civic field names in this core file.
+1. **Read pack overlay:** [`schema-packs/README.md`](schema-packs/README.md), then that pack’s **`pack.json`** `field_policy` + **`taxonomy.json`** `axis_to_signal_map`. Do **not** hard-code civic field names in this core file.
 2. **Copy, do not invent:** for each pack-required `signals.*` key, copy the first `disposition=canonical` English snake_case `label` from the pack-named taxonomy axis already present on `canonical_payload.taxonomy`. Do **not** invent enum values, civic tokens, or placeholders (`example`, `unknown`, `n/a`, empty string).
 3. **Omit if no source:** if the named axis has no canonical label → **omit** that key. Orchestrator item 20 **STOP**s when a pack-required key is missing or empty after trim (return here; do not guess).
 4. Optional pack `signals.*` / `geo.*` keys: copy only when an existing artifact already has a matching token; otherwise omit. Keys ⊆ pack payload. Narrative-first: this object is **additional** to `canonical_payload` (AC-GPT-REQ3-04).
