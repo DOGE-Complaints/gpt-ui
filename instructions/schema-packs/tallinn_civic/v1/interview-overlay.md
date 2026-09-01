@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date** | 2026-09-01 |
-| **Traceability** | GPT-SSR-09 / GIM-308; migrated from archived `archive/data-model.v1.3.md` §4–§5 |
+| **Traceability** | GPT-SSR-08 / GIM-312–314; GPT-SSR-09 / GIM-308; migrated from archived `archive/data-model.v1.3.md` §4–§5 |
 | **Binding pair** | `schema_id=tallinn_civic`, `schema_version=v1` |
 
 **SEC-001:** Gateway Schema Runtime validates JSON. This file is GPT process overlay only.
@@ -30,11 +30,29 @@ When the string includes district, street, or landmark detail, **preserve** that
 
 ## Geo sidecar sync (mirror_to_payload)
 
-When `pack.json` → `geo_intake.mirror_to_payload` is `true` (civic default): keep `geo_detail.address.*` consistent with `structured_payload.geo.*` before stash. Latitude/longitude live on `geo_detail` root only — **not** in payload schema. Optional `detail_level` on wire/payload when resident precision is known (pack `geo_model` + gateway GW-SSR-27).
+When `pack.json` → `geo_intake.mirror_to_payload` is `true` (civic default): keep `geo_detail.address.*` consistent with `structured_payload.geo.*` before stash. Latitude/longitude live on `geo_detail` root only — **not** in payload schema.
 
-## Instance territory (GPT pre-flight — indicators)
+## Precision index (`detail_level`)
 
-Read `gpt_instance_territory` from same-pack [`pack.json`](pack.json). Gateway **parse-only**; GPT **STOP / clarify** when resident place is outside instance rules (may be stricter than node `geo_scope`). SSR-08 expands rules; do not invent bbox/EHAK here.
+Read `geo_model` from [`pack.json`](pack.json). Allowed levels = `precision_levels` (also `payload.schema.json` `geo.detail_level` enum). Inference default: `from_address_depth`.
+
+| Deepest confirmed evidence | Emit `detail_level` |
+|----------------------------|---------------------|
+| region only | `region` |
+| city / settlement | `settlement` |
+| district | `district` |
+| street (no house) | `street` |
+| house | `house` |
+| house range / houses[] | `house_range` |
+| lat/lon confirmed | `coordinates` (keep house if house also confirmed) |
+
+Do **not** invent street/house to deepen precision. God Mode: warn if coarse `detail_level` + coords without house.
+
+## Instance territory (GPT pre-flight)
+
+Read `gpt_instance_territory` from same-pack [`pack.json`](pack.json). Gateway **parse-only**; GPT **STOP / clarify** per [`inbound-validation.md`](inbound-validation.md) §6 when resident place is outside instance rules (may be stricter than node `geo_scope`).
+
+**This pack:** `admin_token` settlement `tallinn`. Do not invent EHAK/`admin_id` or bbox rules unless present in pack JSON.
 
 ## Phase → axes + ecosystem cues
 

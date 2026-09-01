@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 1.3 |
+| **Version** | 1.4 |
 | **Date** | 2026-09-01 |
-| **Traceability** | GPT-SSR-06 / GIM-295; GPT-SSR-05 / GIM-288; GPT-SSR-04 / GIM-278; GPT-SSR-03 / GIM-270; GPT-SSR-01 / GIM-250; REQ3-GPT-002; SEC-001 |
+| **Traceability** | GPT-SSR-08 / GIM-314; GPT-SSR-06 / GIM-295; GPT-SSR-05 / GIM-288; GPT-SSR-04 / GIM-278; GPT-SSR-03 / GIM-270; GPT-SSR-01 / GIM-250; REQ3-GPT-002; SEC-001 |
 | **Binding pair** | `schema_id=tallinn_civic`, `schema_version=v1` |
 
 **SEC-001:** Gateway Schema Runtime remains authoritative. This pack is a **non-executable projection**. Do not call APIs from this file. Do not duplicate OpenAPI request bodies.
@@ -58,6 +58,17 @@ Do not ask the resident to pick labels or confirm taxonomy keys mid-interview. C
 
 When orchestrator handles HTTP 422 `GEO_SCOPE_MISMATCH`, use this **pack copy**: the demo geo scope is Estonia / Tallinn (`pack.json` → `node_clustering.civic.geo_scope` = `settlement:tallinn`). Ask the resident to clarify a place inside that region. Core orchestrator keeps HTTP handling only — it must not weld this city list.
 
-## 6. Instance territory (outline only — GPT-SSR-08)
+## 6. Instance territory STOP / copy (GPT-SSR-08)
 
-**Reserved:** resident-facing STOP/copy for instance territory precision. Body lands when SSR-08 / GW-SSR-27 deliver the territory model. Do **not** invent territory rules in this file until that story.
+Read `gpt_instance_territory` from same-pack [`pack.json`](pack.json). Gateway **parse-only** for this block (enforcement on intake deferred). GPT enforces **before stash**.
+
+**This civic pack (as-built):** `enabled=true`; one rule `admin_token` / `settlement` / `tallinn` — same breadth as node `geo_scope`. If the operator narrows rules (e.g. district-only), STOP must follow the **stricter** instance rules, not only node scope.
+
+| Event | GPT action | Resident copy (this pack) |
+|-------|------------|---------------------------|
+| Place outside instance `admin_token` or `admin_id` | **STOP** — clarify; **do not stash** | Ask for a place inside this GPT’s territory (demo: Tallinn / Estonia civic zone). Do not invent an in-zone address. |
+| Place outside instance `bbox` (when a bbox rule is present) | **STOP** — same | Ask to confirm a place inside the map zone for this GPT. |
+| Place outside node `geo_scope` | Use orchestrator 422 path | See §5 — do not duplicate HTTP handling here. |
+| `detail_level` below `house` but coordinates present | God Mode **warn**; do not invent house | Prefer honesty: keep coarse `detail_level`; coords optional. |
+
+Multiple territory rules: **OR** (any match = inside). Absent / `enabled=false` → instance STOP inactive; node §5 still applies.
