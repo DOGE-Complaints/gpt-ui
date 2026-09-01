@@ -129,11 +129,11 @@ Under-applied label keys for this instance: follow [`story-label-taxonomy.md`](.
 
 Exact vs civic clustering: gateway pack `exact_lenses` (e.g. `civic_domain_micro`, `failure_pattern_micro`) inform how structured `signals.*` cluster; GPT does not execute those lenses.
 
-## 6. Taxonomy pointer (Residual — P3 decision)
+## 6. Taxonomy pointer (superseded by pack `taxonomy.json` — GPT-SSR-05)
 
-**Decision:** keep [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) as SSOT for 13-axis label keys; this pack **includes** it by reference (do **not** migrate the whole file into the pack in this story). Pack-owned vocabulary may replace the include in a later story.
+**Decision (P3 SSR-05):** pack-instance SSOT for 13-axis vocabulary + `axis_to_signal_map` = [`taxonomy.json`](taxonomy.json) (byte-identical copy from gateway; GW-SSR-26/28 Done). [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) remains **narrative glossary / process** until SSR-09 archive — **not** the swap copy-paste SSOT.
 
-Allowed canonical labels for this instance = keys listed in `story-label-taxonomy.md` with disposition `canonical`.
+Allowed canonical labels for this instance = keys in pack `taxonomy.json` `canonical_keys` with disposition `canonical`.
 
 ## 7. Civic stash examples (moved from core orchestrator)
 

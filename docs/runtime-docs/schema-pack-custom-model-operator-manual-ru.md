@@ -117,17 +117,20 @@ Citizen Mode может **не показывать** binding в разгово�
 
 Цель: указать GPT на другой gateway pack (`NODE_SCHEMA_ID` / `NODE_SCHEMA_VERSION`).
 
-### Шаг 1 — copy-paste gateway JSON (v2 — GPT-SSR-04)
+### Шаг 1 — copy-paste gateway JSON (v2 — GPT-SSR-04 + SSR-05)
 
 **Default policy:** byte-identical copy from gateway SSOT.
 
-1. Открыть `doge-complaints-gateway/schema-packs/<new_id>/<new_ver>/` (`pack.json`, `payload.schema.json`).
-2. Скопировать **оба JSON** в:
+1. Открыть `doge-complaints-gateway/schema-packs/<new_id>/<new_ver>/` (`pack.json`, `payload.schema.json`, **`taxonomy.json`**).
+2. Скопировать **три JSON** в:
    - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/pack.json`
    - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/payload.schema.json`
-3. **Optional diff-check** перед upload: `cmp` оба файла с gateway (должны совпадать байт-в-байт).
+   - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/taxonomy.json`
+3. **Optional diff-check** перед upload: `cmp` все три файла с gateway (должны совпадать байт-в-байт).
 4. Сохранить или обновить `inbound-validation.md` (content rules — dual contour, SSR-06).
 5. **Не** перепроецировать JSON→MD вручную. **Не** re-import Actions, если менялись только JSON/MD.
+
+> **Gateway prerequisite:** on-disk `taxonomy.json` SSOT — [GW-SSR-26/28/29](../../../../doge-complaints-gateway/docs/tasks/backlog-stories/semantic-schema-runtime/INDEX.md) Done on gateway side.
 
 > **Historical (wave 1 — до GPT-SSR-04):** ручная проекция gateway JSON → `data-model.md` + `inbound-validation.md` («спроецировать»). Deprecated для новых swap; оставлено только как fallback до SSR-09 archive.
 
@@ -144,7 +147,7 @@ Citizen Mode может **не показывать** binding в разгово�
 
 ### Шаг 3 — загрузить Instructions в Custom GPT
 
-Загрузить **ядро** + **README** + **pack artifacts** (`pack.json`, `payload.schema.json`, `inbound-validation.md`, interim `data-model.md` if still present).
+Загрузить **ядро** + **README** + **pack artifacts** (`pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, interim `data-model.md` if still present).
 
 Если менялись **только** pack files и README → **Actions re-import не нужен**.
 
