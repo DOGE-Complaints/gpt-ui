@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 1.2 |
-| **Date** | 2026-08-31 |
-| **Traceability** | GPT-SSR-03 / GIM-270; GPT-SSR-01 / GIM-250 / GIM-254; REQ3-GPT-002; SEC-001 |
+| **Version** | 1.3 |
+| **Date** | 2026-09-01 |
+| **Traceability** | GPT-SSR-06 / GIM-295; GPT-SSR-05 / GIM-288; GPT-SSR-04 / GIM-278; GPT-SSR-03 / GIM-270; GPT-SSR-01 / GIM-250; REQ3-GPT-002; SEC-001 |
 | **Binding pair** | `schema_id=tallinn_civic`, `schema_version=v1` |
 
 **SEC-001:** Gateway Schema Runtime remains authoritative. This pack is a **non-executable projection**. Do not call APIs from this file. Do not duplicate OpenAPI request bodies.
@@ -29,7 +29,9 @@ When operator profile is `demo_baseline`, apply these **domain** classes (proces
 
 ## 2. Label enum / multi-axis evidence checklists
 
-Validate candidate labels against [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) (include from the data-model pack). Every value destined for `canonical_payload.labels[]` must be a canonical allowed key with story evidence.
+Validate candidate labels against same-pack [`taxonomy.json`](taxonomy.json) (`canonical_keys` + axis disposition). [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) remains narrative glossary / process until SSR-09 — **not** the pack swap SSOT for enum checks (GPT-SSR-05 / GPT-SSR-06).
+
+Every value destined for `canonical_payload.labels[]` must be a canonical allowed key with story evidence.
 
 - Unknown free-text, metadata-only, internal-only safety/privacy, and low-confidence hypotheses must **not** enter canonical labels.
 - Keep them in validation notes as `metadata_only`, `needs_clarification`, or `rejected`.
@@ -37,7 +39,12 @@ Validate candidate labels against [`story-label-taxonomy.md`](../../../story-lab
 
 ## 3. Completeness vs pack required fields
 
-Before stash, this civic instance requires structured `signals.civic_domain` and `signals.failure_pattern` per gateway `field_policy` / `payload.schema.json` **when** the pack structured payload is being filled.
+Before stash, this civic instance requires structured signals per same-pack [`pack.json`](pack.json) `field_policy` (literal):
+
+- `signals.civic_domain` → **required** (`pack.json` → `field_policy["signals.civic_domain"]`)
+- `signals.failure_pattern` → **required** (`pack.json` → `field_policy["signals.failure_pattern"]`)
+
+Shape reference: same-pack [`payload.schema.json`](payload.schema.json) — **when** the pack structured payload is being filled.
 
 Core still requires logical Issue §4.1 `type`, `labels`, `title`, `description` for interview completeness. Pack required `signals.*` are **additional** for this instance — not a replacement for narrative-first intake (REQ3-PR-004).
 
@@ -49,4 +56,8 @@ Do not ask the resident to pick labels or confirm taxonomy keys mid-interview. C
 
 ## 5. GEO_SCOPE_MISMATCH copy (this civic instance)
 
-When orchestrator handles HTTP 422 `GEO_SCOPE_MISMATCH`, use this **pack copy**: the demo geo scope is Estonia / Tallinn. Ask the resident to clarify a place inside that region. Core orchestrator keeps HTTP handling only — it must not weld this city list.
+When orchestrator handles HTTP 422 `GEO_SCOPE_MISMATCH`, use this **pack copy**: the demo geo scope is Estonia / Tallinn (`pack.json` → `node_clustering.civic.geo_scope` = `settlement:tallinn`). Ask the resident to clarify a place inside that region. Core orchestrator keeps HTTP handling only — it must not weld this city list.
+
+## 6. Instance territory (outline only — GPT-SSR-08)
+
+**Reserved:** resident-facing STOP/copy for instance territory precision. Body lands when SSR-08 / GW-SSR-27 deliver the territory model. Do **not** invent territory rules in this file until that story.
