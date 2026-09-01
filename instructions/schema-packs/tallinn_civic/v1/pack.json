@@ -1,0 +1,236 @@
+{
+  "schema_id": "tallinn_civic",
+  "schema_version": "v1",
+  "payload_schema": "payload.schema.json",
+  "taxonomy_schema": "taxonomy.json",
+  "field_policy": {
+    "signals.civic_domain": "required",
+    "signals.failure_pattern": "required",
+    "signals.civic_weight": "optional",
+    "signals.desired_outcome": "optional",
+    "signals.affected_group": "optional",
+    "signals.service_object": "optional",
+    "signals.need": "optional",
+    "signals.ecosystem_signal": "optional",
+    "signals.canonical_type": "optional",
+    "geo.district": "optional",
+    "geo.settlement": "optional",
+    "geo.region": "optional",
+    "geo.country": "optional",
+    "geo.street": "optional",
+    "geo.house": "optional",
+    "geo.house_range": "optional",
+    "geo.houses": "optional",
+    "geo.detail_level": "optional"
+  },
+  "exact_lenses": [
+    {
+      "lens_id": "civic_domain_micro",
+      "source_fields": ["signals.civic_domain"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "micro",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "failure_pattern_micro",
+      "source_fields": ["signals.failure_pattern"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "micro",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "civic_weight_systemic",
+      "source_fields": ["signals.civic_weight"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "systemic",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "desired_outcome_local",
+      "source_fields": ["signals.desired_outcome"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "local",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "affected_group_local",
+      "source_fields": ["signals.affected_group"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "local",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "geographic_district_micro",
+      "source_fields": ["geo.district"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "micro",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "service_object_micro",
+      "source_fields": ["signals.service_object"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "micro",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "deep_need_local",
+      "source_fields": ["signals.need"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "local",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "ecosystem_signal_systemic",
+      "source_fields": ["signals.ecosystem_signal"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "systemic",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "composite_primary_micro",
+      "source_fields": ["signals.civic_domain", "signals.failure_pattern"],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "micro",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v1",
+      "readiness_policy": {
+        "min_readiness_score": 35,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    }
+  ],
+  "node_clustering": {
+    "civic": {
+      "active_lenses": [
+        "composite_primary_micro",
+        "civic_domain_micro",
+        "failure_pattern_micro",
+        "civic_weight_systemic",
+        "desired_outcome_local",
+        "affected_group_local",
+        "geographic_district_micro",
+        "service_object_micro",
+        "deep_need_local",
+        "ecosystem_signal_systemic"
+      ],
+      "primary_lens": "composite_primary_micro",
+      "min_size": 5,
+      "min_size_by_lens": {
+        "composite_primary_micro": 8,
+        "service_object_micro": 3,
+        "deep_need_local": 3,
+        "ecosystem_signal_systemic": 3
+      },
+      "readiness_threshold": 60,
+      "signal_source": "canonical",
+      "id_algorithm": "sha256",
+      "geo_filter": "country",
+      "geo_scope": "settlement:tallinn",
+      "tie_breaker": "alpha",
+      "type_resolution": "canonical_priority"
+    }
+  },
+  "geo_intake": {
+    "mode": "optional",
+    "merge": true,
+    "mirror_to_payload": true
+  },
+  "geo_model": {
+    "precision_levels": [
+      "region",
+      "settlement",
+      "district",
+      "street",
+      "house",
+      "house_range",
+      "coordinates"
+    ],
+    "default_precision_inference": "from_address_depth"
+  },
+  "gpt_instance_territory": {
+    "enabled": true,
+    "rules": [
+      {
+        "type": "admin_token",
+        "level": "settlement",
+        "value": "tallinn"
+      }
+    ]
+  }
+}
