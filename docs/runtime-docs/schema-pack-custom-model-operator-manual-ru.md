@@ -31,9 +31,11 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 | Слой | Что это | Где на диске |
 |------|---------|--------------|
 | **Ядро инструкций** | Интервью, safety, policy *process*, normalizer process, orchestrator HTTP | [`GPT UI/instructions/`](../../instructions/) (`story-interview-flow.md`, `story-policy-gate.md`, `story-normalizer.md`, `api-orchestrator.md`, …) |
-| **Active pair** | Какая нода сейчас активна (`schema_id` + `schema_version`) | [`GPT UI/instructions/schema-packs/README.md`](../../instructions/schema-packs/README.md) **v1.0** |
-| **Модель (data-model)** | Форма `structured_payload`, `geo_intake`, geo-канон, примеры | [`…/tallinn_civic/v1/data-model.md`](../../instructions/schema-packs/tallinn_civic/v1/data-model.md) **v1.3** |
-| **Правила валидации (inbound)** | Domain lists / completeness vs pack fields | [`…/tallinn_civic/v1/inbound-validation.md`](../../instructions/schema-packs/tallinn_civic/v1/inbound-validation.md) **v1.2** |
+| **Active pair** | Какая нода сейчас активна (`schema_id` + `schema_version`) | [`GPT UI/instructions/schema-packs/README.md`](../../instructions/schema-packs/README.md) **v1.3** |
+| **Pack JSON (модель)** | `field_policy`, `geo_intake`, clustering, payload shape, taxonomy | [`…/tallinn_civic/v1/pack.json`](../../instructions/schema-packs/tallinn_civic/v1/pack.json) + [`payload.schema.json`](../../instructions/schema-packs/tallinn_civic/v1/payload.schema.json) + [`taxonomy.json`](../../instructions/schema-packs/tallinn_civic/v1/taxonomy.json) — COPY gateway |
+| **Interview overlay** | Geo-канон, phase→axes, ecosystem cues (prose) | [`…/tallinn_civic/v1/interview-overlay.md`](../../instructions/schema-packs/tallinn_civic/v1/interview-overlay.md) **v1.1** |
+| **Правила валидации (inbound)** | Domain lists / completeness vs pack fields | [`…/tallinn_civic/v1/inbound-validation.md`](../../instructions/schema-packs/tallinn_civic/v1/inbound-validation.md) **v1.4** |
+| **Archive (не SSOT)** | Старая MD-проекция формы полей | [`…/tallinn_civic/v1/archive/data-model.v1.3.md`](../../instructions/schema-packs/tallinn_civic/v1/archive/data-model.v1.3.md) |
 | **OpenAPI Actions** | Wire: обязательный `schema_binding`, опциональный `geo_detail` | [`GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml`](../custom-gpt-story-intake-actions.openapi.yaml) **info.version 0.8.0** |
 | **Справка по Actions** | Lockstep с OpenAPI | [`story-api-methods-reference.md`](../../instructions/story-api-methods-reference.md) |
 | **Gateway SSOT** | Исполняемый pack + payload schema | `doge-complaints-gateway/schema-packs/<id>/<ver>/` |
@@ -42,6 +44,8 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 
 **Важно:** `schema_version` в паке (`v1`) — это **семантическая** версия модели ноды.  
 На проводе envelope остаётся `schema_version: "m2.story_intake_envelope.v2"`. Это **разные** поля. Не путать.
+
+**Wave 2:** active `data-model.md` **нет** — форма полей = JSON; prose = overlay + inbound.
 
 ---
 
@@ -230,12 +234,12 @@ Citizen Mode может **не показывать** binding в разгово�
 
 | # | Проверка | Pass когда |
 |---|----------|------------|
-| 1 | Фазы интервью / Phase 7 | Не менялись в `story-interview-flow.md`; списки полей — из data-model |
+| 1 | Фазы интервью / Phase 7 | Не менялись в `story-interview-flow.md`; списки полей — из `pack.json` / `interview-overlay.md` |
 | 2 | Envelope id | Всё ещё `m2.story_intake_envelope.v2` |
 | 3 | Active pair | Берётся из README, не hardcoded civic в core |
-| 4 | Geo gate | Параметризован `geo_intake.mode` пака |
+| 4 | Geo gate | Параметризован `geo_intake.mode` пака (`pack.json`) |
 | 5 | PII / admission process | Без правок process в normalizer / orchestrator |
-| 6 | Domain field names | Живут в двух pack-файлах |
+| 6 | Domain field names | Живут в pack JSON + inbound / overlay (не core) |
 
 Fail: ради имён полей ноды пришлось править orchestrator / interview-flow.
 
@@ -247,9 +251,13 @@ Fail: ради имён полей ноды пришлось править orch
 # Active pair + swap
 GPT UI/instructions/schema-packs/README.md
 
-# Текущая модель + валидация (экстрагированы)
-GPT UI/instructions/schema-packs/tallinn_civic/v1/data-model.md
+# Wave-2 pack bundle (tallinn_civic/v1)
+GPT UI/instructions/schema-packs/tallinn_civic/v1/pack.json
+GPT UI/instructions/schema-packs/tallinn_civic/v1/payload.schema.json
+GPT UI/instructions/schema-packs/tallinn_civic/v1/taxonomy.json
 GPT UI/instructions/schema-packs/tallinn_civic/v1/inbound-validation.md
+GPT UI/instructions/schema-packs/tallinn_civic/v1/interview-overlay.md
+GPT UI/instructions/schema-packs/tallinn_civic/v1/archive/data-model.v1.3.md
 
 # Emit / STOP
 GPT UI/instructions/api-orchestrator.md          # §5.2.1, items 13 / 19 / 20
@@ -270,8 +278,10 @@ doge-complaints-gateway/schema-packs/tallinn_civic/v1/
 | Поле | Значение |
 |------|----------|
 | Дата | 2026-09-01 |
-| Pack README | v1.0 |
-| data-model | v1.3 |
-| inbound-validation | v1.2 |
+| Pack README | v1.3 |
+| pack JSON / payload / taxonomy | gateway copy (SSR-04/05) |
+| interview-overlay | v1.1 |
+| inbound-validation | v1.4 |
+| archive data-model | v1.3 (not SSOT) |
 | OpenAPI | 0.8.0 |
-| Orchestrator (emit) | 0.5.9 (GIM-273…275) |
+| Orchestrator (emit) | 0.5.9+ (SSR-09 JSON paths) |

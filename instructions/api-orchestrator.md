@@ -297,7 +297,7 @@ Build the `StoryDraftStashRequest` body **only** from `normalized_issue_payload`
     "schema_version": "<README active schema_version — not envelope id>",
     "structured_payload": {
       "signals": {
-        "<pack required signal keys>": "<from pack data-model / normalizer handoff — no invent>"
+        "<pack required signal keys>": "<from pack.json field_policy / normalizer handoff — no invent>"
       }
     }
   },
