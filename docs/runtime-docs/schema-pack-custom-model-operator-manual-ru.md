@@ -191,8 +191,8 @@ Citizen Mode может **не показывать** binding в разгово�
 |--------|--------------|-----|
 | Достаточно ли эпизода (Q1–Q3)? | GPT interview | `story-interview-flow.md` |
 | Spam / off-topic / gossip? | GPT policy **process** + domain lists пака | `story-policy-gate.md` + `inbound-validation.md` |
-| Labels canonical? | GPT ingest + taxonomy | `ingest-validation.md`, `story-label-taxonomy.md` |
-| Pack-required signals перед stash? | GPT normalizer + orchestrator STOP | data-model §2 + orchestrator item 20 |
+| Labels canonical? | GPT ingest + pack taxonomy.json | `ingest-validation.md` + pack `taxonomy.json` (stub: `story-label-taxonomy.md`) |
+| Pack-required signals перед stash? | GPT normalizer + orchestrator STOP | `pack.json` field_policy + orchestrator item 20 |
 | Schema / required `schema_binding` / payload shape? | **Gateway** | `contracts.py` Schema Runtime |
 | Content «мусор» на сервере? | **Нет** (as-built) | см. validation as-built |
 
