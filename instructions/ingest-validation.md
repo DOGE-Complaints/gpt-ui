@@ -28,7 +28,7 @@ When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`st
 
 - [`story-interview-flow.md`](story-interview-flow.md) — civic interview phases 1–7 (**FR-M1** interview structure), four narrative layers (**FR-M1** layering), **§5 seven-question completeness** before treating dialogue as ready for Phase 7 summary / draft Issue framing.
 - [`story-data-model.md`](story-data-model.md) — §4.1 logical Issue fields (`type`, `labels`, trilingual `title` / `description`, optional `summary`, optional `institution`) for structural completeness toward the normalizer.
-- [`story-label-taxonomy.md`](story-label-taxonomy.md) — controlled label axes, canonical allowed keys, metadata-only candidates, internal-only labels, and unknown-value handling. Civic completeness vs pack required `signals.*` and domain label checklists: active inbound-validation pack ([`schema-packs/README.md`](schema-packs/README.md)).
+- [`story-label-taxonomy.md`](story-label-taxonomy.md) — **redirect stub** (GPT-SSR-10). Enum / keys: active pack [`taxonomy.json`](schema-packs/README.md). Process rules: **Label process rules (GPT-SSR-10)** below. Civic completeness vs pack required `signals.*`: active inbound-validation pack.
 - [`story-i18n-policy.md`](story-i18n-policy.md) — **FR-M1-028…031**: session language, `{ et, ru, en }` drafts, fidelity vs translation polish.
 - [`story-api-methods-reference.md`](story-api-methods-reference.md) — HTTP SSOT (this module still **never** calls APIs).
 - [`story-policy-gate.md`](story-policy-gate.md) — **policy admission** after validation + safety; consumes `gate_request_package`, emits `policy_gate_result`.
@@ -54,7 +54,37 @@ When the operator configures **DOGEstonia** (Issue ingest per `root.md` and [`st
 
 **REQ-22 wire handoff:** Story Intake **user** transport is **stash** via `postStoryDraftStash` (`POST /story-drafts`, `m2.story_intake_envelope.v2`) per [`api-orchestrator.md`](api-orchestrator.md) §5.2. Validation must preserve language signals for [`story-normalizer.md`](story-normalizer.md): `session_language` (UI primary) and `detected_input_language` (user narrative text). Do not block strict-chain progression solely because Issue draft routes are unused.
 
-**GIM-88 label vocabulary guardrail:** Validate `labels` against [`story-label-taxonomy.md`](story-label-taxonomy.md). Every value in `canonical_payload.labels[]` must be a canonical allowed key with story evidence and source/provenance. Unknown free-text labels, metadata-only candidates, internal-only safety/privacy labels, and low-confidence hypotheses must **not** enter canonical labels. Keep them in validation notes as `metadata_only`, `needs_clarification`, or `rejected`. If a user correction in Phase 7 rejects the framing that produced a label, remove that label or downgrade it before normalizer handoff.
+**GIM-88 label vocabulary guardrail:** Validate `labels` against the active pack [`taxonomy.json`](schema-packs/README.md) (`canonical_keys` with disposition `canonical`; see also pack [`inbound-validation.md`](schema-packs/README.md) §2). Every value in `canonical_payload.labels[]` must be a canonical allowed key with story evidence and source/provenance. Unknown free-text labels, metadata-only candidates, internal-only safety/privacy labels, and low-confidence hypotheses must **not** enter canonical labels. Keep them in validation notes as `metadata_only`, `needs_clarification`, or `rejected`. If a user correction in Phase 7 rejects the framing that produced a label, remove that label or downgrade it before normalizer handoff.
+
+### Label process rules (GPT-SSR-10)
+
+Migrated from retired `story-label-taxonomy.md` §2 / §7 (archive: [`archive/story-label-taxonomy.v0.2.3.md`](archive/story-label-taxonomy.v0.2.3.md)). **Key tables live only in pack `taxonomy.json`** — do not duplicate them here.
+
+**Non-negotiable**
+
+1. Do not ask the resident to choose labels upfront.
+2. Do not lock `type` or `labels` before narrative maturity and Phase 7 confirmation.
+3. Do not invent label keys.
+4. Do not place internal/safety/privacy labels into public/card labels.
+5. Do not use labels to imply official routing, institution responsibility, publication status, or backend acceptance.
+6. Unknown or low-confidence labels must be omitted from `canonical_payload.labels[]` and recorded as `metadata_only`, `needs_clarification`, or `rejected`.
+7. **English tokens on the wire (GPT-TAX-02):** every `label` on `canonical_payload.taxonomy` / derived `labels[]` / stash `narrative.taxonomy` MUST be an **English** snake_case token from pack `taxonomy.json`. Do **not** emit Estonian or Russian prose as a `label` string. Map to a listed English key or omit / `needs_clarification`.
+8. There is **no** product AC that unknown keys MUST cause **HTTP 422** or a **server vocabulary reject**. GPT-side omit (rule 6) is sufficient.
+9. **Exact key sync is secondary** to vector similarity / embeddings. Session-to-session label-string drift is acceptable.
+
+**Candidate metadata shape** (validation/normalization notes):
+
+```json
+{
+  "label": "transport",
+  "axis": "topic_domain",
+  "source": "Phase 2 resident story",
+  "confidence": "high",
+  "disposition": "canonical"
+}
+```
+
+Allowed `disposition` values: `canonical` | `metadata_only` | `needs_clarification` | `rejected` | `internal`. Internal / safety-privacy keys go under matching axis with `disposition: "internal"` — **not** in flat `labels[]`. Metadata-only candidates may appear in notes only unless promoted in pack JSON.
 
 **Artifacts:** Keep emitting `ingest_validation_report` with `stop_the_line.blocked = true` when Issue §4.1 validation fails. For narrative incompleteness before Phase 7, set `stop_the_line.blocked = true` for progression to **final** summary/framing until §5 passes or gaps are accepted; likewise block while **§7.2** (FR-M1-032…034) is incomplete. Record gaps in `missing_required_fields[]` using clear synthetic keys (e.g. `issue_narrative:section5_gaps`) **or** a short free-text `narrative_completeness_notes` field inside the report body until M1-03 defines a schema.
 
@@ -157,7 +187,7 @@ For **Issue** ingest (per `root.md` and the Issue overlay at the top of this fil
 
 - Read **`extracted_data`** and **`metadata`** from [`ingest-deep-parsing.md`](ingest-deep-parsing.md).
 - Validate that hints do **not** assert final `ISSUE_STATUS` or backend-only fields (`id`, `created_at`, … — see `story-data-model.md` §4.4).
-- Validate `labels_hints[]` against [`story-label-taxonomy.md`](story-label-taxonomy.md); unsupported hints stay metadata-only or require clarification.
+- Validate `labels_hints[]` against active pack [`taxonomy.json`](schema-packs/README.md); unsupported hints stay metadata-only or require clarification.
 - Map gaps in Issue §4.1 into `missing_required_fields[]` for batch user questions; use `metadata.ambiguities` for clarification batches.
 - **Provisional `type` / labels:** follow the Issue overlay (FR-M1-024…027).
 
@@ -221,7 +251,7 @@ Populate on every validation round that may precede HTTP; preserve through hando
 ## 6. Enum validation (Issue)
 
 - **`type`:** `ISSUE_TYPE` per [`story-data-model.md`](story-data-model.md) §5 (canonical enums in-file).
-- **`labels`:** controlled keys per [`story-label-taxonomy.md`](story-label-taxonomy.md). Do not invent labels, do not pass metadata-only/internal labels as canonical labels, and do not invent Issue `type` enum values.
+- **`labels`:** controlled keys per active pack [`taxonomy.json`](schema-packs/README.md). Do not invent labels, do not pass metadata-only/internal labels as canonical labels, and do not invent Issue `type` enum values.
 
 ### 6.1 Label validation checklist
 

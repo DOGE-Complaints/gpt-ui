@@ -7,7 +7,7 @@
 |----------------|--------|
 | **Version** | 0.2.23 |
 | **Date** | 2026-09-01 |
-| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254; GPT-SSR-03 / GIM-268 / GIM-273; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md); [`schema-packs/README.md`](schema-packs/README.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
+| **Traceability** | FR-M1-035–037; REQ-33; REQ-34; REQ-35; REQ-36; REQ-38; REQ-39; REQ-40; REQ-41; GPT-TAX-01; GPT-TAX-02 / GIM-227; GPT-PII-01 / GIM-241; GPT-SSR-01 / GIM-251 / GIM-253 / GIM-254; GPT-SSR-03 / GIM-268 / GIM-273; [`story-data-model.md`](story-data-model.md) §4.1; [`story-label-taxonomy.md`](story-label-taxonomy.md) (redirect stub); [`schema-packs/README.md`](schema-packs/README.md); [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) §2.1; [`story-policy-gate.md`](story-policy-gate.md); strict-chain alignment with `base` / `ingest-validation` / `safety-compliance` |
 
 ---
 
@@ -29,7 +29,7 @@ The model emits a logical JSON-shaped artifact for the next module (`api-orchest
   - **`structured_payload_handoff`** (GPT-SSR-03 / GIM-273) — pack-required `signals.*` copies from existing taxonomy tokens (§4.7); orchestrator maps this into `schema_binding.structured_payload`.
   - **`normalization_metadata`** — **references** to upstream strict-chain artifacts (see §6), plus optional label extraction metadata, not a full duplicate of raw interview text or multimodal sources.
 - **Label extraction:** apply **all** taxonomy keys that genuinely apply to the story — one or more keys per applicable axis (`topic_domain`, `failure_mode`, `civic_signal`, `issue_archetype_support`) where evidence exists in the validated narrative. **Conservative** means: do not invent labels or apply low-confidence keys — it does **not** mean use only one label total.
-- Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5 and [`story-label-taxonomy.md`](story-label-taxonomy.md)). Civic payload field names / geo canon for the **active node** come from the active [`schema-packs/`](schema-packs/README.md) **`pack.json`** + **`payload.schema.json`** + **`interview-overlay.md`** — not as the sole core model.
+- Preserve **conservative** typing for enums and label keys: values must match **Issue** SoT ([`story-data-model.md`](story-data-model.md) §4–5) and pack [`taxonomy.json`](schema-packs/README.md) canonical keys. Civic payload field names / geo canon for the **active node** come from the active [`schema-packs/`](schema-packs/README.md) **`pack.json`** + **`payload.schema.json`** + **`interview-overlay.md`** — not as the sole core model.
 
 ### 2.2 This instruction MUST NOT
 
@@ -132,7 +132,7 @@ Must conform to [`story-data-model.md`](story-data-model.md) **§4.1** (required
 | Field | Rule |
 |-------|------|
 | `type` | One of `ISSUE_TYPE` values per [`story-data-model.md`](story-data-model.md) §5 (display enum). Pack `signals.canonical_type` / payload field shapes: read the active **`payload.schema.json`**. Apply **observation vs complaint decision rule** below. |
-| `taxonomy` | **GPT-TAX-01 SoT:** object keyed by taxonomy axis (13 axes in [`story-label-taxonomy.md`](story-label-taxonomy.md) §3 / gateway `TAXONOMY_AXIS_VALUES`). Each axis → array of `{ "label", "disposition" }`. Group candidates from `label_extraction_metadata` **by axis** — never flatten away the axis. Include dispositions `canonical`, `metadata_only`, `needs_clarification`, `rejected`, and **`internal`** (for §6 internal-only keys). Omit empty axes. Orchestrator maps to `narrative.taxonomy`. |
+| `taxonomy` | **GPT-TAX-01 SoT:** object keyed by taxonomy axis (13 axes in pack [`taxonomy.json`](schema-packs/README.md) `axes[]` / gateway `TAXONOMY_AXIS_VALUES`). Each axis → array of `{ "label", "disposition" }`. Group candidates from `label_extraction_metadata` **by axis** — never flatten away the axis. Include dispositions `canonical`, `metadata_only`, `needs_clarification`, `rejected`, and **`internal`** (for §6 internal-only keys). Omit empty axes. Orchestrator maps to `narrative.taxonomy`. |
 | `labels` | **Derived / compat:** string array of keys with `disposition = "canonical"` only (from `taxonomy` when present). Do not include metadata-only, internal-only, unknown, or low-confidence candidates. Apply **multi-axis** extraction per §2.1 — see rule below. |
 | `title`, `description` | `{ et, ru, en }` per §4.1 and i18n policy. |
 | `summary` | Optional `{ et, ru, en }` when content is minimal (see **`summary` generation rule** below); orchestrator/UI use summary for card preview when present. |
@@ -175,9 +175,9 @@ Do **not** omit `civic_signal` labels because they seem "less obvious" — these
 
 #### 4.1a Label extraction hints (commonly under-applied keys)
 
-**Process stays in this core file.** Axis / key lists for the **active node** live in the pack — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s **`interview-overlay.md`** + [`taxonomy.json`](schema-packs/README.md), plus [`story-label-taxonomy.md`](story-label-taxonomy.md) (narrative glossary). Do **not** copy civic overlay tables here.
+**Process stays in this core file.** Axis / key lists for the **active node** live in the pack — read [`schema-packs/README.md`](schema-packs/README.md), then the active pair’s **`interview-overlay.md`** + [`taxonomy.json`](schema-packs/README.md), plus [`story-label-taxonomy.md`](story-label-taxonomy.md) redirect stub / [`ingest-validation.md`](ingest-validation.md) Label process rules. Do **not** copy civic overlay tables here.
 
-Use [`story-label-taxonomy.md`](story-label-taxonomy.md) as SSOT. When narrative evidence matches, include the key even if another topic_domain label is already present.
+Use active pack [`taxonomy.json`](schema-packs/README.md) as enum SSOT. When narrative evidence matches, include the key even if another topic_domain label is already present.
 
 #### 4.1a.1 Ecosystem-deficit classification preference (REQ-38)
 
@@ -246,7 +246,7 @@ When validation supplies label reasoning, keep it under `normalization_metadata.
 }
 ```
 
-Only candidates with `disposition = "canonical"` and keys allowed by [`story-label-taxonomy.md`](story-label-taxonomy.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, `rejected`, or **`internal`** disposition remain out of flat `labels[]` but **MUST** be grouped into `canonical_payload.taxonomy[axis]` with their disposition preserved (GPT-TAX-01 — backend filters public surfaces).
+Only candidates with `disposition = "canonical"` and keys allowed by pack [`taxonomy.json`](schema-packs/README.md) may appear in `canonical_payload.labels[]`. Candidates with `metadata_only`, `needs_clarification`, `rejected`, or **`internal`** disposition remain out of flat `labels[]` but **MUST** be grouped into `canonical_payload.taxonomy[axis]` with their disposition preserved (GPT-TAX-01 — backend filters public surfaces).
 
 **Taxonomy emit rule (GPT-TAX-01):** Build `canonical_payload.taxonomy` from `label_extraction_metadata.candidates` (and equivalent confirmed keys) by grouping on `axis`. Example:
 
@@ -260,7 +260,7 @@ Only candidates with `disposition = "canonical"` and keys allowed by [`story-lab
 
 Then derive `canonical_payload.labels[]` = all `label` values under any axis with `disposition = "canonical"` (order: axis table order in taxonomy §3, then label order within axis).
 
-**English token rule (GPT-TAX-02 / GIM-227):** Every `label` written into `canonical_payload.taxonomy[*][].label` and into derived `canonical_payload.labels[]` MUST be an **English** token (snake_case / [`story-label-taxonomy.md`](story-label-taxonomy.md) §4 style). If a candidate is Estonian or Russian prose, **remap** to the closest listed English key or omit / `needs_clarification` — do **not** leave et/ru prose on the wire. This is GPT-side correction, **not** HTTP 422 / server vocabulary reject.
+**English token rule (GPT-TAX-02 / GIM-227):** Every `label` written into `canonical_payload.taxonomy[*][].label` and into derived `canonical_payload.labels[]` MUST be an **English** token (snake_case  / pack `taxonomy.json` English key style). If a candidate is Estonian or Russian prose, **remap** to the closest listed English key or omit / `needs_clarification` — do **not** leave et/ru prose on the wire. This is GPT-side correction, **not** HTTP 422 / server vocabulary reject.
 
 #### 4.2.2 `location_extraction_metadata`
 

@@ -76,7 +76,7 @@ Phases 1–7 **process** stays in [`story-interview-flow.md`](../../../story-int
 | Community fragmentation | Weak ties, underused spaces | `community_fragmentation`, `underused_resources` |
 | Replicable model desire | «Should work in other districts too» | `replicable_model_needed`, `governance_signal` |
 
-Allowed canonical labels = [`taxonomy.json`](taxonomy.json) `canonical_keys` with disposition `canonical`. Narrative glossary: [`story-label-taxonomy.md`](../../../story-label-taxonomy.md).
+Allowed canonical labels = [`taxonomy.json`](taxonomy.json) `canonical_keys` with disposition `canonical`. Process / redirect: [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) stub → [`ingest-validation.md`](../../../ingest-validation.md) Label process rules.
 
 ## Civic stash examples (demo only)
 

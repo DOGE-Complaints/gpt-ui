@@ -29,7 +29,7 @@ When operator profile is `demo_baseline`, apply these **domain** classes (proces
 
 ## 2. Label enum / multi-axis evidence checklists
 
-Validate candidate labels against same-pack [`taxonomy.json`](taxonomy.json) (`canonical_keys` + axis disposition). [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) remains narrative glossary / process until SSR-09 — **not** the pack swap SSOT for enum checks (GPT-SSR-05 / GPT-SSR-06).
+Validate candidate labels against same-pack [`taxonomy.json`](taxonomy.json) (`canonical_keys` + axis disposition). [`story-label-taxonomy.md`](../../../story-label-taxonomy.md) is a **redirect stub** (GPT-SSR-10); process rules live in [`ingest-validation.md`](../../../ingest-validation.md). This pack JSON remains enum SSOT (GPT-SSR-05/06/10).
 
 Every value destined for `canonical_payload.labels[]` must be a canonical allowed key with story evidence.
 

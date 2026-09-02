@@ -7,7 +7,7 @@
 |----------------|--------|
 | **Version** | 0.16 |
 | **Date** | 2026-08-31 |
-| **Traceability** | REQ-36; [`story-label-taxonomy.md`](story-label-taxonomy.md) v0.2; [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md); GPT-SSR-01 / GIM-251 / GIM-253 |
+| **Traceability** | REQ-36; [`story-label-taxonomy.md`](story-label-taxonomy.md) redirect stub (GPT-SSR-10); pack `taxonomy.json`; [`story-i18n-policy.md`](story-i18n-policy.md) (FR-M1-028…031); [`story-normalizer.md`](story-normalizer.md); GPT-SSR-01 / GIM-251 / GIM-253 |
 
 ---
 
@@ -56,7 +56,7 @@ Below is the **target display contract** for the product UI (mocks and dashboard
 | Field | Type (logical) | Rule |
 |-------|----------------|------|
 | `type` | string enum | One of `ISSUE_TYPE`: `complaint`, `observation`, `absurdity`, `system_bug`. |
-| `labels` | `string[]` | Controlled tag keys from [`story-label-taxonomy.md`](story-label-taxonomy.md) with disposition `canonical`. Unknown, free-text, internal-only, low-confidence, or metadata-only candidates must not enter `canonical_payload.labels[]`. |
+| `labels` | `string[]` | Controlled tag keys from active pack [`taxonomy.json`](schema-packs/README.md) with disposition `canonical`. Unknown, free-text, internal-only, low-confidence, or metadata-only candidates must not enter `canonical_payload.labels[]`. |
 | `title` | `{ et: string, ru: string, en: string }` | Draft title; all three keys filled meaningfully or explicitly flagged “needs translation” in validator report — see [`story-i18n-policy.md`](story-i18n-policy.md). |
 | `description` | `{ et, ru, en }` | Full detail-page text. |
 | `summary` | `{ et, ru, en }` (optional) | Short card text; if absent, UI may use `title`. |
@@ -93,7 +93,7 @@ These fields are sent via the **`gpt_signals`** block in `StoryDraftStashRequest
 ## 5. Source of truth for enums
 
 - **Types and statuses:** product enums `ISSUE_TYPE`, `ISSUE_STATUS` — match §4 literal sets above for instruction-layer work.
-- **Labels:** [`story-label-taxonomy.md`](story-label-taxonomy.md) v0.2 — controlled axes (`topic_domain`, `service_object`, `affected_scope`, `civic_signal`, `deep_need`, `desired_outcome`, `ecosystem_signal`, `governance_signal`, plus `failure_mode`, `issue_archetype_support`, internal-only), canonical allowed keys in §4, metadata-only candidates in §5, and unknown-value handling. No separate `equity_dimension` or `affected_population` axis (REQ-36 OD-1/OD-2).
+- **Labels:** active pack [`taxonomy.json`](schema-packs/README.md) — axes + `canonical_keys`; process rules in [`ingest-validation.md`](ingest-validation.md) (GPT-SSR-10). Stub: [`story-label-taxonomy.md`](story-label-taxonomy.md). No separate `equity_dimension` or `affected_population` axis (REQ-36 OD-1/OD-2).
 
 If UI mocks disagree with this file on `title`/`summary` shape (string vs `{ et, ru, en }`), for **Module 1 GPT → UI** priority is **§4.1** (trilingual objects) unless the deployed OpenAPI explicitly locks a different wire shape.
 
@@ -111,7 +111,7 @@ Do not collect PII by default; do not store personal data in Issue content beyon
 |--------|----------------|
 | [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) | Ingest phase order and strict-chain artifacts **in instruction terms** (not UI statuses). |
 | [`story-policy-gate.md`](story-policy-gate.md) | Policy admission; `policy_gate_result` / `review_metadata` alignment; no API. |
-| [`story-label-taxonomy.md`](story-label-taxonomy.md) | Controlled source of truth for `labels` and label extraction metadata boundaries. |
+| Pack [`taxonomy.json`](schema-packs/README.md) | Enum SSOT for `labels` / axes (GPT-SSR-10). Process: [`ingest-validation.md`](ingest-validation.md). Stub: [`story-label-taxonomy.md`](story-label-taxonomy.md). |
 | `ingest-validation.md` | §4.1 completeness, batch follow-ups. |
 | [`story-normalizer.md`](story-normalizer.md) | Canonical JSON for orchestrator / **`normalized_issue_payload`**. |
 | `api-orchestrator.md` | Only HTTP entrypoint; response interpretation is authoritative. |

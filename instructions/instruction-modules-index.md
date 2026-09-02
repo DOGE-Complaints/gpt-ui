@@ -2,15 +2,15 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.42 |
-| **Date** | 2026-09-01 |
+| **Версия индекса** | 0.43 |
+| **Date** | 2026-09-02 |
 | **Scope** | Runtime navigation map for DOGEstonia Issue instructions; no task/epic dependency in operational sections. |
 
 This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy donor content is removed from the active runtime surface.
 
 **For Custom GPT DOGEstonia ingest use Story track modules only** (`story-*`, `ingest-*`, `api-orchestrator.md` in Story mode). Legacy donor guardrails and review checklist: [`activity-legacy-paths-inventory.md`](activity-legacy-paths-inventory.md).
 
-Use this index together with [`story-data-model.md`](story-data-model.md), [`story-label-taxonomy.md`](story-label-taxonomy.md), [`schema-packs/README.md`](schema-packs/README.md), [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md), [`story-policy-gate.md`](story-policy-gate.md), [`story-normalizer.md`](story-normalizer.md), and [`story-api-methods-reference.md`](story-api-methods-reference.md).
+Use this index together with [`story-data-model.md`](story-data-model.md), pack [`taxonomy.json`](schema-packs/README.md) (enum SSOT), [`schema-packs/README.md`](schema-packs/README.md), [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md), [`story-policy-gate.md`](story-policy-gate.md), [`story-normalizer.md`](story-normalizer.md), and [`story-api-methods-reference.md`](story-api-methods-reference.md).
 
 ---
 
@@ -19,7 +19,7 @@ Use this index together with [`story-data-model.md`](story-data-model.md), [`sto
 | File | Role |
 |------|------|
 | [`story-data-model.md`](story-data-model.md) | Canonical logical Issue fields and structural contracts. |
-| [`story-label-taxonomy.md`](story-label-taxonomy.md) | Controlled label axes, allowed canonical keys, metadata-only candidates, and internal label disposition. |
+| Pack [`taxonomy.json`](schema-packs/README.md) | Enum SSOT for label axes / canonical keys (GPT-SSR-10). Process: [`ingest-validation.md`](ingest-validation.md). Redirect stub: [`story-label-taxonomy.md`](story-label-taxonomy.md). |
 | [`story-lifecycle-instructions.md`](story-lifecycle-instructions.md) | Strict chain and handoff order for Module 1. |
 | [`story-interview-flow.md`](story-interview-flow.md) | Dialogue intake flow and clarification boundaries. |
 | [`story-i18n-policy.md`](story-i18n-policy.md) | Session language and `{ et, ru, en }` output policy. |
@@ -66,6 +66,7 @@ with `base.md` as global constitution and `story-lifecycle-instructions.md` as c
 
 | Версия | Дата | Изменение |
 |--------|------|-----------|
+| 0.43 | 2026-09-02 | GPT-SSR-10: pack `taxonomy.json` enum SSOT; `story-label-taxonomy.md` redirect stub; process in ingest-validation. |
 | 0.41 | 2026-08-31 | GPT-SSR-01: schema-packs active pair + two overlay files (non-executable projections). |
 | 0.40 | 2026-04-27 | Self-contained instruction surface: internal links use bare filenames only; removed external repository references from the runtime index. |
 | 0.39 | 2026-04-27 | Core functional-requirements filename aligned with demo M2 gap closure hygiene (GIM-99). |
