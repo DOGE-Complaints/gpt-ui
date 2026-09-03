@@ -150,14 +150,14 @@ Domain **lists** для текущей civic instance (что считать off
 ### 4.1 Schema pack admission overlay (GPT-SSR)
 
 **Process** (когда BLOCK / clarify / approve) — [`story-policy-gate.md`](../../instructions/story-policy-gate.md).  
-**Domain lists / completeness vs pack fields** — [`schema-packs/tallinn_civic/v1/inbound-validation.md`](../../instructions/schema-packs/tallinn_civic/v1/inbound-validation.md) **v1.2**:
+**Domain lists / completeness vs pack fields** — [`schema-packs.tallinn_civic.v1.inbound-validation.md`](../../instructions/schema-packs.tallinn_civic.v1.inbound-validation.md):
 
 - BLOCK / clarify / ACCEPT классы для `demo_baseline` (§1 pack).
 - Label enum / multi-axis evidence (§2) + include taxonomy.
 - Pack-required `signals.civic_domain` + `signals.failure_pattern` **дополнительно** к core §4.1 (§3 pack) — narrative-first сохраняется.
-- GEO_SCOPE copy для жителя при HTTP 422 (§5 pack).
+- GEO_SCOPE copy для жителя при HTTP 422 (§5 pack) — zone framing / language via [`locale-jurisdiction.md`](../../instructions/schema-packs.tallinn_civic.v1.locale-jurisdiction.md).
 
-**Модель полей** (`structured_payload`, `geo_intake`) — [`schema-packs/tallinn_civic/v1/data-model.md`](../../instructions/schema-packs/tallinn_civic/v1/data-model.md) **v1.3**, не в core.
+**Модель полей** (`structured_payload`, `geo_intake`) — active pack [`pack.json`](../../instructions/schema-packs.tallinn_civic.v1.pack.json) + [`payload.schema.json`](../../instructions/schema-packs.tallinn_civic.v1.payload.schema.json) (wave-2 `data-model.md` archived; see [`schema-packs/README.md`](../../instructions/schema-packs/README.md)), не в core.
 
 Как сменить ноду/модель: [`schema-pack-custom-model-operator-manual-ru.md`](./schema-pack-custom-model-operator-manual-ru.md).
 

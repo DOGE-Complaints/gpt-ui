@@ -2,7 +2,7 @@
 
 > **Для кого:** оператор / продукт, которому нужно «переключить» GPT на другую ноду или другую модель полей — без переписывания всего интервью.  
 > **Метод:** [`.cursor/rules/analysis.mdc`](../../../.cursor/rules/analysis.mdc) — факты с диска.  
-> **Сверка:** 2026-09-01.  
+> **Сверка:** 2026-09-03 (GPT-SSR-13 flat six-file + locale).  
 > **Не** юридический документ. **Не** marketplace / §30.
 
 As-built по «мусору» и допускам: [`story-validation-and-garbage-filtering-as-built.md`](./story-validation-and-garbage-filtering-as-built.md).  
@@ -20,7 +20,7 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 Решение (REQ-45 / GPT-SSR-01…03):
 
 - **Ядро** — процесс (как спрашивать, когда STOP, как слать HTTP).
-- **Два сменных файла пака** — *модель* и *правила валидации* конкретной ноды.
+- **Шесть сменных файлов пака (flat)** — JSON trio (*модель*: pack / payload / taxonomy) + prose trio (*inbound* / *interview-overlay* / *locale-jurisdiction*) конкретной ноды.
 - **OpenAPI Actions** — транспортный контракт (`schema_binding` обязателен, `geo_detail` опционален).
 - **Gateway** — настоящий validate (пак в GPT **не** исполняет схему).
 
@@ -31,11 +31,12 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 | Слой | Что это | Где на диске |
 |------|---------|--------------|
 | **Ядро инструкций** | Интервью, safety, policy *process*, normalizer process, orchestrator HTTP | [`GPT UI/instructions/`](../../instructions/) (`story-interview-flow.md`, `story-policy-gate.md`, `story-normalizer.md`, `api-orchestrator.md`, …) |
-| **Active pair** | Какая нода сейчас активна (`schema_id` + `schema_version`) | [`GPT UI/instructions/schema-packs/README.md`](../../instructions/schema-packs/README.md) **v1.3** |
-| **Pack JSON (модель)** | `field_policy`, `geo_intake`, clustering, payload shape, taxonomy | [`…/tallinn_civic/v1/pack.json`](../../instructions/schema-packs/tallinn_civic/v1/pack.json) + [`payload.schema.json`](../../instructions/schema-packs/tallinn_civic/v1/payload.schema.json) + [`taxonomy.json`](../../instructions/schema-packs/tallinn_civic/v1/taxonomy.json) — COPY gateway |
-| **Interview overlay** | Geo-канон, phase→axes, ecosystem cues (prose) | [`…/tallinn_civic/v1/interview-overlay.md`](../../instructions/schema-packs/tallinn_civic/v1/interview-overlay.md) **v1.1** |
-| **Правила валидации (inbound)** | Domain lists / completeness vs pack fields | [`…/tallinn_civic/v1/inbound-validation.md`](../../instructions/schema-packs/tallinn_civic/v1/inbound-validation.md) **v1.4** |
-| **Archive (не SSOT)** | Старая MD-проекция формы полей | [`…/tallinn_civic/v1/archive/data-model.v1.3.md`](../../instructions/schema-packs/tallinn_civic/v1/archive/data-model.v1.3.md) |
+| **Active pair** | Какая нода сейчас активна (`schema_id` + `schema_version`) | [`GPT UI/instructions/schema-packs/README.md`](../../instructions/schema-packs/README.md) **v2.1** |
+| **Pack JSON (модель)** | `field_policy`, `geo_intake`, clustering, payload shape, taxonomy | Flat: [`schema-packs.tallinn_civic.v1.pack.json`](../../instructions/schema-packs.tallinn_civic.v1.pack.json) + [`payload.schema.json`](../../instructions/schema-packs.tallinn_civic.v1.payload.schema.json) + [`taxonomy.json`](../../instructions/schema-packs.tallinn_civic.v1.taxonomy.json) — COPY gateway |
+| **Interview overlay** | Phase→axes, ecosystem cues (prose); script/canon → locale | [`schema-packs.tallinn_civic.v1.interview-overlay.md`](../../instructions/schema-packs.tallinn_civic.v1.interview-overlay.md) |
+| **Правила валидации (inbound)** | Domain lists / completeness vs pack fields | [`schema-packs.tallinn_civic.v1.inbound-validation.md`](../../instructions/schema-packs.tallinn_civic.v1.inbound-validation.md) |
+| **Locale / jurisdiction** | Working languages, scripts, jurisdiction framing, STOP copy language | [`schema-packs.tallinn_civic.v1.locale-jurisdiction.md`](../../instructions/schema-packs.tallinn_civic.v1.locale-jurisdiction.md) |
+| **Archive (не SSOT)** | Nested wave-2 snapshot (historical) | [`archive/schema-packs-nested-tallinn_civic-v1/`](../../instructions/archive/schema-packs-nested-tallinn_civic-v1/) |
 | **OpenAPI Actions** | Wire: обязательный `schema_binding`, опциональный `geo_detail` | [`GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml`](../custom-gpt-story-intake-actions.openapi.yaml) **info.version 0.8.0** |
 | **Справка по Actions** | Lockstep с OpenAPI | [`story-api-methods-reference.md`](../../instructions/story-api-methods-reference.md) |
 | **Gateway SSOT** | Исполняемый pack + payload schema | `doge-complaints-gateway/schema-packs/<id>/<ver>/` |
@@ -49,21 +50,23 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 
 ---
 
-## 3. Pack bundle: что писать куда (wave 2 — GPT-SSR-09)
+## 3. Pack bundle: что писать куда (flat six-file — GPT-SSR-11…13)
 
-Layout для любой ноды:
+Layout для любой ноды (Custom GPT **upload** = flat prefix names):
 
 ```text
-GPT UI/instructions/schema-packs/<schema_id>/<schema_version>/
-  pack.json                 ← COPY gateway (field_policy, geo_intake, clustering)
-  payload.schema.json       ← COPY gateway (signals/geo shape)
-  taxonomy.json             ← COPY gateway (axes + axis_to_signal_map)
-  inbound-validation.md     ← content / admission rules (dual contour)
-  interview-overlay.md      ← geo canon, phase→axes, ecosystem cues
-  archive/data-model.v*.md  ← archived MD projection (не SSOT)
+GPT UI/instructions/
+  schema-packs.<schema_id>.<schema_version>.pack.json              ← COPY gateway
+  schema-packs.<schema_id>.<schema_version>.payload.schema.json    ← COPY gateway
+  schema-packs.<schema_id>.<schema_version>.taxonomy.json          ← COPY gateway
+  schema-packs.<schema_id>.<schema_version>.inbound-validation.md  ← content / admission
+  schema-packs.<schema_id>.<schema_version>.interview-overlay.md   ← geo canon, phase→axes
+  schema-packs.<schema_id>.<schema_version>.locale-jurisdiction.md ← languages / jurisdiction
 ```
 
 Плюс правка active pair в [`schema-packs/README.md`](../../instructions/schema-packs/README.md).
+
+> **Historical nested GPT tree** `schema-packs/<schema_id>/<schema_version>/` — **не** live upload layout; snapshot only under [`archive/schema-packs-nested-tallinn_civic-v1/`](../../instructions/archive/schema-packs-nested-tallinn_civic-v1/). Gateway executable SSOT stays nested under `doge-complaints-gateway/schema-packs/<id>/<ver>/`.
 
 ### 3.1 JSON pack files — модель (read-only)
 
@@ -100,7 +103,7 @@ Geo formation canon, phase→axes tables, ecosystem-deficit cues, demo stash exa
 
 ## 4. Active pair и `schema_binding`
 
-Перед stash orchestrator **читает** README, открывает **`pack.json`** + **`payload.schema.json`** (+ normalizer handoff / overlay), и **MUST** положить в HTTP:
+Перед stash orchestrator **читает** README (active pair), открывает flat six-file set — **`pack.json`** + **`payload.schema.json`** + **`taxonomy.json`** + inbound / overlay / **`locale-jurisdiction.md`** (+ normalizer handoff), и **MUST** положить в HTTP:
 
 ```json
 "schema_binding": {
@@ -127,19 +130,19 @@ Citizen Mode может **не показывать** binding в разгово�
 
 Цель: указать GPT на другой gateway pack (`NODE_SCHEMA_ID` / `NODE_SCHEMA_VERSION`).
 
-### Шаг 1 — copy-paste gateway JSON (v3 — GPT-SSR-09)
+### Шаг 1 — copy-paste gateway JSON → flat GPT names (GPT-SSR-11…13)
 
-**Default policy:** byte-identical copy from gateway SSOT.
+**Default policy:** byte-identical copy from gateway SSOT; GPT upload uses **flat** filenames.
 
-1. Открыть `doge-complaints-gateway/schema-packs/<new_id>/<new_ver>/` (`pack.json`, `payload.schema.json`, **`taxonomy.json`**).
-2. Скопировать **три JSON** в:
-   - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/pack.json`
-   - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/payload.schema.json`
-   - `GPT UI/instructions/schema-packs/<new_id>/<new_ver>/taxonomy.json`
+1. Открыть gateway nested SSOT `doge-complaints-gateway/schema-packs/<new_id>/<new_ver>/` (`pack.json`, `payload.schema.json`, **`taxonomy.json`**).
+2. Скопировать **три JSON** в flat GPT paths:
+   - `GPT UI/instructions/schema-packs.<new_id>.<new_ver>.pack.json`
+   - `GPT UI/instructions/schema-packs.<new_id>.<new_ver>.payload.schema.json`
+   - `GPT UI/instructions/schema-packs.<new_id>.<new_ver>.taxonomy.json`
 3. **Optional diff-check** перед upload: `cmp` все три файла с gateway (должны совпадать байт-в-байт).
-4. Сохранить или обновить `inbound-validation.md` + **`interview-overlay.md`** (content + interview guidance).
+4. Сохранить или обновить flat prose trio: `inbound-validation.md` + **`interview-overlay.md`** + **`locale-jurisdiction.md`** (`schema-packs.<new_id>.<new_ver>.*`).
 5. **Не** перепроецировать JSON→MD вручную. **Не** re-import Actions, если менялись только JSON/MD.
-6. **Не** использовать archived `data-model.md` как SSOT — только JSON + overlay.
+6. **Не** использовать archived `data-model.md` / nested GPT tree как SSOT — только flat six-file + README.
 
 > **Gateway prerequisite:** on-disk `taxonomy.json` SSOT — [GW-SSR-26/28/29](../../../../doge-complaints-gateway/docs/tasks/backlog-stories/semantic-schema-runtime/INDEX.md) Done on gateway side.
 
@@ -154,11 +157,11 @@ Citizen Mode может **не показывать** binding в разгово�
 | `schema_id` | `<new_id>` |
 | `schema_version` | `<new_ver>` |
 
-И ссылки на pack artifacts (wave 2 target: JSON pair + inbound; README rename → SSR-09).
+И ссылки на **flat six-file** pack artifacts (JSON trio + inbound + overlay + **locale-jurisdiction**); README swap table v5 / SSR-13.
 
 ### Шаг 3 — загрузить Instructions в Custom GPT
 
-Загрузить **ядро** + **README** + **pack artifacts** (`pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, `interview-overlay.md`).
+Загрузить **ядро** + **README** + **flat six-file** pack artifacts (`pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, `interview-overlay.md`, **`locale-jurisdiction.md`**).
 
 Если менялись **только** pack files и README → **Actions re-import не нужен**.
 
@@ -250,14 +253,15 @@ Fail: ради имён полей ноды пришлось править orch
 ```text
 # Active pair + swap
 GPT UI/instructions/schema-packs/README.md
+GPT UI/instructions/schema-packs.README.md
 
-# Wave-2 pack bundle (tallinn_civic/v1)
-GPT UI/instructions/schema-packs/tallinn_civic/v1/pack.json
-GPT UI/instructions/schema-packs/tallinn_civic/v1/payload.schema.json
-GPT UI/instructions/schema-packs/tallinn_civic/v1/taxonomy.json
-GPT UI/instructions/schema-packs/tallinn_civic/v1/inbound-validation.md
-GPT UI/instructions/schema-packs/tallinn_civic/v1/interview-overlay.md
-GPT UI/instructions/schema-packs/tallinn_civic/v1/archive/data-model.v1.3.md
+# Flat six-file pack bundle (tallinn_civic/v1) — Custom GPT upload
+GPT UI/instructions/schema-packs.tallinn_civic.v1.pack.json
+GPT UI/instructions/schema-packs.tallinn_civic.v1.payload.schema.json
+GPT UI/instructions/schema-packs.tallinn_civic.v1.taxonomy.json
+GPT UI/instructions/schema-packs.tallinn_civic.v1.inbound-validation.md
+GPT UI/instructions/schema-packs.tallinn_civic.v1.interview-overlay.md
+GPT UI/instructions/schema-packs.tallinn_civic.v1.locale-jurisdiction.md
 
 # Emit / STOP
 GPT UI/instructions/api-orchestrator.md          # §5.2.1, items 13 / 19 / 20
@@ -267,7 +271,7 @@ GPT UI/instructions/story-normalizer.md          # §4.6 geo, §4.7 structured_p
 GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml   # 0.8.0
 GPT UI/instructions/story-api-methods-reference.md
 
-# Gateway projection source
+# Gateway projection source (executable — not GPT upload layout)
 doge-complaints-gateway/schema-packs/tallinn_civic/v1/
 ```
 
@@ -277,11 +281,10 @@ doge-complaints-gateway/schema-packs/tallinn_civic/v1/
 
 | Поле | Значение |
 |------|----------|
-| Дата | 2026-09-01 |
-| Pack README | v1.3 |
-| pack JSON / payload / taxonomy | gateway copy (SSR-04/05) |
-| interview-overlay | v1.1 |
-| inbound-validation | v1.4 |
-| archive data-model | v1.3 (not SSOT) |
+| Дата | 2026-09-03 |
+| Pack README | v2.1 (flat six-file + locale) |
+| pack JSON / payload / taxonomy | flat `schema-packs.tallinn_civic.v1.*` (gateway copy) |
+| interview-overlay / inbound / locale | flat MD trio (SSR-11/12/13) |
+| nested GPT upload paths | retired — archive only |
 | OpenAPI | 0.8.0 |
-| Orchestrator (emit) | 0.5.9+ (SSR-09 JSON paths) |
+| Orchestrator (emit) | 0.5.9+ + SSR-13 locale in active artifact list |
