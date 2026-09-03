@@ -3,8 +3,8 @@
 **Product:** DOGEstonia — Pack Builder tooling under `GPT UI/instructions/node-onboarding/`  
 **Role of this file:** Short index of Pack Builder siblings + bans + emit SSOT.  
 **Not** an instance schema pack. **Not** Module-1 Story Interview Instructions.  
-**Traceability:** REQ-46 §5.0 README · AC-GPT-REQ46-01/05/07/12 · REQ-45a · GPT-PB-04  
-**Version:** 1.0 · **Date:** 2026-09-03  
+**Traceability:** REQ-46 §5.0 README · AC-GPT-REQ46-01/05/07/12 · REQ-45a · GPT-PB-04 · GPT-PB-05  
+**Version:** 1.1 · **Date:** 2026-09-03  
 
 **Path:** `GPT UI/instructions/node-onboarding/pack-builder-README.md`
 
@@ -35,7 +35,8 @@ Pack Builder is **orthogonal** to Module-1. Do not merge these trees.
 | [`pack-builder-taxonomy.schema.json`](./pack-builder-taxonomy.schema.json) | Meta-schema for candidate `taxonomy.json` |
 | [`pack-builder-overlays.checklist.md`](./pack-builder-overlays.checklist.md) | Three prose identities presence/shape checklist |
 
-**Hashes:** see wrapper §0 — `prompt_version_hash` **required**; `standards_set_hash` **recommended**.
+**Hashes:** see wrapper §0 — `prompt_version_hash` **required**; `standards_set_hash` **recommended**.  
+**Remote pins (вне IDE):** SSOT = [`pack-builder-wrapper.md`](./pack-builder-wrapper.md) §0 (primary raw URL + commit) and §1 (standards raw URLs). Same URLs mirrored in primary §1 and repair §2.3.
 
 ---
 
@@ -52,9 +53,9 @@ Pack Builder is **orthogonal** to Module-1. Do not merge these trees.
 
 ## 4. Quick start
 
-1. Open [`pack-builder-wrapper.md`](./pack-builder-wrapper.md) → fill pin URL/tag if publishing remotely.  
-2. Load pinned **primary** into the Pack Builder GPT / dialogue.  
-3. Bind the four standards listed in wrapper §1.  
+1. Open [`pack-builder-wrapper.md`](./pack-builder-wrapper.md) §0 — primary raw URL is filled; pin commit/tag as needed.  
+2. Load pinned **primary** into the Pack Builder GPT / dialogue (fetch from raw URL if вне IDE).  
+3. Bind the four standards from wrapper §1 (local paths and/or raw URLs).  
 4. Emit flat six-file set → validate → repair loop if needed → app/gateway admission.
 
 **Gateway wins** on federation drift. App hosting of raw URLs = REQ-APP-04 F1 (out of this README).

@@ -4,8 +4,8 @@
 **Role of this file:** Thin **wrapper** that tells an operator / hosting surface how to **fetch/pin** the remote primary prompt and **bind** validation standards — then start the Pack Builder dialogue.  
 **Not** the primary Pack Builder body. **Not** the repair/debug template. **Not** Module-1 Story Interview Instructions.  
 **MUST NOT embed** the full primary instruction text here — pin by path/URL/tag only.  
-**Traceability:** REQ-46 §5.0 wrapper · §6 · AC-GPT-REQ46-02/08 · GPT-PB-04 · STORY-GPT-PB-04  
-**Version:** 1.0 · **Date:** 2026-09-03  
+**Traceability:** REQ-46 §5.0 wrapper · §6 · AC-GPT-REQ46-02/08 · GPT-PB-04 · GPT-PB-05 · STORY-GPT-PB-05  
+**Version:** 1.1 · **Date:** 2026-09-03  
 
 **Path:** `GPT UI/instructions/node-onboarding/pack-builder-wrapper.md`
 
@@ -17,25 +17,29 @@
 
 | Field | Value |
 |-------|--------|
-| **Primary path (repo)** | `GPT UI/instructions/node-onboarding/pack-builder-primary-prompt.md` |
-| **Primary raw/tag URL** | `[[OPERATOR_FILLS — git raw or tagged URL to primary]]` |
-| **Primary pin tag / commit** | `[[OPERATOR_FILLS — e.g. tag pb-primary-v1.0]]` |
-| **`prompt_version_hash` (REQUIRED)** | `pb-primary-v1.0-20260903` — **MUST** match primary header; update when primary body changes |
-| **Standards directory** | `GPT UI/instructions/node-onboarding/` |
+| **Primary path (repo)** | `instructions/node-onboarding/pack-builder-primary-prompt.md` (git root = `gpt-ui`) |
+| **Primary raw/tag URL** | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-primary-prompt.md` |
+| **Primary pin tag / commit** | branch `dev` · commit `7f70ea64c2be6359986ec86e1cb1f0c309a9cff1` (pre–PB-05 tip; **re-pin to HEAD** after PB-05 commit/push) |
+| **`prompt_version_hash` (REQUIRED)** | `pb-primary-v1.1-20260903` — **MUST** match primary header; update when primary body changes |
+| **Standards directory** | `instructions/node-onboarding/` |
 | **`standards_set_hash` (RECOMMENDED)** | `sha256:258e13bfdd50e48ce980d4e4e12863e21c4c2896bc9bc675df562c5e7dd2f948` — sha256 of concat sha256 of: `pack-builder-overlays.checklist.md` + `pack-builder-pack.schema.json` + `pack-builder-payload-schema.schema.json` + `pack-builder-taxonomy.schema.json` (sorted by filename; concat per-file sha256 **hex** digests, then sha256); recompute when any standard changes |
 | **Repair template path** | `pack-builder-repair-debug-prompt.md` |
-| **Wrapper version** | `1.0` · `pb-wrapper-v1.0-20260903` |
+| **Wrapper version** | `1.1` · `pb-wrapper-v1.1-20260903` |
+
+Raw URLs are **public** (no auth). To freeze a release, pin a **tag** or immutable commit SHA instead of floating `dev`.
 
 ---
 
 ## 1. Bind validation standards (PB-03)
 
-Before dialogue, bind these files (paths relative to `node-onboarding/`):
+Before dialogue, bind these files (paths relative to `node-onboarding/` **and** remote raw URLs for вне-IDE):
 
-1. `pack-builder-pack.schema.json`
-2. `pack-builder-payload-schema.schema.json`
-3. `pack-builder-taxonomy.schema.json`
-4. `pack-builder-overlays.checklist.md`
+| File (local) | Remote raw URL |
+|--------------|----------------|
+| `pack-builder-pack.schema.json` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-pack.schema.json` |
+| `pack-builder-payload-schema.schema.json` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-payload-schema.schema.json` |
+| `pack-builder-taxonomy.schema.json` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-taxonomy.schema.json` |
+| `pack-builder-overlays.checklist.md` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-overlays.checklist.md` |
 
 Primary **MUST** generate only candidates that pass these checks (when bound). Record `standards_set_hash` alongside `prompt_version_hash` on emit.
 

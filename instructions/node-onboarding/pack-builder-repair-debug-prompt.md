@@ -3,9 +3,9 @@
 **Product:** DOGEstonia — Pack Builder (node onboarding)  
 **Role of this file:** Fill-in **repair / debug** template the operator pastes back into the Pack Builder dialogue after a **candidate validation fail**.  
 **Not** the primary Pack Builder body. **Not** the wrapper. **Not** Module-1 Story Interview Instructions.  
-**Traceability:** REQ-46 §5.0 repair · §5.1.6 · §6.3–4 · AC-GPT-REQ46-02 · GPT-PB-02 · STORY-GPT-PB-02  
-**Version:** 1.0 · **Date:** 2026-09-03  
-**prompt_version_hash:** `pb-repair-v1.0-20260903` (update when this body changes)
+**Traceability:** REQ-46 §5.0 repair · §5.1.6 · §6.3–4 · AC-GPT-REQ46-02 · GPT-PB-02 · GPT-PB-05 · STORY-GPT-PB-05  
+**Version:** 1.1 · **Date:** 2026-09-03  
+**prompt_version_hash:** `pb-repair-v1.1-20260903` (update when this body changes)
 
 **Path:** `GPT UI/instructions/node-onboarding/pack-builder-repair-debug-prompt.md`
 
@@ -43,7 +43,7 @@ emit (primary) → validate vs node-onboarding standards (when present)
 | 4 | Primary | Re-elicit failing parts; **regenerate** flat `schema-packs.*` set only (REQ-45a) |
 | 5 | Operator | Re-run validation; if fail — repeat from step 1 |
 
-**Wrapper orchestration** (fetch/pin primary + standards hashes) is finalized in GPT-PB-04 — name only here; do not invent wrapper body in this file.
+**Wrapper orchestration** (fetch/pin primary + standards hashes + remote URLs) — see `pack-builder-wrapper.md` §0–§1 (GPT-PB-04 / GPT-PB-05). Do not invent wrapper body in this file.
 
 **MUST NOT** “fix” validation by editing Module-1 interview process files (`story-interview-flow`, `api-orchestrator`, OpenAPI Actions, etc.).
 
@@ -80,18 +80,18 @@ Copy from `---` to `---` and fill every `[[…]]` slot.
 - [ ] Missing / wrong **flat** naming (nested path emitted)
 - [ ] Other: `[[OTHER]]`
 
-#### 2.3 Standards paths checked (bind by path; bodies may arrive with GPT-PB-03)
+#### 2.3 Standards paths checked (local + remote raw — GPT-PB-05)
 
-When present under `GPT UI/instructions/node-onboarding/`, cite which failed:
+Cite which failed (local checkout **or** fetched raw URL):
 
-| Standard path | Used? | Fail note |
-|---------------|-------|-----------|
-| `pack-builder-pack.schema.json` | `[[Y/N/PENDING]]` | `[[NOTE]]` |
-| `pack-builder-payload-schema.schema.json` | `[[Y/N/PENDING]]` | `[[NOTE]]` |
-| `pack-builder-taxonomy.schema.json` | `[[Y/N/PENDING]]` | `[[NOTE]]` |
-| `pack-builder-overlays.checklist.md` | `[[Y/N/PENDING]]` | `[[NOTE]]` |
+| Standard path (local) | Remote raw URL | Used? | Fail note |
+|-----------------------|----------------|-------|-----------|
+| `pack-builder-pack.schema.json` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-pack.schema.json` | `[[Y/N]]` | `[[NOTE]]` |
+| `pack-builder-payload-schema.schema.json` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-payload-schema.schema.json` | `[[Y/N]]` | `[[NOTE]]` |
+| `pack-builder-taxonomy.schema.json` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-taxonomy.schema.json` | `[[Y/N]]` | `[[NOTE]]` |
+| `pack-builder-overlays.checklist.md` | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-overlays.checklist.md` | `[[Y/N]]` | `[[NOTE]]` |
 
-If standards are **absent (PB-03 pending):** still request a corrected flat six-file emit; mark candidate `standards_pending_PB-03`; re-validate when standards land.
+Pin SSOT for URLs: `pack-builder-wrapper.md` §0–§1.
 
 #### 2.4 Operator intent for the fix (plain language)
 
@@ -161,9 +161,9 @@ Operator next step after a **successful** re-validate against `node-onboarding` 
 | Pack Builder tooling / repair duty | REQ-46 §5.0 · §5.1.6 · §6.3–4 |
 | App validate / repair (not this file) | REQ-APP-04 F2 |
 | Federation admission (not this file) | REQ4 F2–F5 |
-| Wrapper pin + hashes | GPT-PB-04 (future) |
-| Validation meta-schema bodies | GPT-PB-03 (future; paths named in §2.3) |
+| Wrapper pin + hashes + remote URLs | `pack-builder-wrapper.md` §0–§1 (GPT-PB-04 / GPT-PB-05) |
+| Validation meta-schema bodies | `pack-builder-*.schema.json` + overlays checklist (§2.3) |
 
 ---
 
-*End of Pack Builder repair / debug prompt v1.0*
+*End of Pack Builder repair / debug prompt v1.1*
