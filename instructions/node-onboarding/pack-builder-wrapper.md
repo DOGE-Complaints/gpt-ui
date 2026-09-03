@@ -19,7 +19,7 @@
 |-------|--------|
 | **Primary path (repo)** | `instructions/node-onboarding/pack-builder-primary-prompt.md` (git root = `gpt-ui`) |
 | **Primary raw/tag URL** | `https://raw.githubusercontent.com/DOGE-Complaints/gpt-ui/dev/instructions/node-onboarding/pack-builder-primary-prompt.md` |
-| **Primary pin tag / commit** | branch `dev` · commit `7f70ea64c2be6359986ec86e1cb1f0c309a9cff1` (pre–PB-05 tip; **re-pin to HEAD** after PB-05 commit/push) |
+| **Primary pin tag / commit** | branch `dev` · commit `a8544cb0d85393b170f8ab966e9d598ffb583d0f` (GPT-PB-05 pin) |
 | **`prompt_version_hash` (REQUIRED)** | `pb-primary-v1.1-20260903` — **MUST** match primary header; update when primary body changes |
 | **Standards directory** | `instructions/node-onboarding/` |
 | **`standards_set_hash` (RECOMMENDED)** | `sha256:258e13bfdd50e48ce980d4e4e12863e21c4c2896bc9bc675df562c5e7dd2f948` — sha256 of concat sha256 of: `pack-builder-overlays.checklist.md` + `pack-builder-pack.schema.json` + `pack-builder-payload-schema.schema.json` + `pack-builder-taxonomy.schema.json` (sorted by filename; concat per-file sha256 **hex** digests, then sha256); recompute when any standard changes |
