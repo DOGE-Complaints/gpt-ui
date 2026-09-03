@@ -5,7 +5,7 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 0.5 |
+| **Version** | 0.6 |
 | **Date** | 2026-07-06 |
 | **Traceability** | FR-M1-028…031 (session + trilingual fields); SPA field-shape alignment via [`story-data-model.md`](story-data-model.md) §4 |
 
@@ -79,12 +79,13 @@ Issue draft routes (`IssueCreateRequest.title` as a single string) remain out of
 
 For demo M2 Story Intake **stash** (`postStoryDraftStash`), `session_language` MUST be one of: `et`, `ru`, `en`.
 
+**SSOT declaration (instance):** active pack [`locale-jurisdiction.md`](schema-packs/README.md) §1 `working_languages` (tallinn: `et`, `ru`, `en`). This core section **enforces** the stash allowlist algorithm; do not invent languages here without lockstep gateway + pack locale update (GPT-SSR-13).
+
 - If `ui_lang` resolves to a language outside this set, the interview may proceed normally,
   but the orchestrator MUST block **stash** (§5.2.2 pre-flight) and explain the limitation to the user.
 - This restriction applies only to the Story Intake stash/submit step — the interview itself
   may be held in any language supported by the model.
-- Post-demo: expand allowlist per product decision; do not hardcode additional languages here
-  without a lockstep update to the gateway allowlist.
+- Post-demo: expand allowlist per product decision; update pack locale §1 and gateway allowlist in lockstep.
 
 ---
 
@@ -97,3 +98,4 @@ For demo M2 Story Intake **stash** (`postStoryDraftStash`), `session_language` M
 | 0.3 | 2026-04-25 | Added §6.1 runtime single-string bridge for GIM-74. |
 | 0.4 | 2026-04-27 | Added §6.2 demo language allowlist for M2 Story Intake (`et` \| `ru` \| `en`); aligns with [`api-orchestrator.md`](api-orchestrator.md) §5.2.2 pre-flight (GIM-97). |
 | 0.5 | 2026-07-06 | **GIM-197 / GPT-SUBMIT-01 propagation:** §6.1/§6.2 repointed from `POST /intake/stories` user-path to `postStoryDraftStash` stash + §5.2.2 pre-flight block. |
+| 0.6 | 2026-09-03 | **GPT-SSR-13:** §6.2 cites pack `locale-jurisdiction.md` as instance allowlist SSOT; core keeps enforce algorithm. |

@@ -50,12 +50,12 @@ Live flat JSON byte-identical to archived nested GPT copy (`cmp` ok at P3). Gate
 
 To point this Custom GPT at another node pack, follow **authoritative checklist** [`schema-pack-custom-model-operator-manual-ru.md` §5 v3](../../docs/runtime-docs/schema-pack-custom-model-operator-manual-ru.md) (byte-identical JSON copy-paste).
 
-**Summary (v4 — flat layout after GPT-SSR-11):**
+**Summary (v5 — flat layout + locale after GPT-SSR-13):**
 
 1. **Copy gateway JSON** — byte-identical `pack.json` + `payload.schema.json` + `taxonomy.json` from `doge-complaints-gateway/schema-packs/<new_schema_id>/<new_schema_version>/` into flat `schema-packs.<id>.<ver>.{pack.json,payload.schema.json,taxonomy.json}` under `instructions/` (optional `cmp` before upload).
-2. **Inbound + overlay** — add or update flat `schema-packs.<id>.<ver>.{inbound-validation,interview-overlay}.md`.
-3. **Active pair** — update **this README** + [`schema-packs.README.md`](../schema-packs.README.md) (`schema_id`, `schema_version`) and locked-path links.
-4. **Emit alignment** — orchestrator MUST emit binding pair matching the new active pair (GPT-SSR-03).
+2. **Inbound + overlay + locale** — add or update flat `schema-packs.<id>.<ver>.{inbound-validation,interview-overlay,locale-jurisdiction}.md`.
+3. **Active pair** — update **this README** + [`schema-packs.README.md`](../schema-packs.README.md) (`schema_id`, `schema_version`) and locked-path links (six-file set).
+4. **Emit alignment** — orchestrator MUST emit binding pair matching the new active pair (GPT-SSR-03); read locale for working languages / jurisdiction framing.
 5. **Upload Instructions** — core + flat pack artifacts + README index files. JSON/MD-only pack change → **no Actions re-import**.
 6. **Actions re-import** — **only** when OpenAPI / Actions schema changes (GPT-SSR-02).
 

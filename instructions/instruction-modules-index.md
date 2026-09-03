@@ -2,8 +2,8 @@
 
 | Поле | Значение |
 |------|----------|
-| **Версия индекса** | 0.43 |
-| **Date** | 2026-09-02 |
+| **Версия индекса** | 0.44 |
+| **Date** | 2026-09-03 |
 | **Scope** | Runtime navigation map for DOGEstonia Issue instructions; no task/epic dependency in operational sections. |
 
 This file is a navigation map for runtime instruction modules. The active production path is **DOGEstonia / Issue (Module 1)**. Legacy donor content is removed from the active runtime surface.
@@ -26,7 +26,7 @@ Use this index together with [`story-data-model.md`](story-data-model.md), pack 
 | [`story-policy-gate.md`](story-policy-gate.md) | Policy admission gate for Issue ingest (no HTTP calls). |
 | [`story-normalizer.md`](story-normalizer.md) | Builds `normalized_issue_payload` after gate approval. |
 | [`story-api-methods-reference.md`](story-api-methods-reference.md) | HTTP/OpenAPI reference for Issue actions and lockstep policy. |
-| [`schema-packs/README.md`](schema-packs/README.md) | Active node pack pair (`schema_id` / `schema_version`) + wave-2 bundle: `pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, `interview-overlay.md`. Non-executable JSON; gateway validates. |
+| [`schema-packs/README.md`](schema-packs/README.md) | Active node pack pair (`schema_id` / `schema_version`) + flat six-file set: `pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, `interview-overlay.md`, **`locale-jurisdiction.md`** (GPT-SSR-13). Non-executable JSON; gateway validates. |
 
 ---
 
@@ -66,6 +66,7 @@ with `base.md` as global constitution and `story-lifecycle-instructions.md` as c
 
 | Версия | Дата | Изменение |
 |--------|------|-----------|
+| 0.44 | 2026-09-03 | GPT-SSR-13: active pack bundle includes `locale-jurisdiction.md` (flat six-file set). |
 | 0.43 | 2026-09-02 | GPT-SSR-10: pack `taxonomy.json` enum SSOT; `story-label-taxonomy.md` redirect stub; process in ingest-validation. |
 | 0.41 | 2026-08-31 | GPT-SSR-01: schema-packs active pair + two overlay files (non-executable projections). |
 | 0.40 | 2026-04-27 | Self-contained instruction surface: internal links use bare filenames only; removed external repository references from the runtime index. |

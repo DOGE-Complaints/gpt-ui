@@ -2,7 +2,7 @@
 
 **Status:** Retired as enum SSOT (GPT-SSR-10 / GIM-326).
 
-**Enum / keys / axes / axis_to_signal_map:** active pack [`taxonomy.json`](schema-packs/README.md) (tallinn: [`schema-packs/tallinn_civic/v1/taxonomy.json`](schema-packs/tallinn_civic/v1/taxonomy.json)).
+**Enum / keys / axes / axis_to_signal_map:** active pack [`taxonomy.json`](schema-packs/README.md) (tallinn flat: [`schema-packs.tallinn_civic.v1.taxonomy.json`](schema-packs.tallinn_civic.v1.taxonomy.json)).
 
 **Disposition / admission lists:** pack [`inbound-validation.md`](schema-packs/README.md) §2.
 
