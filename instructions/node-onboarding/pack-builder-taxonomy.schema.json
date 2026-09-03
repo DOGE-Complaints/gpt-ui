@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dogestonia.local/pack-builder/pack-builder-taxonomy.schema.json",
+  "title": "Pack Builder meta-schema — candidate taxonomy.json",
+  "description": "Validates Pack Builder candidate taxonomy.json when taxonomy is required. Full top-level branches: axes, canonical_keys, axis_to_signal_map, dispositions, internal_axes (+ identity). Tallinn exemplar = short axis list + tiny canonical_keys sample — not the full Contour2 catalog. Protocol: gateway wins on federation drift; MUST NOT rewrite Module-1 process.",
+  "$comment": "REQ-46 §5.0 · GPT-PB-03 · AC-GPT-PB03-01/03/04 · gateway wins on drift · no Module-1 process edits",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "axes",
+    "canonical_keys",
+    "axis_to_signal_map",
+    "dispositions",
+    "internal_axes"
+  ],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "minLength": 1,
+      "examples": ["tallinn_civic"]
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1,
+      "examples": ["v1"]
+    },
+    "axes": {
+      "type": "array",
+      "description": "Ordered list of taxonomy axis ids. Tallinn-minimal may list a few axes only.",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "examples": [["topic_domain", "service_object", "location_context"]]
+    },
+    "canonical_keys": {
+      "type": "object",
+      "description": "Map axis_id → array of {key, meaning} (or equivalent objects). Full branch MUST exist; tallinn exemplar keeps 1–3 keys per shown axis.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["key"],
+          "additionalProperties": true,
+          "properties": {
+            "key": { "type": "string" },
+            "meaning": { "type": "string" }
+          }
+        }
+      },
+      "examples": [
+        {
+          "topic_domain": [
+            { "key": "transport", "meaning": "Public transport / mobility." }
+          ]
+        }
+      ]
+    },
+    "axis_to_signal_map": {
+      "type": "object",
+      "description": "Map axis_id → wire/signal field path or name.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string"
+      },
+      "examples": [
+        {
+          "topic_domain": "signals.civic_domain",
+          "service_object": "signals.service_object"
+        }
+      ]
+    },
+    "dispositions": {
+      "type": "array",
+      "description": "Disposition labels used by taxonomy (e.g. canonical, metadata_only).",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "examples": [["canonical", "metadata_only"]]
+    },
+    "internal_axes": {
+      "type": "array",
+      "description": "Internal/non-resident axes branch (MAY be empty array; MUST exist).",
+      "items": { "type": "string" },
+      "examples": [["risk_privacy_safety", "confidence_state"]]
+    }
+  },
+  "examples": [
+    {
+      "schema_id": "tallinn_civic",
+      "schema_version": "v1",
+      "axes": ["topic_domain", "service_object"],
+      "canonical_keys": {
+        "topic_domain": [
+          { "key": "transport", "meaning": "Public transport / mobility." }
+        ],
+        "service_object": [
+          { "key": "school", "meaning": "School as service object." }
+        ]
+      },
+      "axis_to_signal_map": {
+        "topic_domain": "signals.civic_domain",
+        "service_object": "signals.service_object"
+      },
+      "dispositions": ["canonical", "metadata_only"],
+      "internal_axes": ["confidence_state"]
+    }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dogestonia.local/pack-builder/pack-builder-pack.schema.json",
+  "title": "Pack Builder meta-schema — candidate pack.json",
+  "description": "Validates Pack Builder candidate pack.json. Full top-level branch skeleton required; tallinn_civic/v1 is a minimal exemplar only (not deep enrichment). Protocol: semantic align with gateway schema-packs; on federation drift gateway wins. MUST NOT rewrite Module-1 interview process.",
+  "$comment": "REQ-46 §5.0 · GPT-PB-03 · AC-GPT-PB03-01/03/04 · gateway wins on drift · no Module-1 process edits",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_id",
+    "schema_version",
+    "payload_schema",
+    "taxonomy_schema",
+    "field_policy",
+    "geo_intake",
+    "geo_model",
+    "gpt_instance_territory",
+    "exact_lenses",
+    "node_clustering"
+  ],
+  "properties": {
+    "schema_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Pack model id (not envelope m2.story_intake_envelope.v2).",
+      "examples": ["tallinn_civic"]
+    },
+    "schema_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Semantic pack version string.",
+      "examples": ["v1"]
+    },
+    "payload_schema": {
+      "type": "string",
+      "description": "Relative or logical pointer to companion payload schema artifact name.",
+      "examples": ["payload.schema.json"]
+    },
+    "taxonomy_schema": {
+      "type": "string",
+      "description": "Relative or logical pointer to companion taxonomy artifact name.",
+      "examples": ["taxonomy.json"]
+    },
+    "field_policy": {
+      "type": "object",
+      "description": "Map of field path → policy (e.g. required / optional / forbidden). Full branch MUST exist; tallinn exemplar uses a small signal/geo subset.",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string"
+      },
+      "examples": [
+        {
+          "signals.civic_domain": "required",
+          "geo.settlement": "optional"
+        }
+      ]
+    },
+    "geo_intake": {
+      "type": "object",
+      "description": "Geo intake mode/merge/mirror branch (MUST present as object).",
+      "required": ["mode"],
+      "additionalProperties": true,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "examples": ["optional", "required", "disabled"]
+        },
+        "merge": { "type": "boolean" },
+        "mirror_to_payload": { "type": "boolean" }
+      },
+      "examples": [
+        { "mode": "optional", "merge": true, "mirror_to_payload": true }
+      ]
+    },
+    "geo_model": {
+      "type": "object",
+      "description": "Geo model / precision branch. MUST include precision_levels skeleton; tallinn lists a short level set only.",
+      "required": ["precision_levels"],
+      "additionalProperties": true,
+      "properties": {
+        "precision_levels": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "examples": [["region", "settlement"]]
+        },
+        "default_precision_inference": {
+          "description": "Optional inference table/object; structure free at meta level."
+        }
+      }
+    },
+    "gpt_instance_territory": {
+      "type": "object",
+      "description": "GPT-instance territory hooks (enabled + rules). Tallinn exemplar: settlement=tallinn only — do not copy deep rule catalogs.",
+      "required": ["enabled", "rules"],
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "rules": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      },
+      "examples": [
+        {
+          "enabled": true,
+          "rules": [
+            { "type": "admin_token", "level": "settlement", "value": "tallinn" }
+          ]
+        }
+      ]
+    },
+    "exact_lenses": {
+      "type": "array",
+      "description": "Exact-lens definitions branch (MAY be empty array for non-clustering nodes; branch MUST exist).",
+      "items": {
+        "type": "object",
+        "required": ["lens_id", "source_fields", "algorithm"],
+        "additionalProperties": true,
+        "properties": {
+          "lens_id": { "type": "string" },
+          "source_fields": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "algorithm": { "type": "string" }
+        }
+      }
+    },
+    "node_clustering": {
+      "type": "object",
+      "description": "Node clustering branch object (MAY be empty {}; MUST exist as object).",
+      "additionalProperties": true,
+      "examples": [{ "civic": {} }]
+    },
+    "card_fields": {
+      "type": "array",
+      "description": "Optional card_fields branch — when present, array of field paths.",
+      "items": { "type": "string" },
+      "examples": [["signals.desired_outcome", "signals.affected_group"]]
+    }
+  },
+  "examples": [
+    {
+      "schema_id": "tallinn_civic",
+      "schema_version": "v1",
+      "payload_schema": "payload.schema.json",
+      "taxonomy_schema": "taxonomy.json",
+      "field_policy": {
+        "signals.civic_domain": "required",
+        "geo.settlement": "optional"
+      },
+      "geo_intake": {
+        "mode": "optional",
+        "merge": true,
+        "mirror_to_payload": true
+      },
+      "geo_model": {
+        "precision_levels": ["region", "settlement"]
+      },
+      "gpt_instance_territory": {
+        "enabled": true,
+        "rules": [
+          { "type": "admin_token", "level": "settlement", "value": "tallinn" }
+        ]
+      },
+      "exact_lenses": [],
+      "node_clustering": {},
+      "card_fields": ["signals.desired_outcome"]
+    }
+  ]
+}

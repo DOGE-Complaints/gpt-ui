@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dogestonia.local/pack-builder/pack-builder-payload-schema.schema.json",
+  "title": "Pack Builder meta-schema — candidate payload.schema.json",
+  "description": "Validates Pack Builder candidate payload.schema.json (a JSON Schema document). Requires top-level JSON Schema skeleton plus properties.signals and properties.geo branches. Tallinn exemplar = minimal signal/geo property names only — not deep enum catalogs. Protocol: gateway wins on federation drift; MUST NOT rewrite Module-1 process.",
+  "$comment": "REQ-46 §5.0 · GPT-PB-03 · AC-GPT-PB03-01/03/04 · gateway wins on drift · no Module-1 process edits",
+  "type": "object",
+  "required": ["$schema", "type", "properties"],
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema dialect URI for the candidate payload schema.",
+      "examples": ["https://json-schema.org/draft/2020-12/schema"]
+    },
+    "type": {
+      "description": "Root type of the intake payload object.",
+      "examples": ["object"]
+    },
+    "additionalProperties": {
+      "description": "Candidate MAY set additionalProperties; tallinn uses false."
+    },
+    "required": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Required payload branches; tallinn-minimal typically includes signals.",
+      "examples": [["signals"]]
+    },
+    "properties": {
+      "type": "object",
+      "description": "MUST expose top-level structural branches signals and geo (geo MAY be optional at instance level but branch SHOULD be declared for GPT-facing packs).",
+      "required": ["signals"],
+      "properties": {
+        "signals": {
+          "type": "object",
+          "description": "Signals object schema branch. Tallinn-minimal: declare property keys (civic_domain, failure_pattern, …) without copying full enum lists into this meta-schema.",
+          "required": ["type", "properties"],
+          "properties": {
+            "type": { "const": "object" },
+            "properties": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": { "type": "object" }
+            },
+            "required": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        },
+        "geo": {
+          "type": "object",
+          "description": "Geo object schema branch (district/settlement/region/… skeleton). Tallinn-minimal property names only.",
+          "properties": {
+            "type": { "const": "object" },
+            "properties": {
+              "type": "object",
+              "additionalProperties": { "type": "object" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "examples": [
+    {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["signals"],
+      "properties": {
+        "signals": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "civic_domain": { "type": "string" },
+            "failure_pattern": { "type": "string" }
+          }
+        },
+        "geo": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "settlement": { "type": "string" },
+            "region": { "type": "string" },
+            "detail_level": { "type": "string" }
+          }
+        }
+      }
+    }
+  ]
+}
