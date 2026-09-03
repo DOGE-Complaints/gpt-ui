@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 2.0 |
+| **Version** | 2.1 |
 | **Date** | 2026-09-03 |
-| **Traceability** | GPT-SSR-11 / REQ-45a §5–§6; GPT-SSR-09 capstone |
+| **Traceability** | GPT-SSR-12 / GIM-345; GPT-SSR-11 / REQ-45a §5–§6; GPT-SSR-09 capstone |
 
 **SEC-001:** Gateway Schema Runtime remains authoritative. Pack JSON is **read-only reference** in GPT. Do **not** run validate inside GPT.
 
@@ -25,8 +25,7 @@
 - [`schema-packs.tallinn_civic.v1.taxonomy.json`](schema-packs.tallinn_civic.v1.taxonomy.json)
 - [`schema-packs.tallinn_civic.v1.inbound-validation.md`](schema-packs.tallinn_civic.v1.inbound-validation.md)
 - [`schema-packs.tallinn_civic.v1.interview-overlay.md`](schema-packs.tallinn_civic.v1.interview-overlay.md)
-
-**Not in this story (SSR-12):** `schema-packs.tallinn_civic.v1.locale-jurisdiction.md` — deferred.
+- [`schema-packs.tallinn_civic.v1.locale-jurisdiction.md`](schema-packs.tallinn_civic.v1.locale-jurisdiction.md)
 
 **Core pointer retarget (SSR-13):** orchestrator / normalizer / ingest links still use [`schema-packs/README.md`](schema-packs/README.md) until SSR-13.
 

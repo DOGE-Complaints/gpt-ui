@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 2.0 |
+| **Version** | 2.1 |
 | **Date** | 2026-09-03 |
-| **Traceability** | REQ-45a §5–§6; GPT-SSR-11; GPT-SSR-09 capstone; REQ3-AC-016 |
+| **Traceability** | GPT-SSR-12 / GIM-345; REQ-45a §5–§6; GPT-SSR-11; GPT-SSR-09 capstone; REQ3-AC-016 |
 
 This directory holds **navigation + operator runbook**. Live upload SSOT for the active instance is **flat** under `instructions/` (GPT-SSR-11). See also [`schema-packs.README.md`](../schema-packs.README.md).
 
@@ -29,8 +29,7 @@ Pattern: `schema-packs.<schema_id>.<schema_version>.<artifact>` (REQ-45a §5).
 - [`schema-packs.tallinn_civic.v1.taxonomy.json`](../schema-packs.tallinn_civic.v1.taxonomy.json)
 - [`schema-packs.tallinn_civic.v1.inbound-validation.md`](../schema-packs.tallinn_civic.v1.inbound-validation.md)
 - [`schema-packs.tallinn_civic.v1.interview-overlay.md`](../schema-packs.tallinn_civic.v1.interview-overlay.md)
-
-**Deferred (SSR-12):** `schema-packs.tallinn_civic.v1.locale-jurisdiction.md` — not created in SSR-11.
+- [`schema-packs.tallinn_civic.v1.locale-jurisdiction.md`](../schema-packs.tallinn_civic.v1.locale-jurisdiction.md)
 
 **Nested instance retired (SSR-11):** no nested upload SSOT under `schema-packs/`. Archive: [`archive/schema-packs-nested-tallinn_civic-v1/`](../archive/schema-packs-nested-tallinn_civic-v1/). Redirect stub: [`tallinn_civic/README.md`](tallinn_civic/README.md) (if present).
 
@@ -42,7 +41,8 @@ Pattern: `schema-packs.<schema_id>.<schema_version>.<artifact>` (REQ-45a §5).
 | `*.payload.schema.json` | Required signals / geo shape — **read-only reference** | Non-executable |
 | `*.taxonomy.json` | 13 axes, canonical keys, axis_to_signal_map — **read-only reference** | Non-executable |
 | `*.inbound-validation.md` | Content / admission rules (dual contour) | GPT process |
-| `*.interview-overlay.md` | Geo canon, phase→axes, ecosystem cues | GPT process |
+| `*.interview-overlay.md` | Geo formation pointers, phase→axes, ecosystem cues | GPT process |
+| `*.locale-jurisdiction.md` | Working languages, script policy, jurisdiction framing, STOP copy language | GPT process |
 
 Live flat JSON byte-identical to archived nested GPT copy (`cmp` ok at P3). Gateway nested layout unchanged (AC-GPT-REQ45a scope).
 
@@ -79,12 +79,11 @@ To point this Custom GPT at another node pack, follow **authoritative checklist*
 | Pack `.md` / JSON only | Upload Instructions. No Actions re-import. |
 | OpenAPI / Actions schema | GPT-SSR-02 + Actions re-import. |
 
-## Wave 4 handoff (SSR-12 / SSR-13)
+## Wave 4 handoff (SSR-13)
 
 | Item | Story |
 |------|-------|
-| `schema-packs.tallinn_civic.v1.locale-jurisdiction.md` | **SSR-12** — sixth prose identity on flat path |
-| Core Module-1 links → flat paths | **SSR-13** — orchestrator / normalizer / ingest retarget |
+| Core Module-1 links → flat paths + allowlist read pack locale | **SSR-13** — orchestrator / normalizer / ingest retarget |
 
 ## Out of this file
 
