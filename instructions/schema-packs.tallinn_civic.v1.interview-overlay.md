@@ -5,9 +5,9 @@
 
 | Field | Value |
 |-------|--------|
-| **Version** | 1.1 |
-| **Date** | 2026-09-01 |
-| **Traceability** | GPT-SSR-08 / GIM-312–314; GPT-SSR-09 / GIM-308; migrated from archived `archive/data-model.v1.3.md` §4–§5 |
+| **Version** | 1.2 |
+| **Date** | 2026-09-03 |
+| **Traceability** | GPT-SSR-12 / GIM-343–344; GPT-SSR-08 / GIM-312–314; GPT-SSR-09 / GIM-308; migrated from archived `archive/data-model.v1.3.md` §4–§5 |
 | **Binding pair** | `schema_id=tallinn_civic`, `schema_version=v1` |
 
 **SEC-001:** Gateway Schema Runtime validates JSON. This file is GPT process overlay only.
@@ -16,15 +16,7 @@
 
 Process (when to form / omit `location_query` per **mode**) stays in [`story-normalizer.md`](story-normalizer.md) §4.6. Read `geo_intake.mode` from same-pack [`schema-packs.tallinn_civic.v1.pack.json`](schema-packs.tallinn_civic.v1.pack.json) (not prose here).
 
-**Format — prefer Latin script:** freeform `<street/place>, <city>` in Latin (e.g. `Tallinn`, `Kalamaja, Tallinn`, `Tartu mnt 80, Tallinn`). Cyrillic is acceptable when the resident used it and Latin transliteration would distort meaning.
-
-**City-level canonicalization:** when the confirmed location is **city-level only** (no street, district, or landmark), canonicalize to `<City>, Estonia` in Latin:
-
-- `Tallinn` → `Tallinn, Estonia`
-- `Tallinn, Estonia` → `Tallinn, Estonia` (already canonical)
-- `Tallinna linn` → `Tallinn, Estonia`
-
-When the string includes district, street, or landmark detail, **preserve** that detail — do not collapse to city-only. Do not append `, Estonia` when it would simplify a more specific address the resident confirmed.
+**Script policy and city-level jurisdiction canon** for place strings: read same-pack [`schema-packs.tallinn_civic.v1.locale-jurisdiction.md`](schema-packs.tallinn_civic.v1.locale-jurisdiction.md) §2–§3. Apply locale §3 city canon when forming `location_query` at city-level only; preserve street/district/landmark detail when the resident confirmed more.
 
 **Reconcile with `mode=optional`:** this pack does **not** require `location_query` when a place is confirmed. Core MUST NOT force `location_query` for this instance. MAY still form it when the resident gave a place.
 
