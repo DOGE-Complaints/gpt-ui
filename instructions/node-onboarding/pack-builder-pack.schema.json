@@ -2,19 +2,16 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://dogestonia.local/pack-builder/pack-builder-pack.schema.json",
   "title": "Pack Builder meta-schema — candidate pack.json",
-  "description": "Validates Pack Builder candidate pack.json. Full top-level branch skeleton required; tallinn_civic/v1 is a minimal exemplar only (not deep enrichment). Protocol: semantic align with gateway schema-packs; on federation drift gateway wins. MUST NOT rewrite Module-1 interview process. GPT-PB-06: exact_lenses = ExactLensBlock + minItems 1; node_clustering.civic = _CIVIC_REQUIRED_KEYS + ClusterLens. GPT-PB-07: geo_intake.mode ∈ GEO_INTAKE_MODES; geo_intake keys mode/merge/mirror_to_payload only; field_policy values ∈ FIELD_POLICY_STATES.",
-  "$comment": "REQ-46 §5.0 · GPT-PB-03 · GPT-PB-06 · GPT-PB-07 · AC-GPT-PB07-01…03 · handoff Part A 2026-09-04 · cite contracts.py GEO_INTAKE_MODES L75–77 / FIELD_POLICY_STATES L10–20 · resolver.py _parse_geo_intake L420–447 · ExactLensBlock/ClusterLens (PB-06) · gateway wins on drift · no Module-1 process edits · standards_set_hash → PB-09",
+  "description": "Validates Pack Builder candidate pack.json. Core branches required; tallinn_civic/v1 is a minimal exemplar only (not deep enrichment). Protocol: semantic align with gateway schema-packs; on federation drift gateway wins. MUST NOT rewrite Module-1 interview process. GPT-PB-06: exact_lenses = ExactLensBlock + minItems 1; node_clustering.civic = _CIVIC_REQUIRED_KEYS + ClusterLens. GPT-PB-07: geo_intake.mode ∈ GEO_INTAKE_MODES; geo_intake keys mode/merge/mirror_to_payload only; field_policy values ∈ FIELD_POLICY_STATES. GPT-PB-09: taxonomy_schema / geo_model / gpt_instance_territory optional (typed if present) — align gateway optional keys.",
+  "$comment": "REQ-46 §5.0 · GPT-PB-03 · GPT-PB-06 · GPT-PB-07 · GPT-PB-09 · AC-GPT-PB09-01…04 · handoff Part A 2026-09-04 · optional geo_model/gpt_instance_territory/taxonomy_schema · cite contracts.py GEO_INTAKE_MODES / FIELD_POLICY_STATES · ExactLensBlock/ClusterLens (PB-06) · gateway wins on drift · no Module-1 · standards_set_hash in wrapper",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "schema_id",
     "schema_version",
     "payload_schema",
-    "taxonomy_schema",
     "field_policy",
     "geo_intake",
-    "geo_model",
-    "gpt_instance_territory",
     "exact_lenses",
     "node_clustering"
   ],
@@ -38,7 +35,8 @@
     },
     "taxonomy_schema": {
       "type": "string",
-      "description": "Relative or logical pointer to companion taxonomy artifact name.",
+      "description": "Optional pointer to companion taxonomy artifact (typed if present). Gateway treats taxonomy as optional; omit when pack has no taxonomy.json.",
+      "$comment": "GPT-PB-09 T01 · optional like gateway",
       "examples": ["taxonomy.json"]
     },
     "field_policy": {
@@ -90,7 +88,8 @@
     },
     "geo_model": {
       "type": "object",
-      "description": "Geo model / precision branch. MUST include precision_levels skeleton; tallinn lists a short level set only.",
+      "description": "Optional geo model / precision branch (typed if present). When present MUST include precision_levels; tallinn lists a short level set only.",
+      "$comment": "GPT-PB-09 T01 · optional like gateway",
       "required": ["precision_levels"],
       "additionalProperties": true,
       "properties": {
@@ -107,7 +106,8 @@
     },
     "gpt_instance_territory": {
       "type": "object",
-      "description": "GPT-instance territory hooks (enabled + rules). Tallinn exemplar: settlement=tallinn only — do not copy deep rule catalogs.",
+      "description": "Optional GPT-instance territory hooks (typed if present). When present MUST include enabled + rules. Tallinn exemplar: settlement=tallinn only — do not copy deep rule catalogs.",
+      "$comment": "GPT-PB-09 T01 · optional like gateway",
       "required": ["enabled", "rules"],
       "additionalProperties": true,
       "properties": {

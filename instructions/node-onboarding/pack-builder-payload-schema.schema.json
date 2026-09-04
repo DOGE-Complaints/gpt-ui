@@ -3,7 +3,7 @@
   "$id": "https://dogestonia.local/pack-builder/pack-builder-payload-schema.schema.json",
   "title": "Pack Builder meta-schema — candidate payload.schema.json",
   "description": "Validates Pack Builder candidate payload.schema.json (a JSON Schema document). Requires top-level JSON Schema skeleton plus properties.signals and properties.geo branches. Tallinn exemplar = minimal signal/geo property names only — not deep enum catalogs. Protocol: gateway wins on federation drift; MUST NOT rewrite Module-1 process.",
-  "$comment": "REQ-46 §5.0 · GPT-PB-03 · AC-GPT-PB03-01/03/04 · gateway wins on drift · no Module-1 process edits",
+  "$comment": "REQ-46 §5.0 · GPT-PB-03 · GPT-PB-09 · AC-GPT-PB09-03 · requiring properties.signals is Pack Builder authoring aid; gateway load_pack only needs payload schema object — not a false load gate · gateway wins on drift · no Module-1 process edits",
   "type": "object",
   "required": ["$schema", "type", "properties"],
   "additionalProperties": true,
