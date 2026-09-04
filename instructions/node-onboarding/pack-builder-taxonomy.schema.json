@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://dogestonia.local/pack-builder/pack-builder-taxonomy.schema.json",
   "title": "Pack Builder meta-schema — candidate taxonomy.json",
-  "description": "Validates Pack Builder candidate taxonomy.json when taxonomy is required. Full top-level branches: axes, canonical_keys, axis_to_signal_map, dispositions, internal_axes (+ identity). Tallinn exemplar = short axis list + tiny canonical_keys sample — not the full Contour2 catalog. Protocol: gateway wins on federation drift; MUST NOT rewrite Module-1 process.",
-  "$comment": "REQ-46 §5.0 · GPT-PB-03 · AC-GPT-PB03-01/03/04 · gateway wins on drift · no Module-1 process edits",
+  "description": "Validates Pack Builder candidate taxonomy.json when taxonomy is required. Full top-level branches: axes, canonical_keys, axis_to_signal_map, dispositions, internal_axes (+ identity). Contour2 axes are FREE pack-defined unique strings (minItems 1) — MUST NOT lock to 13 (D-SSR-11 / SSR-31 / GPT-PB-08). dispositions ∈ LABEL_DISPOSITION_VALUES. internal_axes MUST be ⊆ axes (document + Pack Builder enforce; gateway rejects violations at load). Tallinn exemplar = short axis list — not full Contour2 catalog. Protocol: gateway wins on federation drift; MUST NOT rewrite Module-1 process.",
+  "$comment": "REQ-46 §5.0 · GPT-PB-03 · GPT-PB-08 · AC-GPT-PB08-01…03 · handoff Part A 2026-09-04 · D-SSR-11 free Contour2 · disposition.py LABEL_DISPOSITION_VALUES L6–14 · resolver.py internal_axes ⊆ axes L297–312 · invert GPT-SSR-15 (do not lock axes to 13) · gateway wins on drift · no Module-1 · standards_set_hash → PB-09",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -28,8 +28,10 @@
     },
     "axes": {
       "type": "array",
-      "description": "Ordered list of taxonomy axis ids. Tallinn-minimal may list a few axes only.",
+      "description": "Ordered list of Contour2 taxonomy axis ids — FREE pack-defined non-empty unique strings. MUST NOT require exactly 13 or enum to TAXONOMY_AXIS_VALUES (post D-SSR-11). Tallinn-minimal may list a few axes only.",
+      "$comment": "GPT-PB-08 T01 · free axes · MUST NOT lock-to-13 · uniqueItems",
       "minItems": 1,
+      "uniqueItems": true,
       "items": { "type": "string", "minLength": 1 },
       "examples": [["topic_domain", "service_object", "location_context"]]
     },
@@ -73,16 +75,29 @@
     },
     "dispositions": {
       "type": "array",
-      "description": "Disposition labels used by taxonomy (e.g. canonical, metadata_only).",
+      "description": "Disposition labels ∈ LABEL_DISPOSITION_VALUES (disposition.py).",
+      "$comment": "GPT-PB-08 T02 · five LabelDisposition values",
       "minItems": 1,
-      "items": { "type": "string" },
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "canonical",
+          "metadata_only",
+          "needs_clarification",
+          "rejected",
+          "internal"
+        ]
+      },
       "examples": [["canonical", "metadata_only"]]
     },
     "internal_axes": {
       "type": "array",
-      "description": "Internal/non-resident axes branch (MAY be empty array; MUST exist).",
-      "items": { "type": "string" },
-      "examples": [["risk_privacy_safety", "confidence_state"]]
+      "description": "Internal/non-resident axes. MUST exist (MAY be empty). Every entry MUST be ∈ axes[] (subset); Pack Builder primary/repair MUST enforce ⊆ — JSON Schema cannot cross-reference array membership; gateway resolver.py L307–310 rejects violations at load.",
+      "$comment": "GPT-PB-08 T03 · internal_axes ⊆ axes · uniqueItems · soft PB-09 checklist",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 },
+      "examples": [[]]
     }
   },
   "examples": [
@@ -103,7 +118,7 @@
         "service_object": "signals.service_object"
       },
       "dispositions": ["canonical", "metadata_only"],
-      "internal_axes": ["confidence_state"]
+      "internal_axes": []
     }
   ]
 }
