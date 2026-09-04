@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://dogestonia.local/pack-builder/pack-builder-pack.schema.json",
   "title": "Pack Builder meta-schema — candidate pack.json",
-  "description": "Validates Pack Builder candidate pack.json. Full top-level branch skeleton required; tallinn_civic/v1 is a minimal exemplar only (not deep enrichment). Protocol: semantic align with gateway schema-packs; on federation drift gateway wins. MUST NOT rewrite Module-1 interview process. GPT-PB-06: exact_lenses items = ExactLensBlock (incl. readiness_policy); exact_lenses minItems 1; node_clustering requires civic with _CIVIC_REQUIRED_KEYS; active_lenses/primary_lens ∈ ClusterLens.",
-  "$comment": "REQ-46 §5.0 · GPT-PB-03 · GPT-PB-06 · AC-GPT-PB06-01…04 · handoff Part A 2026-09-04 · cite contracts.py ExactLensBlock/ReadinessPolicy · resolver.py L35–47/_parse_lens L605–617/exact non-empty L650–652 · types.py ClusterLens · gateway wins on drift · no Module-1 process edits · standards_set_hash → PB-09",
+  "description": "Validates Pack Builder candidate pack.json. Full top-level branch skeleton required; tallinn_civic/v1 is a minimal exemplar only (not deep enrichment). Protocol: semantic align with gateway schema-packs; on federation drift gateway wins. MUST NOT rewrite Module-1 interview process. GPT-PB-06: exact_lenses = ExactLensBlock + minItems 1; node_clustering.civic = _CIVIC_REQUIRED_KEYS + ClusterLens. GPT-PB-07: geo_intake.mode ∈ GEO_INTAKE_MODES; geo_intake keys mode/merge/mirror_to_payload only; field_policy values ∈ FIELD_POLICY_STATES.",
+  "$comment": "REQ-46 §5.0 · GPT-PB-03 · GPT-PB-06 · GPT-PB-07 · AC-GPT-PB07-01…03 · handoff Part A 2026-09-04 · cite contracts.py GEO_INTAKE_MODES L75–77 / FIELD_POLICY_STATES L10–20 · resolver.py _parse_geo_intake L420–447 · ExactLensBlock/ClusterLens (PB-06) · gateway wins on drift · no Module-1 process edits · standards_set_hash → PB-09",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -43,10 +43,20 @@
     },
     "field_policy": {
       "type": "object",
-      "description": "Map of field path → policy (e.g. required / optional / forbidden). Full branch MUST exist; tallinn exemplar uses a small signal/geo subset. Enum lock → GPT-PB-07.",
+      "description": "Map of field path → policy state. Values MUST ∈ FIELD_POLICY_STATES (contracts.py L10–20). Full branch MUST exist; tallinn exemplar uses a small signal/geo subset.",
+      "$comment": "GPT-PB-07 T03 · FIELD_POLICY_STATES ×7 · resolver.py L645–648",
       "minProperties": 1,
       "additionalProperties": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "required",
+          "optional",
+          "disabled",
+          "forbidden",
+          "node_private",
+          "derived",
+          "computed_aggregate_only"
+        ]
       },
       "examples": [
         {
@@ -57,13 +67,19 @@
     },
     "geo_intake": {
       "type": "object",
-      "description": "Geo intake mode/merge/mirror branch (MUST present as object). Mode enum lock → GPT-PB-07.",
-      "required": ["mode"],
-      "additionalProperties": true,
+      "description": "Geo intake GeoIntakeBlock: mode + merge + mirror_to_payload only (resolver.py _parse_geo_intake). mode ∈ GEO_INTAKE_MODES.",
+      "$comment": "GPT-PB-07 T01/T02 · GEO_INTAKE_MODES contracts.py L75–77 · unknown keys reject",
+      "required": ["mode", "merge", "mirror_to_payload"],
+      "additionalProperties": false,
       "properties": {
         "mode": {
           "type": "string",
-          "examples": ["optional", "required", "disabled"]
+          "enum": [
+            "optional",
+            "require_location_or_detail",
+            "require_detail"
+          ],
+          "description": "Gateway GEO_INTAKE_MODES only — not 'required' or 'disabled'."
         },
         "merge": { "type": "boolean" },
         "mirror_to_payload": { "type": "boolean" }
