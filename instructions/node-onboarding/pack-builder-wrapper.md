@@ -4,8 +4,8 @@
 **Role of this file:** Thin **wrapper** that tells an operator / hosting surface how to **fetch/pin** the remote primary prompt and **bind** validation standards — then start the Pack Builder dialogue.  
 **Not** the primary Pack Builder body. **Not** the repair/debug template. **Not** Module-1 Story Interview Instructions.  
 **MUST NOT embed** the full primary instruction text here — pin by path/URL/tag only.  
-**Traceability:** REQ-46 §5.0 wrapper · §6 · AC-GPT-REQ46-02/08 · GPT-PB-04 · GPT-PB-05 · STORY-GPT-PB-05  
-**Version:** 1.1 · **Date:** 2026-09-03  
+**Traceability:** REQ-46 §5.0 wrapper · §6 · AC-GPT-REQ46-02/08 · GPT-PB-04 · GPT-PB-05 · STORY-GPT-PB-05 · GPT-PB-09  
+**Version:** 1.2 · **Date:** 2026-09-04  
 
 **Path:** `GPT UI/instructions/node-onboarding/pack-builder-wrapper.md`
 
@@ -22,9 +22,9 @@
 | **Primary pin tag / commit** | branch `dev` · commit `a8544cb0d85393b170f8ab966e9d598ffb583d0f` (GPT-PB-05 pin) |
 | **`prompt_version_hash` (REQUIRED)** | `pb-primary-v1.1-20260903` — **MUST** match primary header; update when primary body changes |
 | **Standards directory** | `instructions/node-onboarding/` |
-| **`standards_set_hash` (RECOMMENDED)** | `sha256:258e13bfdd50e48ce980d4e4e12863e21c4c2896bc9bc675df562c5e7dd2f948` — sha256 of concat sha256 of: `pack-builder-overlays.checklist.md` + `pack-builder-pack.schema.json` + `pack-builder-payload-schema.schema.json` + `pack-builder-taxonomy.schema.json` (sorted by filename; concat per-file sha256 **hex** digests, then sha256); recompute when any standard changes |
+| **`standards_set_hash` (RECOMMENDED)** | `sha256:dccaebbb44575378902f22eae49d0a6e94645745b925f7cd4956e0d39dd6ffd7` — sha256 of concat sha256 of: `pack-builder-overlays.checklist.md` + `pack-builder-pack.schema.json` + `pack-builder-payload-schema.schema.json` + `pack-builder-taxonomy.schema.json` (sorted by filename; concat per-file sha256 **hex** digests, then sha256); recompute when any standard changes |
 | **Repair template path** | `pack-builder-repair-debug-prompt.md` |
-| **Wrapper version** | `1.1` · `pb-wrapper-v1.1-20260903` |
+| **Wrapper version** | `1.2` · `pb-wrapper-v1.2-20260904` |
 
 Raw URLs are **public** (no auth). To freeze a release, pin a **tag** or immutable commit SHA instead of floating `dev`.
 

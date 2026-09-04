@@ -3,8 +3,8 @@
 **Product:** DOGEstonia — Pack Builder validation standards  
 **Role of this file:** Presence/shape checklist for the **three** GPT pack prose identities (REQ-45a §4). Used with the JSON meta-schemas to accept/reject a candidate flat pack.  
 **Not** Module-1 Story Interview process. **Not** primary/repair/wrapper bodies.  
-**Traceability:** REQ-46 §5.0 overlays checklist · AC-GPT-REQ46-09 · REQ-45a §4–§6 · GPT-PB-03 · AC-GPT-PB03-02/04  
-**Version:** 1.0 · **Date:** 2026-09-03  
+**Traceability:** REQ-46 §5.0 overlays checklist · AC-GPT-REQ46-09 · REQ-45a §4–§6 · GPT-PB-03 · AC-GPT-PB03-02/04 · GPT-PB-09 · AC-GPT-PB09-02/03  
+**Version:** 1.1 · **Date:** 2026-09-04  
 
 **Path:** `GPT UI/instructions/node-onboarding/pack-builder-overlays.checklist.md`
 
@@ -90,19 +90,42 @@ Check **presence and shape**, not empty stubs and not “content lives only in c
 
 ---
 
-## 4. Operator tick-box (copy into repair / validate notes)
+## 5. Advisory — gateway load gates (Pack Builder ↔ load_pack)
+
+> **Advisory only:** `load_pack` does **not** read prose MD overlays. This section complements §1–§4 so operators catch false-admission before gateway admission. Cite gateway contracts / resolver — do not invent enums.
+
+| Gate | Pack Builder check | Gateway cite (concept) |
+|------|--------------------|------------------------|
+| **exact_lenses readiness** | Each exact lens has nested `readiness_policy` (ExactLensBlock) | PB-06 / contracts ExactLensBlock |
+| **civic clustering** | `node_clustering.civic` present with `_CIVIC_REQUIRED_KEYS`; lens ∈ ClusterLens set | PB-06 |
+| **geo_intake.mode** | ∈ `optional` \| `require_location_or_detail` \| `require_detail` only | GEO_INTAKE_MODES · PB-07 |
+| **field_policy values** | ∈ seven `FIELD_POLICY_STATES` | contracts.py · PB-07 |
+| **optional pack keys** | `geo_model` / `gpt_instance_territory` / `taxonomy_schema` MAY be omitted; validate shape **when present** | Part A drift · PB-09 |
+| **Contour2 axes** | Node-defined free unique strings (`minItems: 1`) | D-SSR-11 / SSR-31 / GPT-PB-08 |
+
+**MUST NOT:** Require Contour2 `axes` equality to tallinn **13** (`TAXONOMY_AXIS_VALUES` lockstep). Checklist and meta **forbid** «axes must equal 13».
+
+**Payload authoring note (not a hard load gate):** Pack Builder payload meta may require `properties.signals` as an authoring aid. Gateway `load_pack` only needs a JSON Schema **object** for payload — missing deep `signals` shape is **not** by itself a false load gate (Part A). See `pack-builder-payload-schema.schema.json` `$comment`.
+
+**Parent analysis:** `doge-complaints-gateway/docs/analysis/uus-veerenni-civic-v1-gateway-load-blockers-handoff-2026-09-04.md` Part A.
+
+---
+
+## 6. Operator tick-box (copy into repair / validate notes)
 
 ```text
 schema_id / schema_version: [[PAIR]]
 [ ] pack.json validates vs pack-builder-pack.schema.json
 [ ] payload.schema.json validates vs pack-builder-payload-schema.schema.json
-[ ] taxonomy.json validates vs pack-builder-taxonomy.schema.json (if required)
+[ ] taxonomy.json validates vs pack-builder-taxonomy.schema.json (if present / required by emit)
 [ ] inbound-validation.md present + non-empty (identity 1)
 [ ] interview-overlay.md present + non-empty (identity 2)
 [ ] locale-jurisdiction.md present + non-empty (identity 3)
 [ ] flat schema-packs.* names only
 [ ] gateway-wins acknowledged on federation drift
 [ ] no Module-1 process edits
+[ ] advisory load gates §5 reviewed (readiness / civic / geo / field_policy)
+[ ] Contour2 axes NOT forced to tallinn 13
 ```
 
 **Pass:** all applicable boxes checked.  

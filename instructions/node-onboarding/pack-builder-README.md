@@ -33,9 +33,10 @@ Pack Builder is **orthogonal** to Module-1. Do not merge these trees.
 | [`pack-builder-pack.schema.json`](./pack-builder-pack.schema.json) | Meta-schema for candidate `pack.json` |
 | [`pack-builder-payload-schema.schema.json`](./pack-builder-payload-schema.schema.json) | Meta-schema for candidate `payload.schema.json` |
 | [`pack-builder-taxonomy.schema.json`](./pack-builder-taxonomy.schema.json) | Meta-schema for candidate `taxonomy.json` |
-| [`pack-builder-overlays.checklist.md`](./pack-builder-overlays.checklist.md) | Three prose identities presence/shape checklist |
+| [`pack-builder-overlays.checklist.md`](./pack-builder-overlays.checklist.md) | Three prose identities presence/shape checklist + **§5 advisory gateway load gates** (Part A / GPT-PB-09) |
 
 **Hashes:** see wrapper §0 — `prompt_version_hash` **required**; `standards_set_hash` **recommended**.  
+**Load gates:** checklist §5 (readiness / civic ClusterLens / geo modes / field_policy; Contour2 axes **must not** equal tallinn 13). Parent: gateway handoff Part A 2026-09-04.  
 **Remote pins (вне IDE):** SSOT = [`pack-builder-wrapper.md`](./pack-builder-wrapper.md) §0 (primary raw URL + commit) and §1 (standards raw URLs). Same URLs mirrored in primary §1 and repair §2.3.
 
 ---
