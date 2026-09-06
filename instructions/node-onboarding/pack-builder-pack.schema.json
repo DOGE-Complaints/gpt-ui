@@ -96,8 +96,20 @@
         "precision_levels": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string" },
-          "examples": [["region", "settlement"]]
+          "items": {
+            "type": "string",
+            "enum": [
+              "region",
+              "settlement",
+              "district",
+              "street",
+              "house",
+              "house_range",
+              "coordinates"
+            ]
+          },
+          "examples": [["region", "settlement"]],
+          "$comment": "NODEONB-02 — mirror contracts.py GEO_PRECISION_LEVELS"
         },
         "default_precision_inference": {
           "description": "Optional inference table/object; structure free at meta level."
@@ -266,10 +278,22 @@
             },
             "signal_source": { "type": "string", "minLength": 1 },
             "id_algorithm": { "type": "string", "minLength": 1 },
-            "geo_filter": { "type": "string", "minLength": 1 },
+            "geo_filter": {
+              "type": "string",
+              "enum": ["country", "region", "settlement", "district", "any"],
+              "$comment": "NODEONB-02 — mirror scope.py GEO_FILTER_LEVELS (+ legacy any)"
+            },
             "geo_scope": {
-              "description": "String token (e.g. settlement:tallinn) or null — resolver.py L193–204.",
-              "type": ["string", "null"]
+              "description": "null or <level>:<value> with level in country|region|settlement|district (scope.py parse_cluster_geo_scope).",
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "string",
+                  "minLength": 3,
+                  "pattern": "^(country|region|settlement|district):.+$"
+                }
+              ],
+              "$comment": "NODEONB-02 — hard load-gate vocab"
             },
             "tie_breaker": { "type": "string", "minLength": 1 },
             "type_resolution": { "type": "string", "minLength": 1 }
