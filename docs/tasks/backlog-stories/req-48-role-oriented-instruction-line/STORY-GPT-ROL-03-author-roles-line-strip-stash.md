@@ -3,7 +3,8 @@
 ## Meta
 - **Key:** `STORY-GPT-ROL-03-author-roles-line-strip-stash`
 - **Пакет:** [`req-48-role-oriented-instruction-line/`](./INDEX.md)
-- **Status:** Todo
+- **Status:** Done (Awaiting Commits)
+- **Pipeline (pkg-000066):** [`STORY-GPT-ROL-03 pipeline`](../../../analysis/tasks/epics/EPIC-M1-12-req48-role-oriented-instruction-line/stories/STORY-GPT-ROL-03-author-roles-line-strip-stash/STORY-GPT-ROL-03-author-roles-line-strip-stash.md) · GIM-453…461 🟢 · P3 `2026-11-02T14:25:00Z`
 - **Приоритет:** P1
 - **Тип:** instruction authoring (role-oriented line)
 - **Parent REQ:** [`REQ-48`](../../../requirements/REQ-48-req15-role-oriented-instruction-line-and-export.md) **AC-GPT-48-02**, **AC-GPT-48-03** · §3b
@@ -32,14 +33,15 @@
 
 ## Verified current state
 
-- Sibling tree **Absent** (REQ-48 §3).
+- Sibling tree **Present** — [`GPT UI/instructions-roles-req15/`](../../../../instructions-roles-req15/) (core + five roles + README; P3).
+- Grep gate **CLEAN** — no model duty strings for gateway story-draft stash / SPA submit redirect (AC-02).
 - Fixture reference (not GPT UI SSOT): [`doge-ai-bridge/tests/fixtures/content/roles.manifest.json`](../../../../../doge-ai-bridge/tests/fixtures/content/roles.manifest.json) + `roles-instructions/*.md`.
 - Path rule: `doge-ai-bridge/src/aibridge/roles/assembly.py` `_reject_root_child`.
 
 ## Target / Acceptance Criteria
 
-- [ ] **AC-GPT-ROL03-01** (= **AC-GPT-48-02**): Five roles + shared core Present under `instructions-roles-req15/`; documented as REQ15 authoring SSOT.
-- [ ] **AC-GPT-ROL03-02** (= **AC-GPT-48-03**): Review/grep gate — new line has no model duty for gateway stash URL / `POST /story-drafts` / SPA redirect procedure.
+- [x] **AC-GPT-ROL03-01** (= **AC-GPT-48-02**): Five roles + shared core Present under `instructions-roles-req15/`; documented as REQ15 authoring SSOT.
+- [x] **AC-GPT-ROL03-02** (= **AC-GPT-48-03**): Review/grep gate — new line has no model duty for gateway stash URL / `POST /story-drafts` / SPA redirect procedure.
 
 ## Подзадачи (технические)
 

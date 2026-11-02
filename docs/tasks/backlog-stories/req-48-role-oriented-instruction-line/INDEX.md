@@ -10,11 +10,11 @@
 |-------|-------|--------|---------|
 | 1 | [STORY-GPT-ROL-01 — archive Module-1 snapshot](./STORY-GPT-ROL-01-archive-module1-snapshot.md) | Done (Awaiting Commits) | — |
 | 2 | [STORY-GPT-ROL-02 — Module-1 role mapping](./STORY-GPT-ROL-02-module1-role-mapping.md) | Done (Awaiting Commits) | GPT-ROL-01 |
-| 3 | [STORY-GPT-ROL-03 — author roles line + strip stash](./STORY-GPT-ROL-03-author-roles-line-strip-stash.md) | Todo | GPT-ROL-02 |
+| 3 | [STORY-GPT-ROL-03 — author roles line + strip stash](./STORY-GPT-ROL-03-author-roles-line-strip-stash.md) | Done (Awaiting Commits) | GPT-ROL-02 |
 | 4 | [STORY-GPT-ROL-04 — export roles-schema + parity + ops](./STORY-GPT-ROL-04-export-roles-schema-parity-ops.md) | Todo | GPT-ROL-03 |
 
 **Progress:** 2/4 Done (50%) · **As-of:** 2026-11-02T13:25:46Z  
-**Technical subtaks:** ROL-01 archive Present; ROL-02 mapping Present (`docs/analysis/req-48-module1-role-mapping.md`); ROL-03…04 name ≠ create until their P1.3/P3
+**Technical subtaks:** ROL-01 archive Present; ROL-02 mapping Present (`docs/analysis/req-48-module1-role-mapping.md`); ROL-03 sibling Present (`instructions-roles-req15/`); ROL-04 name ≠ create until P1.3/P3
 
 ## Граница
 
