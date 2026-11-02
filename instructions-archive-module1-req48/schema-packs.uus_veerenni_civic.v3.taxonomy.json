@@ -1,0 +1,1082 @@
+{
+  "schema_id": "uus_veerenni_civic",
+  "schema_version": "v3",
+  "axes": [
+    "signal_type",
+    "topic_domain",
+    "service_object",
+    "location_context",
+    "failure_mode",
+    "affected_scope",
+    "impact_scope",
+    "severity",
+    "impact_type",
+    "need_strength",
+    "occurrence_type",
+    "time_pattern",
+    "frequency",
+    "desired_outcome",
+    "facility_or_service_need",
+    "mobility_mode",
+    "public_space_feature",
+    "residential_scope",
+    "weather_dependency",
+    "positive_pattern",
+    "deep_need",
+    "ecosystem_signal",
+    "confidence_state",
+    "risk_privacy_safety"
+  ],
+  "canonical_keys": {
+    "signal_type": [
+      {
+        "key": "problem",
+        "meaning": "A concrete problem or harmful condition."
+      },
+      {
+        "key": "safety_risk",
+        "meaning": "A safety concern or practical risk."
+      },
+      {
+        "key": "maintenance_defect",
+        "meaning": "A broken, damaged, dirty, or poorly maintained condition."
+      },
+      {
+        "key": "accessibility_convenience",
+        "meaning": "A friction affecting access or everyday convenience."
+      },
+      {
+        "key": "missing_service_facility",
+        "meaning": "A missing local service, facility, space, or capability."
+      },
+      {
+        "key": "idea_improvement",
+        "meaning": "An idea for making the neighbourhood better."
+      },
+      {
+        "key": "community_social_life",
+        "meaning": "A need or observation about social and community life."
+      },
+      {
+        "key": "positive_pattern",
+        "meaning": "Something residents value and may want preserved or replicated."
+      },
+      {
+        "key": "other_unclear",
+        "meaning": "Relevant local signal that does not yet fit another type."
+      }
+    ],
+    "topic_domain": [
+      {
+        "key": "mobility_access",
+        "meaning": "Walking, cycling, driving, parking, public transport, routes and access."
+      },
+      {
+        "key": "safety",
+        "meaning": "Public-space, traffic or practical neighbourhood safety."
+      },
+      {
+        "key": "public_space",
+        "meaning": "Courtyards, streets, squares, seating, play and shared outdoor space."
+      },
+      {
+        "key": "cleanliness_waste",
+        "meaning": "Bins, litter, recycling, waste collection and cleanliness."
+      },
+      {
+        "key": "infrastructure_maintenance",
+        "meaning": "Lighting, surfaces, drainage, defects, construction and upkeep."
+      },
+      {
+        "key": "environment_comfort",
+        "meaning": "Noise, air, smell, wind, heat, water, greenery and physical comfort."
+      },
+      {
+        "key": "children_families",
+        "meaning": "Children, parents, indoor/outdoor family facilities and family life."
+      },
+      {
+        "key": "community_social_life",
+        "meaning": "Neighbour interaction, clubs, shared activities and belonging."
+      },
+      {
+        "key": "work_learning_creativity",
+        "meaning": "Coworking, learning, creative studios, workshops and maker activities."
+      },
+      {
+        "key": "local_services_amenities",
+        "meaning": "Retail, food, household, beauty, wellness, parcel, pet and other local services."
+      },
+      {
+        "key": "housing_shared_residential",
+        "meaning": "Building-adjacent and shared residential environment."
+      },
+      {
+        "key": "digital_information",
+        "meaning": "Neighbourhood information, navigation and digital-service friction."
+      }
+    ],
+    "service_object": [
+      {
+        "key": "pedestrian_route",
+        "meaning": "Walking route or pedestrian connection."
+      },
+      {
+        "key": "crossing",
+        "meaning": "Pedestrian crossing."
+      },
+      {
+        "key": "bike_parking",
+        "meaning": "Bicycle parking or storage."
+      },
+      {
+        "key": "car_parking",
+        "meaning": "Car parking."
+      },
+      {
+        "key": "public_transport",
+        "meaning": "Bus, tram or other public transport service."
+      },
+      {
+        "key": "street_lighting",
+        "meaning": "Street or public-space lighting."
+      },
+      {
+        "key": "waste_bin",
+        "meaning": "Public or shared waste bin."
+      },
+      {
+        "key": "recycling_point",
+        "meaning": "Recycling container or collection point."
+      },
+      {
+        "key": "playground",
+        "meaning": "Outdoor playground."
+      },
+      {
+        "key": "green_space",
+        "meaning": "Green area, planting or park-like space."
+      },
+      {
+        "key": "community_space",
+        "meaning": "General shared neighbourhood or community room."
+      },
+      {
+        "key": "coworking_space",
+        "meaning": "Coworking or shared work space."
+      },
+      {
+        "key": "quiet_workspace",
+        "meaning": "Quiet desk/work area outside the home."
+      },
+      {
+        "key": "meeting_room",
+        "meaning": "Occasional meeting room."
+      },
+      {
+        "key": "creative_workshop",
+        "meaning": "General creative workshop or studio."
+      },
+      {
+        "key": "ceramics_workshop",
+        "meaning": "Ceramics / clay workspace."
+      },
+      {
+        "key": "sewing_space",
+        "meaning": "Sewing / textile workspace."
+      },
+      {
+        "key": "art_studio",
+        "meaning": "Drawing / painting / visual-arts workspace."
+      },
+      {
+        "key": "maker_space",
+        "meaning": "Maker / fabrication / practical creative workspace."
+      },
+      {
+        "key": "children_indoor_space",
+        "meaning": "Indoor play/social space for children."
+      },
+      {
+        "key": "birthday_event_space",
+        "meaning": "Space suitable for children's birthdays or small events."
+      },
+      {
+        "key": "youth_space",
+        "meaning": "Space for teenagers and youth socialisation."
+      },
+      {
+        "key": "sports_facility",
+        "meaning": "Local sports or recreation facility."
+      },
+      {
+        "key": "shared_equipment",
+        "meaning": "Shared tools or equipment resource."
+      },
+      {
+        "key": "cafe_food",
+        "meaning": "Cafe, food or local eating service."
+      },
+      {
+        "key": "retail",
+        "meaning": "Local shop or retail service."
+      },
+      {
+        "key": "household_service",
+        "meaning": "Household or everyday practical service."
+      },
+      {
+        "key": "parcel_service",
+        "meaning": "Parcel pickup, returns or delivery-related service."
+      },
+      {
+        "key": "health_wellness",
+        "meaning": "Health or wellness service."
+      },
+      {
+        "key": "massage_salon",
+        "meaning": "Massage salon or massage service."
+      },
+      {
+        "key": "beauty_center",
+        "meaning": "Beauty centre / beauty services."
+      },
+      {
+        "key": "pet_service",
+        "meaning": "Pet-related local service."
+      },
+      {
+        "key": "childcare",
+        "meaning": "Childcare service or facility."
+      }
+    ],
+    "location_context": [
+      {
+        "key": "public_space",
+        "meaning": "Public outdoor space."
+      },
+      {
+        "key": "residential_shared_space",
+        "meaning": "Shared residential space."
+      },
+      {
+        "key": "street",
+        "meaning": "Street or street segment."
+      },
+      {
+        "key": "mobility_route",
+        "meaning": "Route used for movement through or from the neighbourhood."
+      },
+      {
+        "key": "service_location",
+        "meaning": "Place where a local service is or could be provided."
+      },
+      {
+        "key": "commercial_space",
+        "meaning": "Commercial premises or retail frontage."
+      },
+      {
+        "key": "green_area",
+        "meaning": "Green area."
+      },
+      {
+        "key": "playground",
+        "meaning": "Playground area."
+      },
+      {
+        "key": "school_or_child_route",
+        "meaning": "Route materially used by children or families."
+      },
+      {
+        "key": "neighborhood_wide",
+        "meaning": "Applies to Uus Veerenni as a whole."
+      }
+    ],
+    "failure_mode": [
+      {
+        "key": "broken_infrastructure",
+        "meaning": "Existing infrastructure is damaged or not working."
+      },
+      {
+        "key": "maintenance_gap",
+        "meaning": "Cleaning, repair or routine upkeep is insufficient."
+      },
+      {
+        "key": "unsafe_condition",
+        "meaning": "Condition creates practical safety risk."
+      },
+      {
+        "key": "access_blocked",
+        "meaning": "A route, place or service is difficult or impossible to access."
+      },
+      {
+        "key": "capacity_shortage",
+        "meaning": "Existing capacity is insufficient for demand."
+      },
+      {
+        "key": "service_unavailable",
+        "meaning": "Expected or desired service is unavailable."
+      },
+      {
+        "key": "information_gap",
+        "meaning": "Useful local information is missing or unclear."
+      },
+      {
+        "key": "recurring_friction",
+        "meaning": "Repeated everyday inconvenience."
+      },
+      {
+        "key": "missing_capability",
+        "meaning": "Residents lack a useful local capability, space or service."
+      },
+      {
+        "key": "improvement_opportunity",
+        "meaning": "Existing situation can be improved without a clear failure."
+      },
+      {
+        "key": "positive_observation",
+        "meaning": "Existing pattern works well."
+      }
+    ],
+    "affected_scope": [
+      {
+        "key": "only_me",
+        "meaning": "Only the reporting resident is explicitly affected."
+      },
+      {
+        "key": "my_household",
+        "meaning": "Reporter household is affected."
+      },
+      {
+        "key": "children",
+        "meaning": "Children."
+      },
+      {
+        "key": "parents_with_children",
+        "meaning": "Parents or carers with children."
+      },
+      {
+        "key": "elderly",
+        "meaning": "Older residents."
+      },
+      {
+        "key": "pedestrians",
+        "meaning": "Pedestrians."
+      },
+      {
+        "key": "cyclists",
+        "meaning": "Cyclists."
+      },
+      {
+        "key": "drivers",
+        "meaning": "Drivers."
+      },
+      {
+        "key": "pet_owners",
+        "meaning": "Pet owners."
+      },
+      {
+        "key": "specific_buildings",
+        "meaning": "Residents of one or more specific buildings."
+      },
+      {
+        "key": "specific_street",
+        "meaning": "Residents or users of a specific street."
+      },
+      {
+        "key": "whole_neighborhood",
+        "meaning": "Uus Veerenni broadly."
+      },
+      {
+        "key": "visitors",
+        "meaning": "Visitors."
+      },
+      {
+        "key": "local_workers",
+        "meaning": "People working in or immediately around the neighbourhood."
+      }
+    ],
+    "impact_scope": [
+      {
+        "key": "individual",
+        "meaning": "Individual."
+      },
+      {
+        "key": "household",
+        "meaning": "Household."
+      },
+      {
+        "key": "building",
+        "meaning": "One building."
+      },
+      {
+        "key": "street",
+        "meaning": "Street-level."
+      },
+      {
+        "key": "local_area",
+        "meaning": "Small local area."
+      },
+      {
+        "key": "neighborhood",
+        "meaning": "Neighbourhood-wide."
+      },
+      {
+        "key": "unclear",
+        "meaning": "Impact scale is not yet clear."
+      }
+    ],
+    "severity": [
+      {
+        "key": "minor",
+        "meaning": "Low practical burden."
+      },
+      {
+        "key": "moderate",
+        "meaning": "Noticeable recurring burden."
+      },
+      {
+        "key": "significant",
+        "meaning": "Strong impact on daily use or quality of life."
+      },
+      {
+        "key": "critical",
+        "meaning": "Immediate or serious practical risk."
+      },
+      {
+        "key": "unknown",
+        "meaning": "Not enough evidence to rate."
+      }
+    ],
+    "impact_type": [
+      {
+        "key": "inconvenience",
+        "meaning": "Everyday inconvenience."
+      },
+      {
+        "key": "accessibility",
+        "meaning": "Access barrier."
+      },
+      {
+        "key": "safety",
+        "meaning": "Safety impact."
+      },
+      {
+        "key": "health_or_wellbeing",
+        "meaning": "Wellbeing-related impact."
+      },
+      {
+        "key": "property_or_infrastructure",
+        "meaning": "Impact on physical property or infrastructure."
+      },
+      {
+        "key": "environmental",
+        "meaning": "Environmental impact."
+      },
+      {
+        "key": "social",
+        "meaning": "Social/community impact."
+      },
+      {
+        "key": "financial",
+        "meaning": "Direct practical financial burden."
+      },
+      {
+        "key": "quality_of_life",
+        "meaning": "General quality-of-life impact."
+      }
+    ],
+    "need_strength": [
+      {
+        "key": "nice_to_have",
+        "meaning": "Desirable but low-priority."
+      },
+      {
+        "key": "useful",
+        "meaning": "Would materially improve local life."
+      },
+      {
+        "key": "important",
+        "meaning": "Meaningful unmet need."
+      },
+      {
+        "key": "strongly_needed",
+        "meaning": "Strongly expressed unmet need."
+      },
+      {
+        "key": "unknown",
+        "meaning": "Strength not stated."
+      }
+    ],
+    "occurrence_type": [
+      {
+        "key": "one_time",
+        "meaning": "Single observed episode."
+      },
+      {
+        "key": "recurring",
+        "meaning": "Repeated episodes."
+      },
+      {
+        "key": "continuous",
+        "meaning": "Condition is continuously present."
+      },
+      {
+        "key": "seasonal",
+        "meaning": "Condition appears seasonally."
+      },
+      {
+        "key": "unknown",
+        "meaning": "Occurrence pattern not known."
+      },
+      {
+        "key": "not_applicable",
+        "meaning": "Time pattern is not meaningful for this idea or need."
+      }
+    ],
+    "time_pattern": [
+      {
+        "key": "morning",
+        "meaning": "Primarily mornings."
+      },
+      {
+        "key": "daytime",
+        "meaning": "Primarily daytime."
+      },
+      {
+        "key": "evening",
+        "meaning": "Primarily evenings."
+      },
+      {
+        "key": "night",
+        "meaning": "Primarily nights."
+      },
+      {
+        "key": "weekday",
+        "meaning": "Primarily weekdays."
+      },
+      {
+        "key": "weekend",
+        "meaning": "Primarily weekends."
+      },
+      {
+        "key": "after_rain",
+        "meaning": "After rain."
+      },
+      {
+        "key": "during_snow",
+        "meaning": "During snow."
+      },
+      {
+        "key": "winter",
+        "meaning": "Winter."
+      },
+      {
+        "key": "summer",
+        "meaning": "Summer."
+      },
+      {
+        "key": "not_applicable",
+        "meaning": "Not meaningful for this story."
+      }
+    ],
+    "frequency": [
+      {
+        "key": "once",
+        "meaning": "Once."
+      },
+      {
+        "key": "rarely",
+        "meaning": "Rarely."
+      },
+      {
+        "key": "sometimes",
+        "meaning": "Sometimes."
+      },
+      {
+        "key": "often",
+        "meaning": "Often."
+      },
+      {
+        "key": "daily",
+        "meaning": "Daily."
+      },
+      {
+        "key": "several_times_per_day",
+        "meaning": "Several times per day."
+      },
+      {
+        "key": "unknown",
+        "meaning": "Not known."
+      },
+      {
+        "key": "not_applicable",
+        "meaning": "Not meaningful for this story."
+      }
+    ],
+    "desired_outcome": [
+      {
+        "key": "fix_existing",
+        "meaning": "Fix an existing object or condition."
+      },
+      {
+        "key": "add_new",
+        "meaning": "Add something new."
+      },
+      {
+        "key": "remove",
+        "meaning": "Remove an unwanted object or condition."
+      },
+      {
+        "key": "improve",
+        "meaning": "Improve an existing situation."
+      },
+      {
+        "key": "make_safer",
+        "meaning": "Make it safer."
+      },
+      {
+        "key": "make_more_accessible",
+        "meaning": "Improve accessibility."
+      },
+      {
+        "key": "make_more_convenient",
+        "meaning": "Make everyday use easier."
+      },
+      {
+        "key": "increase_capacity",
+        "meaning": "Increase capacity."
+      },
+      {
+        "key": "reduce_frequency",
+        "meaning": "Reduce recurring negative episodes."
+      },
+      {
+        "key": "reduce_noise",
+        "meaning": "Reduce noise."
+      },
+      {
+        "key": "provide_information",
+        "meaning": "Provide clearer information."
+      },
+      {
+        "key": "create_space",
+        "meaning": "Create or provide a space."
+      },
+      {
+        "key": "create_service",
+        "meaning": "Create or provide a service."
+      },
+      {
+        "key": "preserve_existing_good_pattern",
+        "meaning": "Preserve a positive existing pattern."
+      },
+      {
+        "key": "replicate_good_pattern",
+        "meaning": "Repeat a positive solution elsewhere."
+      }
+    ],
+    "facility_or_service_need": [
+      {
+        "key": "workspace",
+        "meaning": "General workspace."
+      },
+      {
+        "key": "coworking",
+        "meaning": "Coworking."
+      },
+      {
+        "key": "meeting_space",
+        "meaning": "Meeting room or shared meeting space."
+      },
+      {
+        "key": "creative_workshop",
+        "meaning": "General creative workshop."
+      },
+      {
+        "key": "ceramics",
+        "meaning": "Ceramics / clay."
+      },
+      {
+        "key": "sewing",
+        "meaning": "Sewing / textile."
+      },
+      {
+        "key": "art",
+        "meaning": "Drawing / painting / visual arts."
+      },
+      {
+        "key": "maker_space",
+        "meaning": "Maker / practical workshop."
+      },
+      {
+        "key": "children_indoor_space",
+        "meaning": "Indoor children's social/play space."
+      },
+      {
+        "key": "birthday_event_space",
+        "meaning": "Birthday / small event space."
+      },
+      {
+        "key": "youth_space",
+        "meaning": "Youth social space."
+      },
+      {
+        "key": "sports",
+        "meaning": "Sports / recreation."
+      },
+      {
+        "key": "community_space",
+        "meaning": "General shared community space."
+      },
+      {
+        "key": "shared_equipment",
+        "meaning": "Shared tools/equipment."
+      },
+      {
+        "key": "cafe_food",
+        "meaning": "Cafe or food."
+      },
+      {
+        "key": "retail",
+        "meaning": "Retail."
+      },
+      {
+        "key": "household_service",
+        "meaning": "Household service."
+      },
+      {
+        "key": "parcel_service",
+        "meaning": "Parcel / returns."
+      },
+      {
+        "key": "health_wellness",
+        "meaning": "Health / wellness."
+      },
+      {
+        "key": "massage_salon",
+        "meaning": "Massage salon."
+      },
+      {
+        "key": "beauty_center",
+        "meaning": "Beauty centre."
+      },
+      {
+        "key": "pet_service",
+        "meaning": "Pet service."
+      },
+      {
+        "key": "childcare",
+        "meaning": "Childcare."
+      }
+    ],
+    "mobility_mode": [
+      {
+        "key": "pedestrian",
+        "meaning": "Walking."
+      },
+      {
+        "key": "bicycle",
+        "meaning": "Bicycle."
+      },
+      {
+        "key": "scooter",
+        "meaning": "Scooter."
+      },
+      {
+        "key": "car",
+        "meaning": "Car."
+      },
+      {
+        "key": "public_transport",
+        "meaning": "Public transport."
+      },
+      {
+        "key": "stroller",
+        "meaning": "Stroller."
+      },
+      {
+        "key": "wheelchair",
+        "meaning": "Wheelchair or mobility aid."
+      },
+      {
+        "key": "delivery",
+        "meaning": "Delivery vehicle / courier flow."
+      },
+      {
+        "key": "mixed",
+        "meaning": "Multiple modes."
+      }
+    ],
+    "public_space_feature": [
+      {
+        "key": "seating",
+        "meaning": "Seating."
+      },
+      {
+        "key": "lighting",
+        "meaning": "Lighting."
+      },
+      {
+        "key": "shelter",
+        "meaning": "Weather shelter."
+      },
+      {
+        "key": "greenery",
+        "meaning": "Greenery."
+      },
+      {
+        "key": "play",
+        "meaning": "Play function."
+      },
+      {
+        "key": "bike_parking",
+        "meaning": "Bike parking."
+      },
+      {
+        "key": "waste_bin",
+        "meaning": "Waste bin."
+      },
+      {
+        "key": "recycling",
+        "meaning": "Recycling."
+      },
+      {
+        "key": "walking_path",
+        "meaning": "Walking path."
+      },
+      {
+        "key": "crossing",
+        "meaning": "Crossing."
+      },
+      {
+        "key": "accessibility",
+        "meaning": "Accessibility feature."
+      }
+    ],
+    "residential_scope": [
+      {
+        "key": "specific_building",
+        "meaning": "Specific building."
+      },
+      {
+        "key": "several_buildings",
+        "meaning": "Several buildings."
+      },
+      {
+        "key": "courtyard",
+        "meaning": "Courtyard."
+      },
+      {
+        "key": "housing_association_area",
+        "meaning": "Housing association/shared property area."
+      },
+      {
+        "key": "neighborhood",
+        "meaning": "Neighbourhood-wide."
+      },
+      {
+        "key": "not_applicable",
+        "meaning": "Not a residential-space story."
+      }
+    ],
+    "weather_dependency": [
+      {
+        "key": "rain",
+        "meaning": "Rain."
+      },
+      {
+        "key": "snow",
+        "meaning": "Snow."
+      },
+      {
+        "key": "ice",
+        "meaning": "Ice."
+      },
+      {
+        "key": "heat",
+        "meaning": "Heat."
+      },
+      {
+        "key": "darkness",
+        "meaning": "Darkness."
+      },
+      {
+        "key": "wind",
+        "meaning": "Wind."
+      },
+      {
+        "key": "none",
+        "meaning": "No evident weather dependency."
+      },
+      {
+        "key": "unknown",
+        "meaning": "Unknown."
+      },
+      {
+        "key": "not_applicable",
+        "meaning": "Not applicable."
+      }
+    ],
+    "positive_pattern": [
+      {
+        "key": "works_well",
+        "meaning": "Residents explicitly say something works well."
+      },
+      {
+        "key": "pleasant_to_use",
+        "meaning": "Place/service is pleasant to use."
+      },
+      {
+        "key": "safe_and_comfortable",
+        "meaning": "Pattern feels safe and comfortable."
+      },
+      {
+        "key": "supports_social_life",
+        "meaning": "Pattern supports social/community life."
+      },
+      {
+        "key": "worth_preserving",
+        "meaning": "Worth preserving."
+      },
+      {
+        "key": "worth_replicating",
+        "meaning": "Potentially worth replicating elsewhere."
+      }
+    ],
+    "deep_need": [
+      {
+        "key": "safety_need",
+        "meaning": "Safety."
+      },
+      {
+        "key": "convenience",
+        "meaning": "Everyday convenience."
+      },
+      {
+        "key": "access",
+        "meaning": "Reliable access."
+      },
+      {
+        "key": "belonging",
+        "meaning": "Belonging and connection."
+      },
+      {
+        "key": "meaningful_community",
+        "meaning": "Meaningful neighbourhood community."
+      },
+      {
+        "key": "creative_self_realization",
+        "meaning": "Creative expression."
+      },
+      {
+        "key": "learning_growth",
+        "meaning": "Learning and development."
+      },
+      {
+        "key": "family_support",
+        "meaning": "Support for family life."
+      },
+      {
+        "key": "local_self_sufficiency",
+        "meaning": "Ability to meet more everyday needs locally."
+      },
+      {
+        "key": "quality_of_life",
+        "meaning": "General quality of local life."
+      }
+    ],
+    "ecosystem_signal": [
+      {
+        "key": "ecosystem_gap",
+        "meaning": "Missing local ecosystem or service environment."
+      },
+      {
+        "key": "missing_infrastructure",
+        "meaning": "Needed local infrastructure is absent."
+      },
+      {
+        "key": "capacity_shortage",
+        "meaning": "Existing capacity is too low."
+      },
+      {
+        "key": "underused_resources",
+        "meaning": "Existing local resources appear underused."
+      },
+      {
+        "key": "community_fragmentation",
+        "meaning": "Weak community connection."
+      },
+      {
+        "key": "positive_local_model",
+        "meaning": "Existing local pattern may be a useful model."
+      }
+    ],
+    "confidence_state": [
+      {
+        "key": "confirmed_by_user",
+        "meaning": "Explicitly stated or confirmed by resident."
+      },
+      {
+        "key": "gpt_hypothesis",
+        "meaning": "Inferred by GPT, not confirmed."
+      },
+      {
+        "key": "needs_clarification",
+        "meaning": "Clarification needed."
+      },
+      {
+        "key": "low_confidence",
+        "meaning": "Weak evidence."
+      },
+      {
+        "key": "conflict_unresolved",
+        "meaning": "Conflicting evidence."
+      }
+    ],
+    "risk_privacy_safety": [
+      {
+        "key": "pii_present",
+        "meaning": "Internal privacy handling."
+      },
+      {
+        "key": "redaction_needed",
+        "meaning": "Internal redaction handling."
+      },
+      {
+        "key": "minor_context",
+        "meaning": "Minors are contextually involved."
+      },
+      {
+        "key": "health_context",
+        "meaning": "Health context requires careful handling."
+      },
+      {
+        "key": "violence_context",
+        "meaning": "Violence/safety context requires gate handling."
+      }
+    ]
+  },
+  "axis_to_signal_map": {
+    "topic_domain": "signals.civic_domain",
+    "failure_mode": "signals.failure_pattern",
+    "desired_outcome": "signals.desired_outcome",
+    "affected_scope": "signals.affected_group",
+    "service_object": "signals.service_object",
+    "facility_or_service_need": "signals.facility_or_service_need",
+    "deep_need": "signals.need",
+    "ecosystem_signal": "signals.ecosystem_signal",
+    "signal_type": "signals.canonical_type"
+  },
+  "dispositions": [
+    "canonical",
+    "metadata_only",
+    "needs_clarification",
+    "rejected",
+    "internal"
+  ],
+  "internal_axes": [
+    "risk_privacy_safety",
+    "confidence_state"
+  ]
+}

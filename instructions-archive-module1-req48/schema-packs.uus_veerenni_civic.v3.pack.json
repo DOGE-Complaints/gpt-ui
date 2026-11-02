@@ -1,0 +1,132 @@
+{
+  "schema_id": "uus_veerenni_civic",
+  "schema_version": "v3",
+  "payload_schema": "payload.schema.json",
+  "taxonomy_schema": "taxonomy.json",
+  "card_fields": [
+    "signals.canonical_type",
+    "signals.civic_domain",
+    "signals.failure_pattern",
+    "signals.service_object",
+    "signals.facility_or_service_need",
+    "signals.desired_outcome",
+    "signals.affected_group",
+    "geo.detail_level",
+    "geo.district",
+    "geo.street",
+    "geo.streets"
+  ],
+  "field_policy": {
+    "signals.civic_domain": "required",
+    "signals.failure_pattern": "required",
+    "signals.civic_weight": "optional",
+    "signals.desired_outcome": "optional",
+    "signals.affected_group": "optional",
+    "signals.service_object": "optional",
+    "signals.facility_or_service_need": "optional",
+    "signals.need": "optional",
+    "signals.ecosystem_signal": "optional",
+    "signals.canonical_type": "optional",
+    "geo.district": "optional",
+    "geo.settlement": "optional",
+    "geo.region": "optional",
+    "geo.country": "optional",
+    "geo.street": "optional",
+    "geo.house": "optional",
+    "geo.house_range": "optional",
+    "geo.houses": "optional",
+    "geo.streets": "optional",
+    "geo.detail_level": "optional"
+  },
+  "geo_intake": {
+    "mode": "optional",
+    "merge": true,
+    "mirror_to_payload": true
+  },
+  "geo_model": {
+    "precision_levels": [
+      "region",
+      "settlement",
+      "district",
+      "street",
+      "house",
+      "house_range",
+      "coordinates"
+    ],
+    "default_precision_inference": "from_address_depth"
+  },
+  "gpt_instance_territory": {
+    "enabled": true,
+    "rules": [
+      {
+        "type": "admin_token",
+        "level": "settlement",
+        "value": "tallinn"
+      }
+    ]
+  },
+  "exact_lenses": [
+    {
+      "lens_id": "composite_primary_micro",
+      "source_fields": [
+        "signals.civic_domain",
+        "signals.failure_pattern",
+        "signals.service_object",
+        "signals.facility_or_service_need"
+      ],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "micro",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v3",
+      "readiness_policy": {
+        "min_readiness_score": 50,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    },
+    {
+      "lens_id": "service_object_micro",
+      "source_fields": [
+        "signals.service_object",
+        "signals.facility_or_service_need"
+      ],
+      "algorithm": "exact",
+      "scope": "node",
+      "scale": "micro",
+      "missing_value_policy": "skip",
+      "min_size": 3,
+      "version": "v3",
+      "readiness_policy": {
+        "min_readiness_score": 50,
+        "min_stories": 3,
+        "require_actionable_canonical_type": false
+      }
+    }
+  ],
+  "node_clustering": {
+    "civic": {
+      "active_lenses": [
+        "composite_primary_micro",
+        "service_object_micro"
+      ],
+      "primary_lens": "composite_primary_micro",
+      "min_size": 3,
+      "min_size_by_lens": {
+        "composite_primary_micro": 3,
+        "service_object_micro": 3
+      },
+      "readiness_threshold": 50,
+      "signal_source": "canonical",
+      "id_algorithm": "sha256",
+      "geo_filter": "settlement",
+      "geo_scope": "settlement:tallinn",
+      "tie_breaker": "alpha",
+      "type_resolution": "compatible_signal_family",
+      "semantic_merge_policy": "same_function_or_underlying_situation_with_adaptive_geo",
+      "preserve_distinct_variants": true,
+      "community_focus": "Uus Veerenni residents and directly affecting adjacent Tallinn infrastructure/services"
+    }
+  }
+}
