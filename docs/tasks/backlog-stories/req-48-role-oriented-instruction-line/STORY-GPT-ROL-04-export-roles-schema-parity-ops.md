@@ -3,7 +3,8 @@
 ## Meta
 - **Key:** `STORY-GPT-ROL-04-export-roles-schema-parity-ops`
 - **Пакет:** [`req-48-role-oriented-instruction-line/`](./INDEX.md)
-- **Status:** Todo
+- **Status:** Done (Awaiting Commits)
+- **Pipeline (pkg-000067):** GIM-462…467 🟢 · P3 `2026-11-02T14:39:55Z`
 - **Приоритет:** P1
 - **Тип:** export layout + parity evidence + operator docs
 - **Parent REQ:** [`REQ-48`](../../../requirements/REQ-48-req15-role-oriented-instruction-line-and-export.md) **AC-GPT-48-05**, **AC-GPT-48-06**, **AC-GPT-48-07** · §3b
@@ -34,13 +35,14 @@
 
 - §3b locked in REQ-48 / REQ-13.
 - Sync script **not found** (REQ-48 §3).
-- Export bodies / parity evidence **Absent**.
+- Export bodies / parity evidence **Present** (P3).
+- Manifest **Present** · operator note **Present**.
 
 ## Target / Acceptance Criteria
 
-- [ ] **AC-GPT-ROL04-01** (= **AC-GPT-48-05**): Export layout documented and produceable as roles-schema; Phase-A `files[]` is not the new-line SSOT.
-- [ ] **AC-GPT-ROL04-02** (= **AC-GPT-48-06**): Export parity Pass evidence Present (E1); no silent subset vs intended inventory.
-- [ ] **AC-GPT-ROL04-03** (= **AC-GPT-48-07**): Operator note Present — archive vs new line; publish-to-volume steps (manual v1).
+- [x] **AC-GPT-ROL04-01** (= **AC-GPT-48-05**): Export layout documented and produceable as roles-schema; Phase-A `files[]` is not the new-line SSOT.
+- [x] **AC-GPT-ROL04-02** (= **AC-GPT-48-06**): Export parity Pass evidence Present (E1); no silent subset vs intended inventory.
+- [x] **AC-GPT-ROL04-03** (= **AC-GPT-48-07**): Operator note Present — archive vs new line; publish-to-volume steps (manual v1).
 
 ## Подзадачи (технические)
 

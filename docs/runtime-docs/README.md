@@ -18,9 +18,11 @@
 
 | Документ | Вопрос |
 |----------|--------|
+| [../architecture/README.md](../architecture/README.md) | Архитектурная логика Module-1 / packs / два канала (Actions vs `doge-ai-bridge` → Responses) |
 | [schema-pack-custom-model-operator-manual-ru.md](./schema-pack-custom-model-operator-manual-ru.md) | Как настроить GPT под кастомную модель и правила валидации (swap двух pack-файлов; active pair; `schema_binding`) |
 | [story-pii-processing-before-send-as-built.md](./story-pii-processing-before-send-as-built.md) | Что считается PII в story-path; есть ли очистка перед отправкой на сервер; что персистится; где `redact_pii`; scan set включая `geo_detail` |
 | [story-validation-and-garbage-filtering-as-built.md](./story-validation-and-garbage-filtering-as-built.md) | По каким критериям история допускается; schema packs / `schema_binding`; как фильтруется «мусор»; что гарантирует gateway vs GPT |
+| [req-48-roles-line-publish-operator-note-ru.md](./req-48-roles-line-publish-operator-note-ru.md) | REQ-48: archive vs new roles line; ручной publish-to-volume (V2); env `DOGESTONIA_INSTRUCTIONS_DIR` / `_MANIFEST` |
 
 Смежные as-built вне GPT UI:
 

@@ -49,3 +49,11 @@ Peer honesty note: [`doge-ai-bridge/docs/runtime-docs/11-content-volume-parity-s
 ## Fail-closed
 
 Incomplete/mismatched **consume** readiness is aibridge REQ-13 duty. GPT UI operator note should still warn: publishing a subset without updating intended inventory fails Export Pass honesty (AC-06).
+
+## Related (implement)
+
+| Artifact | Path |
+|----------|------|
+| Operator note (V2) | [`../../runtime-docs/req-48-roles-line-publish-operator-note-ru.md`](../../runtime-docs/req-48-roles-line-publish-operator-note-ru.md) |
+| Export Pass evidence (E1) | [`../../analysis/req-48-export-parity-evidence.md`](../../analysis/req-48-export-parity-evidence.md) |
+| Roles-schema manifest | [`../../../instructions-roles-req15/roles.manifest.json`](../../../instructions-roles-req15/roles.manifest.json) |

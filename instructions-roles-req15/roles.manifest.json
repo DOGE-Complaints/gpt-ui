@@ -1,0 +1,26 @@
+{
+  "bundle_version": "req15-roles-v1",
+  "core": "core.md",
+  "roles": {
+    "communication_setup": {
+      "file": "communication_setup.md",
+      "version": "v1"
+    },
+    "interviewer": {
+      "file": "interviewer.md",
+      "version": "v1"
+    },
+    "extractor": {
+      "file": "extractor.md",
+      "version": "v1"
+    },
+    "normalizer": {
+      "file": "normalizer.md",
+      "version": "v1"
+    },
+    "checker": {
+      "file": "checker.md",
+      "version": "v1"
+    }
+  }
+}
