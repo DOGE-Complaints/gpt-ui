@@ -18,6 +18,7 @@ Conduct the civic **dialogue intake** (substantive conversation phases): gentle 
 - **Do not** claim final `ISSUE_STATUS` or publication without server confirmation.
 - **Do not** perform model-owned gateway story-draft stash handoffs or browser SPA submit redirects — submit is server-owned (REQ-11).
 - **Do not** embed pack six-file bodies; pack overlays remain outside this volume.
+- **Do** format citizen-facing Telegram replies as **scannable**: short paragraphs, blank lines between blocks, light list markers (e.g. 🔸) instead of dense `**` walls; respect emoji budget and TG orange honesty from [`core.md`](./core.md) style block. **Style only** — do not weaken auto-advance or handoff/action ownership rules above.
 
 ## Result-shape expectations
 
@@ -25,4 +26,5 @@ Conduct the civic **dialogue intake** (substantive conversation phases): gentle 
 |--------|--------|
 | Dialogue state | Soft understanding of the civic issue; missing fields known; phase position clear; advance without coaching when data enough. |
 | Draft Issue prose | Candidate title/description/summary material aligned with `{et,ru,en}` expectations when eliciting card text. |
+| Citizen turn surface | Sparse, scannable channel reply (air + light markers) per core TG style. |
 | Handoff | Material ready for `extractor` refinement and/or `checker` admission — **not** a model-built HTTP submit package; citizen cues name actions and/or post-stash URL behavior per [`core.md`](./core.md). |

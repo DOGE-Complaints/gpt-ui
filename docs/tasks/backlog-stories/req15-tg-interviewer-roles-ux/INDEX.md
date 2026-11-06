@@ -6,7 +6,7 @@
 > **Architecture:** [`../../../architecture/req15-tg-interviewer-roles-ux/00-overview.md`](../../../architecture/req15-tg-interviewer-roles-ux/00-overview.md)  
 > **Evidence:** [`docs/analysis/req15-tg-interviewer-ux-gap-pille-2026-11-06.md`](../../../../../docs/analysis/req15-tg-interviewer-ux-gap-pille-2026-11-06.md) · [target](../../../../../docs/analysis/req15-tg-interviewer-target-ux-2026-11-06.md) · [triage](../../../../../docs/analysis/req15-tg-interviewer-ux-gap-triage-2026-11-06.md)  
 > **Peer runtime:** aibridge [`STORY-68`](../../../../../doge-ai-bridge/docs/tasks/backlog-stories/req15-tg-channel-interviewer-ux/STORY-AIBRIDGE-68-channel-seam-send-actions-always.md) (soft-dep for ROL-05)  
-> **Emitted:** 2026-11-06 · **Tech-arch + subtaks:** 2026-11-06T11:51:22Z · **Status:** Todo · implement deferred  
+> **Emitted:** 2026-11-06 · **Tech-arch + subtaks:** 2026-11-06T11:51:22Z · **Status:** Done (Awaiting Commits) · ROL-05/06 P3  
 > **Method:** [`.cursor/rules/analysis.mdc`](../../../../../.cursor/rules/analysis.mdc)  
 > **Honesty:** instruction **texts** only on Apply; no aibridge/telegram code this package; supersedes root accumulative prose batch
 
@@ -15,7 +15,7 @@
 | Order | Key | Title | Status | Depends |
 |-------|-----|-------|--------|---------|
 | 1 | STORY-GPT-ROL-05 | [Stage proactivity + handoff wording](STORY-GPT-ROL-05-channel-interview-stage-proactivity.md) | Done (Awaiting Commits) · pkg-000068 GIM-468…474 🟢 | Soft: aibridge 68 |
-| 2 | STORY-GPT-ROL-06 | [Surface readability](STORY-GPT-ROL-06-channel-interview-surface-readability.md) | Todo · tech-arch + T01–T05 Present | Soft: after/parallel 05 |
+| 2 | STORY-GPT-ROL-06 | [Surface readability](STORY-GPT-ROL-06-channel-interview-surface-readability.md) | Done (Awaiting Commits) · pkg-000069 GIM-475…479 🟢 | Soft: after/parallel 05 |
 
 ## Build order
 

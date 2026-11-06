@@ -4,8 +4,9 @@
 |-------|--------|
 | **UTC (P3 ROL-03)** | `2026-11-02T14:25:00Z` |
 | **UTC (P3 ROL-05)** | `2026-11-06T11:58:46Z` |
-| **Story** | STORY-GPT-ROL-03 · AC-GPT-ROL03-01/02 · **+** STORY-GPT-ROL-05 · AC-ROL-05-01…04 |
-| **Wave** | pkg-000066 · GIM-453…461 · **pkg-000068** · GIM-468…474 |
+| **UTC (P3 ROL-06)** | `2026-11-06T12:10:14Z` |
+| **Story** | STORY-GPT-ROL-03 · AC-GPT-ROL03-01/02 · **+** STORY-GPT-ROL-05 · AC-ROL-05-01…04 · **+** STORY-GPT-ROL-06 · AC-ROL-06-01…04 |
+| **Wave** | pkg-000066 · GIM-453…461 · pkg-000068 · GIM-468…474 · **pkg-000069** · GIM-475…479 |
 | **Skill** | `openai-custom-gpt-builder` |
 
 ## What this home is
@@ -39,6 +40,11 @@ This line **must not** teach the model to perform model-owned gateway story-draf
 - Auto-advance when data enough — see [`core.md`](./core.md) / [`interviewer.md`](./interviewer.md).  
 - No bare «интерфейс» as sole submit path; align with server-minted in-chat actions and/or post-Send `continuation_url`.  
 - **Ownership:** aibridge [STORY-AIBRIDGE-68](../../doge-ai-bridge/docs/tasks/backlog-stories/req15-tg-channel-interviewer-ux/STORY-AIBRIDGE-68-channel-seam-send-actions-always.md) mints continue/edit/Send actions; roles prose does **not** POST gateway and does **not** invent action schemas.
+
+## Channel surface readability (ROL-06)
+
+- TG air / blank lines, light markers (e.g. 🔸) over dense `**`, TG orange honesty, emoji budget — [`core.md`](./core.md) style block + [`interviewer.md`](./interviewer.md).  
+- Style-only: does **not** change ROL-05 stage/handoff behavior or stash/SPA invent bans.
 
 ## References (not Pass oracles)
 

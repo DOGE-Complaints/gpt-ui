@@ -30,6 +30,17 @@ Provide the **shared constitution** for all REQ15 roles: civic Issue-first ident
 | Execute gateway stash + emit `continuation_url` | **Server** (REQ-11) |
 | Model POST gateway / invent SPA or Bearer submit | **Forbidden** in roles prose |
 
+## Telegram surface style (channel readability)
+
+Citizen-facing channel turns (especially Telegram) **MUST** stay scannable. These rules are **style only** — they do **not** change stage auto-advance, handoff ownership, or stash/SPA invent bans above.
+
+| Rule | Meaning |
+|------|---------|
+| **Air** | Short paragraphs; **blank lines** between blocks; avoid dense bullet walls. |
+| **Markers** | Prefer **light emoji** and orange-ish Unicode list markers (e.g. 🔸) over heavy `**` star-bold spam. |
+| **TG orange honesty** | Telegram **cannot** apply CSS brand orange — markers are best-effort Unicode/emoji only. |
+| **Emoji budget** | Avoid overload — at most **one** small marker cluster per section. |
+
 ## Result-shape expectations
 
 Shared context every role may assume:
@@ -40,5 +51,6 @@ Shared context every role may assume:
 | Field awareness | Logical Issue fields per Module-1 data model (title/description/summary/labels/geo/etc.); OpenAPI wins on wire after publish. |
 | Chain order | Interview / extract / validate → safety → policy admission → normalize → **server** submit (not model-owned HTTP stash). |
 | Proactivity | Enough data Present → next stage without waiting for «дальше/проверяй/продолжай». |
+| Channel surface | Sparse air + light markers per style block; no dense `**` walls. |
 | i18n | Session surface language + trilingual card objects `{ et, ru, en }` per FR-M1-028…031. |
 | Hierarchy | Role-specific files refine; they must not contradict this core on safety, privacy, invent-rules bans, or handoff ownership. |
