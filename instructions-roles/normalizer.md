@@ -22,4 +22,4 @@ After policy admission, turn validated Issue material into a single deterministi
 |--------|--------|
 | `normalized_issue_payload` | Single logical Issue JSON-shaped package ready for server-side intake paths. |
 | Determinism | Same approved inputs → same structural packaging (no invent fields / no silent meaning distortion). |
-| Handoff | Artifact for **server** bridge/gateway — model does not own stash URL choice or SPA submit redirect. |
+| Handoff | Artifact for **server** bridge/gateway — model does not own stash URL choice or SPA submit redirect; any citizen cue follows [`core.md`](./core.md) (in-chat actions / post-Send `continuation_url` — not bare «интерфейс»). |

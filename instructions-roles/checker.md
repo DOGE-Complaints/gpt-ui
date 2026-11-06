@@ -23,4 +23,4 @@ Enforce **safety/compliance** boundaries and **policy admission** for Issue inge
 |--------|--------|
 | Safety outcome | BLOCK / REQUEST / allow-continue signal with reason class when refusing. |
 | `policy_gate_result` (logical) | Admission status (e.g. approved / denied) + refs; approved material may proceed to `normalizer`. |
-| Handoff | On approve → `normalizer`. On deny/block → stop or remediate in dialogue — **never** model-owned HTTP submit workaround. |
+| Handoff | On approve → `normalizer`. On deny/block → stop or remediate in dialogue — **never** model-owned HTTP submit workaround; citizen-facing cues follow [`core.md`](./core.md) (actions / post-Send URL — not bare «интерфейс»). |

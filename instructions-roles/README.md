@@ -1,10 +1,11 @@
-# instructions-roles-req15 — REQ15 authoring SSOT (GPT UI)
+# instructions-roles — REQ15 authoring SSOT (GPT UI)
 
 | Field | Value |
 |-------|--------|
-| **UTC (P3)** | `2026-11-02T14:25:00Z` |
-| **Story** | STORY-GPT-ROL-03 · AC-GPT-ROL03-01/02 (= AC-GPT-48-02/03) |
-| **Wave** | pkg-000066 · GIM-453…461 |
+| **UTC (P3 ROL-03)** | `2026-11-02T14:25:00Z` |
+| **UTC (P3 ROL-05)** | `2026-11-06T11:58:46Z` |
+| **Story** | STORY-GPT-ROL-03 · AC-GPT-ROL03-01/02 · **+** STORY-GPT-ROL-05 · AC-ROL-05-01…04 |
+| **Wave** | pkg-000066 · GIM-453…461 · **pkg-000068** · GIM-468…474 |
 | **Skill** | `openai-custom-gpt-builder` |
 
 ## What this home is
@@ -29,9 +30,15 @@ Consumer rejects nested paths (`_reject_root_child`). Only these files:
 
 Schema-pack six-file + `schema-packs.README.md` stay **outside** this volume (mapping pack table / arch 02). Do **not** add pack entries as roles.manifest children in this home.
 
-## Stash / SPA (AC-03)
+## Stash / SPA (AC-03 / AC-ROL-05-03)
 
 This line **must not** teach the model to perform model-owned gateway story-draft stash handoffs or browser SPA submit redirects. Those duties are **server-only** (peer REQ-11). See mapping § orchestrator stash/SPA.
+
+## Channel proactivity + handoff (ROL-05)
+
+- Auto-advance when data enough — see [`core.md`](./core.md) / [`interviewer.md`](./interviewer.md).  
+- No bare «интерфейс» as sole submit path; align with server-minted in-chat actions and/or post-Send `continuation_url`.  
+- **Ownership:** aibridge [STORY-AIBRIDGE-68](../../doge-ai-bridge/docs/tasks/backlog-stories/req15-tg-channel-interviewer-ux/STORY-AIBRIDGE-68-channel-seam-send-actions-always.md) mints continue/edit/Send actions; roles prose does **not** POST gateway and does **not** invent action schemas.
 
 ## References (not Pass oracles)
 
