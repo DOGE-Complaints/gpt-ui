@@ -4,6 +4,8 @@
 **Sources (mapping `role(s)`):** archive `story-normalizer.md`  
 **Shared:** see [`core.md`](./core.md)
 
+**Citizen fence:** Internal handoff tables and role ids in this file are **model-facing**. Any citizen-visible `reply_text` **MUST** follow [`core.md`](./core.md) **Citizen surface covenant** — no operable normalizer/HANDOFF theater, no fake «передал», no free-text command school as primary.
+
 ## Purpose
 
 After policy admission, turn validated Issue material into a single deterministic logical package — **`normalized_issue_payload`** — for downstream **server** consumption. Structural only: do not re-run validation, safety, or policy admission.

@@ -5,8 +5,9 @@
 | **UTC (P3 ROL-03)** | `2026-11-02T14:25:00Z` |
 | **UTC (P3 ROL-05)** | `2026-11-06T11:58:46Z` |
 | **UTC (P3 ROL-06)** | `2026-11-06T12:10:14Z` |
-| **Story** | STORY-GPT-ROL-03 · AC-GPT-ROL03-01/02 · **+** STORY-GPT-ROL-05 · AC-ROL-05-01…04 · **+** STORY-GPT-ROL-06 · AC-ROL-06-01…04 |
-| **Wave** | pkg-000066 · GIM-453…461 · pkg-000068 · GIM-468…474 · **pkg-000069** · GIM-475…479 |
+| **UTC (P3 ROL-07)** | `2026-11-10T12:35:03Z` |
+| **Story** | STORY-GPT-ROL-03 · AC-GPT-ROL03-01/02 · **+** STORY-GPT-ROL-05 · AC-ROL-05-01…04 · **+** STORY-GPT-ROL-06 · AC-ROL-06-01…04 · **+** STORY-GPT-ROL-07 · AC-ROL-07-01…04 |
+| **Wave** | pkg-000066 · GIM-453…461 · pkg-000068 · GIM-468…474 · pkg-000069 · GIM-475…479 · **pkg-000070** · GIM-480…486 |
 | **Skill** | `openai-custom-gpt-builder` |
 
 ## What this home is
@@ -45,6 +46,13 @@ This line **must not** teach the model to perform model-owned gateway story-draf
 
 - TG air / blank lines, light markers (e.g. 🔸) over dense `**`, TG orange honesty, emoji budget — [`core.md`](./core.md) style block + [`interviewer.md`](./interviewer.md).  
 - Style-only: does **not** change ROL-05 stage/handoff behavior or stash/SPA invent bans.
+
+## Citizen surface — no role theater (ROL-07)
+
+- Covenant in [`core.md`](./core.md): citizen `reply_text` must not leak operable extractor/checker/normalizer/HANDOFF steps, fake «передал» progress, or free-text command school as primary when CTAs are the path.  
+- Utterance rules: [`interviewer.md`](./interviewer.md); fence lines on other role md.  
+- **Ownership:** aibridge [STORY-AIBRIDGE-71](../../doge-ai-bridge/docs/tasks/backlog-stories/req15-tg-channel-interviewer-ux/STORY-AIBRIDGE-71-awaiting-interpretation-actions-always.md) mints Confirm/Edit when awaiting interpretation; [STORY-AIBRIDGE-72](../../doge-ai-bridge/docs/tasks/backlog-stories/req15-tg-channel-interviewer-ux/STORY-AIBRIDGE-72-send-after-draft-confirm-and-validation.md) owns Send sequencing — roles **do not invent CTAs**; empty actions → honest wait/refuse, never theater substitute.  
+- Keeps ROL-03 stash/SPA invent bans and ROL-05/06 behavior.
 
 ## References (not Pass oracles)
 

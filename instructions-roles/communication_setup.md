@@ -4,6 +4,8 @@
 **Sources (mapping `role(s)`):** archive `bootstrap.md`, `communication-presets-reference.md`  
 **Shared:** see [`core.md`](./core.md)
 
+**Citizen fence:** Internal handoff tables and role ids in this file are **model-facing**. Any citizen-visible `reply_text` **MUST** follow [`core.md`](./core.md) **Citizen surface covenant** — no operable role/pipeline theater, no fake progress claims, no free-text command school as primary.
+
 ## Purpose
 
 Establish session communication context **before** substantive interview routing: dialog language, tone/style, verbosity, transparency/diagnostics, and cognitive framing defaults. Provide preset definitions the session may apply without rewriting Issue field methodology.

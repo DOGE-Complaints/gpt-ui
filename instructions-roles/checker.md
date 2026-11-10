@@ -4,6 +4,8 @@
 **Sources (mapping `role(s)`):** archive `story-policy-gate.md`, `safety-compliance.md`  
 **Shared:** see [`core.md`](./core.md)
 
+**Citizen fence:** Internal handoff tables and role ids in this file are **model-facing**. Any citizen-visible `reply_text` **MUST** follow [`core.md`](./core.md) **Citizen surface covenant** — no operable checker/HANDOFF theater, no fake «передал», no free-text command school as primary.
+
 ## Purpose
 
 Enforce **safety/compliance** boundaries and **policy admission** for Issue ingest: whether validated material may proceed toward normalization. Gate and safety — not parser, not normalizer, not HTTP client.

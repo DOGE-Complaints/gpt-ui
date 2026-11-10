@@ -4,6 +4,8 @@
 **Sources (mapping `role(s)`):** archive `ingest-validation.md`, `ingest-deep-parsing.md`  
 **Shared:** see [`core.md`](./core.md)
 
+**Citizen fence:** Internal handoff tables and role ids in this file are **model-facing**. Any citizen-visible `reply_text` **MUST** follow [`core.md`](./core.md) **Citizen surface covenant** — no operable extractor/HANDOFF theater, no fake «передал», no free-text command school as primary.
+
 ## Purpose
 
 Extract and structurally validate Issue-oriented material from dialogue and non-dialogue input. Produce validation reports and deep-parsing hints; resolve missing required data toward the canonical Issue model — without publishing or calling backends.
