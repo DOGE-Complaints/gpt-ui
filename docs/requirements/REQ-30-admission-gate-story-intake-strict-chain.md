@@ -4,7 +4,7 @@
 > **Технический контекст:** Action/tool `postStoryIntake` технически принимает валидный Story Intake envelope, даже если он был собран ad hoc — без доказанного наличия `ingest_validation_report`, `safety_compliance_report`, `policy_gate_result`, `normalized_issue_payload`. Pipeline guard отсутствует.
 
 **Версия:** 1.0 · 2026-05-29  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-06 (M1-06-05…07) closed; was `ready for tasking`  
 **Приоритет:** P1 (data integrity / analytics pollution / operator trust risk)  
 **Тип:** GPT instruction update — `api-orchestrator.md` §5.2 pre-flight; дополнительно server-side guardrail (SHOULD)  
 **Серверная сторона:** рекомендованные изменения (SHOULD) — reject non-substantive production payloads; HTTP 422 `INTAKE_NOT_SUBSTANTIVE`  

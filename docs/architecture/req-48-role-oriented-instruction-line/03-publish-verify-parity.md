@@ -34,7 +34,7 @@ Target evidence pack (logical; create at implement):
 Suggested homes at implement (pick one; do not create now):
 
 - `GPT UI/docs/analysis/req-48-export-parity-evidence-*.md`, or  
-- a file beside `instructions-roles-req15/` after that tree exists.
+- a file beside `instructions-roles/` after that tree exists.
 
 ## Verify surfaces
 
@@ -56,4 +56,4 @@ Incomplete/mismatched **consume** readiness is aibridge REQ-13 duty. GPT UI oper
 |----------|------|
 | Operator note (V2) | [`../../runtime-docs/req-48-roles-line-publish-operator-note-ru.md`](../../runtime-docs/req-48-roles-line-publish-operator-note-ru.md) |
 | Export Pass evidence (E1) | [`../../analysis/req-48-export-parity-evidence.md`](../../analysis/req-48-export-parity-evidence.md) |
-| Roles-schema manifest | [`../../../instructions-roles-req15/roles.manifest.json`](../../../instructions-roles-req15/roles.manifest.json) |
+| Roles-schema manifest | [`../../../instructions-roles/roles.manifest.json`](../../../instructions-roles/roles.manifest.json) |

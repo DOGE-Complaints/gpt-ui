@@ -5,7 +5,7 @@
 > **Технический SoT (сервер):** `doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md §6.3`, `src/core/application/services.py:117-137`, `src/core/geo/`.
 
 **Версия:** 1.0 · 2026-05-22  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-09 (M1-09-12…14) closed; was `ready for tasking`  
 **Приоритет:** P2  
 **Тип:** функциональное расширение — добавление нового поля в normalizer output и wire  
 **Серверная сторона:** не требует изменений — `contracts.py` уже принимает `narrative.location_query`; geo-резолвер уже реализован  

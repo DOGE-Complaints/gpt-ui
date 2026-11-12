@@ -7,7 +7,7 @@
 **Связанные эпики реализации (Scrum):** `GPT UI/docs/analysis/tasks/README-epics-module1-gpt-interview.md`  
 **Индекс эпиков и сторис (S / Key / Task):** `GPT UI/docs/analysis/tasks/gpt-interview-module1-tasks-index.md`
 
-## Оглавление REQ (43 файла; №37 вакантен)
+## Оглавление REQ (47 файлов на диске с REQ-45a + REQ-46 + REQ-47; №37 вакантен; child runtime → doge-ai-bridge REQ-01)
 
 | № | Файл |
 |---|------|
@@ -54,8 +54,23 @@
 | 41 | [REQ-41-trigger-observability-audit-trail.md](./REQ-41-trigger-observability-audit-trail.md) |
 | 42 | [REQ-42-adaptive-post-submission-confirmation-message.md](./REQ-42-adaptive-post-submission-confirmation-message.md) |
 | 43 | [REQ-43-proactive-story-intake-offer.md](./REQ-43-proactive-story-intake-offer.md) |
+| 44 | [REQ-44-research-program-framework.md](./REQ-44-research-program-framework.md) |
+| 45 | [REQ-45-semantic-schema-intake-envelope-compatibility.md](./REQ-45-semantic-schema-intake-envelope-compatibility.md) |
+| 45a | [REQ-45a-pack-prose-identities-and-flat-layout.md](./REQ-45a-pack-prose-identities-and-flat-layout.md) |
+| 46 | [REQ-46-pack-builder-prompt-wrapper-and-repair-debug.md](./REQ-46-pack-builder-prompt-wrapper-and-repair-debug.md) |
+| 47 | [REQ-47-responses-api-https-bearer-bridge.md](./REQ-47-responses-api-https-bearer-bridge.md) — protocol: Responses → Story Intake channel; runtime child = [`doge-ai-bridge` REQ-01](../../../doge-ai-bridge/docs/requirements/REQ-01-doge-ai-bridge-runtime.md) (Draft; ≠ gateway REQ-47) |
 
-**Версия:** 1.9 · 2026-06-09 (REQ-43 Done — proactive story-intake offer; `story-interview-flow.md` v0.20 §5 Q7 non-blocking, §7.5 proactive offer, §8 anti-pattern row 10; GAP-43-01/02 gateway REQ-43 (institution) namespace disambiguation; P3 demo+post-demo).
+**Версия:** 2.5 · 2026-09-10 (REQ-47.1 relocated → doge-ai-bridge REQ-01; GPT UI keeps protocol REQ-47 only).
+
+Предыдущее (2.4 · 2026-09-10): REQ-47 v0.3 protocol parent + REQ-47.1 child (temp under GPT UI).
+
+Предыдущее (2.2 · 2026-09-03): REQ-45a Draft — pack prose identities + flat `schema-packs.*`; continuation of REQ-45; REQ-46 v0.6 consumes REQ-45a layout SSOT.
+
+Предыдущее (2.1 · 2026-09-03): REQ-46 Draft — Pack Builder wrapper/primary/repair + validation schemas; child of product REQ4 §5.1; orthogonal to REQ-45 interview overlays.
+
+Предыдущее (2.0 · 2026-07-24): REQ-18/19/20 Status synced **Done** — relevance audit: handoff/auth/taxonomy closed via REQ-22, SUBMIT-01/02, GIM-57, EPIC-M1-08 + GPT-TAX-01; obsolete draft bits marked in REQ headers.
+
+Предыдущее (1.9 · 2026-06-09): REQ-43 Done — proactive story-intake offer; `story-interview-flow.md` v0.20 §5 Q7 non-blocking, §7.5 proactive offer, §8 anti-pattern row 10; GAP-43-01/02 gateway REQ-43 (institution) namespace disambiguation; P3 demo+post-demo).
 
 Предыдущее (1.8 · 2026-06-08): REQ-42 Done — adaptive post-submit message; `comm_context.cognitive_style` (systemic/narrative/mixed, passive, default mixed), `api-orchestrator.md` §5.2.4, оба 202-статуса, Citizen forbidden-lexicon; GAP-42-01 namespace disambiguation gateway vs GPT-UI REQ-42; P3 demo+post-demo.
 

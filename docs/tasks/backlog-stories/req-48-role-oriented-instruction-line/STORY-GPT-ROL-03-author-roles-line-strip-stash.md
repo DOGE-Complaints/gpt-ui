@@ -20,7 +20,7 @@
 
 ## Scope
 
-- Create authoring/export home `GPT UI/instructions-roles-req15/` with shared **core** + five role files for ids: `communication_setup` · `interviewer` · `extractor` · `normalizer` · `checker` (root children only — §3b).
+- Create authoring/export home `GPT UI/instructions-roles/` with shared **core** + five role files for ids: `communication_setup` · `interviewer` · `extractor` · `normalizer` · `checker` (root children only — §3b).
 - Prose: purpose, bounds, result-shape expectations; methodology from mapping (no silent drop).
 - New line **MUST NOT** require the model to perform gateway stash or SPA redirect (**AC-03**).
 
@@ -33,14 +33,14 @@
 
 ## Verified current state
 
-- Sibling tree **Present** — [`GPT UI/instructions-roles-req15/`](../../../../instructions-roles-req15/) (core + five roles + README; P3).
+- Sibling tree **Present** — [`GPT UI/instructions-roles/`](../../../../instructions-roles/) (core + five roles + README; P3).
 - Grep gate **CLEAN** — no model duty strings for gateway story-draft stash / SPA submit redirect (AC-02).
 - Fixture reference (not GPT UI SSOT): [`doge-ai-bridge/tests/fixtures/content/roles.manifest.json`](../../../../../doge-ai-bridge/tests/fixtures/content/roles.manifest.json) + `roles-instructions/*.md`.
 - Path rule: `doge-ai-bridge/src/aibridge/roles/assembly.py` `_reject_root_child`.
 
 ## Target / Acceptance Criteria
 
-- [x] **AC-GPT-ROL03-01** (= **AC-GPT-48-02**): Five roles + shared core Present under `instructions-roles-req15/`; documented as REQ15 authoring SSOT.
+- [x] **AC-GPT-ROL03-01** (= **AC-GPT-48-02**): Five roles + shared core Present under `instructions-roles/`; documented as REQ15 authoring SSOT.
 - [x] **AC-GPT-ROL03-02** (= **AC-GPT-48-03**): Review/grep gate — new line has no model duty for gateway stash URL / `POST /story-drafts` / SPA redirect procedure.
 
 ## Подзадачи (технические)
@@ -49,7 +49,7 @@
 
 | ID | Task | AC | Done when |
 |----|------|-----|-----------|
-| **T01** | Create sibling dir `GPT UI/instructions-roles-req15/` with **root children only** (no `/` in manifest paths): `core.md`, `communication_setup.md`, `interviewer.md`, `extractor.md`, `normalizer.md`, `checker.md`. Enforce consumer path rule (`assembly.py` `_reject_root_child`). | AC-01 | Six files Present as root children |
+| **T01** | Create sibling dir `GPT UI/instructions-roles/` with **root children only** (no `/` in manifest paths): `core.md`, `communication_setup.md`, `interviewer.md`, `extractor.md`, `normalizer.md`, `checker.md`. Enforce consumer path rule (`assembly.py` `_reject_root_child`). | AC-01 | Six files Present as root children |
 | **T02** | Author **`core.md`** from mapping rows classed `shared` (bootstrap/comm + constitution; no node field catalogs / no pack six-file embed — P1). | AC-01 | core.md Present; maps to shared |
 | **T03** | Author **`communication_setup.md`** — purpose, bounds, result-shape expectations for role id `communication_setup`. | AC-01 | File Present |
 | **T04** | Author **`interviewer.md`** — same for `interviewer`. | AC-01 | File Present |
@@ -67,14 +67,14 @@
 
 | Role | Path |
 |------|------|
-| Sibling home | `GPT UI/instructions-roles-req15/` |
+| Sibling home | `GPT UI/instructions-roles/` |
 | Core | `…/core.md` |
 | Roles | `…/communication_setup.md` · `interviewer.md` · `extractor.md` · `normalizer.md` · `checker.md` |
 | Sibling README | `…/README.md` |
 
 ## Точки в репо
 
-- `GPT UI/instructions-roles-req15/` — create on implement / P3; filenames must match later `roles.manifest.json` (ROL-04).
+- `GPT UI/instructions-roles/` — create on implement / P3; filenames must match later `roles.manifest.json` (ROL-04).
 - Do not treat aibridge fixtures as Export Pass oracle.
 
 ## Dependencies

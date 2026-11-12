@@ -25,7 +25,7 @@
 GPT UI/
   instructions/                          # working as-was (Custom GPT continuity)
   instructions-archive-module1-req48/    # B2 snapshot baseline (name ≠ create until implement)
-  instructions-roles-req15/              # B sibling: authoring SSOT + export-ready flat root children
+  instructions-roles/              # B sibling: authoring SSOT + export-ready flat root children
 ```
 
 **Flow (logical):**
@@ -51,7 +51,7 @@ Details: [01](./01-git-homes-and-ownership.md) · [02](./02-export-roles-schema-
 
 ## Ownership / contracts
 
-- **SSOT texts (new line):** `GPT UI/instructions-roles-req15/` after implement.  
+- **SSOT texts (new line):** `GPT UI/instructions-roles/` after implement.  
 - **Consumer contract:** REQ-48 §3b / REQ-13 §3b — do not invent alternate layout.  
 - **Path rule:** root children only (`assembly.py` `_reject_root_child`).  
 - **Role ids:** `communication_setup` · `interviewer` · `extractor` · `normalizer` · `checker`.  

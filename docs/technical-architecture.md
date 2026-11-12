@@ -4,6 +4,8 @@
 **SoT по коду инструкций:** файлы в `GPT UI/instructions/`; для **DOGEstonia Issue** контракт HTTP — **`GPT UI/instructions/story-api-methods-reference.md`** и импортированный Actions contract (build/import artifact: `GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml`).  
 **Метод:** `@analysis.mdc` — только проверяемые факты из актуальных секций; legacy donor тела вырезаны (**2026-04-20**, strategy **C**).
 
+**Карта 2026-09+ (два канала, packs, bridge delivery):** [`docs/architecture/README.md`](./architecture/README.md) — не заменяет этот extract; расширяет навигацию Actions vs `doge-ai-bridge`.
+
 **Версия:** 0.3 · 2026-04-20
 
 ---

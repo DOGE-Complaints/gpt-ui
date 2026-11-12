@@ -5,7 +5,7 @@
 > **Технический SoT (сервер):** `doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md §6.3`, `src/core/domain/narrative_i18n.py:parse_required_i18n_dict()`.
 
 **Версия:** 1.0 · 2026-05-22  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-09 (M1-09-09…11) closed; was `ready for tasking`  
 **Приоритет:** P1  
 **Тип:** активация функционала (canonical fields) + исправление бага (summary rule)  
 **Серверная сторона:** не требует изменений — `contracts.py` и `parse_story_intake_request()` уже принимают оба поля  

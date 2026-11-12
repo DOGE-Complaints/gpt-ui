@@ -50,7 +50,7 @@
 
 | ID | Task | AC | Done when |
 |----|------|-----|-----------|
-| **T01** | Add `GPT UI/instructions-roles-req15/roles.manifest.json` — roles-schema §3b: `bundle_version` (string), `core` → `core.md`, `roles` for five ids each `{ "file", "version" }` with root-child filenames from ROL-03; start pins **`v1`** unless mapping says otherwise. Shape ref: fixture (not oracle). | AC-05 | Manifest Present + valid shape |
+| **T01** | Add `GPT UI/instructions-roles/roles.manifest.json` — roles-schema §3b: `bundle_version` (string), `core` → `core.md`, `roles` for five ids each `{ "file", "version" }` with root-child filenames from ROL-03; start pins **`v1`** unless mapping says otherwise. Shape ref: fixture (not oracle). | AC-05 | Manifest Present + valid shape |
 | **T02** | Document env cutover in operator note / evidence header: `DOGESTONIA_INSTRUCTIONS_DIR` → sibling root; `DOGESTONIA_INSTRUCTIONS_MANIFEST` → roles-schema path; Phase-A `files[]` **not** new-line SSOT. | AC-05, AC-07 | Wording Present |
 | **T03** | **E1 Export Pass evidence** at `GPT UI/docs/analysis/req-48-export-parity-evidence.md`: intended inventory (manifest + six md); per-file sha256 after UTF-8 + LF (`normalize_text` in `doge-ai-bridge/src/aibridge/content.py` L23–26) then `sha256_hex`; record `bundle_version`; labels **≠ joint wire SSOT**, **≠ Consume Pass**. Do not conflate with runtime `session_pin`. | AC-06 | Evidence file Present; hashes match files |
 | **T04** | **Operator note (V2)** at `GPT UI/docs/runtime-docs/req-48-roles-line-publish-operator-note-ru.md`: three Git homes; archive vs new line; manual publish-to-volume steps; warn against subset publish without updating inventory; **no** CI/image sync script. | AC-07 | Note Present |
@@ -61,13 +61,13 @@
 
 | Role | Path |
 |------|------|
-| Manifest | `GPT UI/instructions-roles-req15/roles.manifest.json` |
+| Manifest | `GPT UI/instructions-roles/roles.manifest.json` |
 | Export evidence | `GPT UI/docs/analysis/req-48-export-parity-evidence.md` |
 | Operator note | `GPT UI/docs/runtime-docs/req-48-roles-line-publish-operator-note-ru.md` |
 
 ## Точки в репо
 
-- Manifest + role files under `GPT UI/instructions-roles-req15/` (from ROL-03).
+- Manifest + role files under `GPT UI/instructions-roles/` (from ROL-03).
 - Evidence / operator note: locked paths above.
 - Peer shape reference: fixtures only.
 

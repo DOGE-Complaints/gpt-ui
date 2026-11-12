@@ -5,7 +5,7 @@
 > 2) user authorization flow и перенос user identity в intake payload.
 
 **Версия:** 0.1 · 2026-04-21  
-**Статус:** active draft  
+**Статус:** Done — GIM-57 / `task-data-auth-boundaries-bearer-vs-user-identity` (boundaries в `api-orchestrator.md` + `story-api-methods-reference.md`). §1–2 remain valid SoT (bearer ≠ user identity).  
 **Связанные документы:** [REQ-18](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md), [Gateway API Reference](../../../doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md)
 
 ---
@@ -41,26 +41,26 @@
 
 ## 3. User authorization flow (demo redirect pattern)
 
-### 3.1 Целевой demo-flow
+> **Obsolete / superseded by GPT-SUBMIT-01 (2026-07):** user author is resolved at **browser submit** via identity `/me` (GW-DRAFT-02), not via GPT Actions payload. GPT stash body has **no `submitter`**. Mock IdP → `submitter.external_user_id` in GPT intake is **historical**. Bearer ≠ user identity (§1–2) still applies.
 
-Для demo допускается внешний redirect flow:
+### 3.1 Целевой demo-flow (historical)
+
+Для demo допускался внешний redirect flow:
 1. Из диалога пользователь переходит по ссылке на внешнюю mock IdP страницу (веб-приложение).
 2. Mock IdP выполняет user-auth (демо-режим для фиксированного пользователя).
 3. IdP возвращает redirect обратно в диалог с параметром user id.
 4. Полученный user id маппится в payload story intake как `submitter.external_user_id`.
 
-### 3.2 Контрактная привязка
+### 3.2 Контрактная привязка (historical for GPT Actions user path)
 
-Для `POST /intake/stories` (planned HTTP binding, existing contract):
-- `submitter.external_user_id` — required, non-empty string.
-- `submitter.identity_issuer` — optional.
+Для service `POST /intake/stories` (gateway): `submitter.external_user_id` may still apply on **service** intake. GPT **user** path uses stash without `submitter`.
 
-Источник: `doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md` (раздел `POST /intake/stories`, identity linkage path).
+Источник (gateway): `doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md`.
 
-### 3.3 Boundary-правило
+### 3.3 Boundary-правило (still valid)
 
 - User identity не выводится из server bearer.
-- User identity передаётся явно в payload уровня доменной истории.
+- User identity для published story — не из GPT Actions bearer; для user path — browser session (`/me`), не поле GPT stash.
 
 ---
 

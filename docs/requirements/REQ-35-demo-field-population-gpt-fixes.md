@@ -2,14 +2,14 @@
 
 > **Назначение:** закрыть остаточную дельту GPT-инструктажного слоя по наполнению полей при подаче истории, выявленную тест-прогоном 2026-06-01. Бóльшая часть исходного списка уже закрыта парными REQ (см. §1.1 «Уже сделано»); этот REQ фиксирует **только проверенную по коду дельту**: (1) `location_query` сформулирован как разрешение, а не обязанность, и без правила латиницы; (2) `origin.conversation_id` без guidance на заполнение из контекста; (3) `gpt_signals.severity` без активного правила определения.
 > **Источник:** перенос GPT-части из `doge-complaints-gateway/docs/requirements/47-demo-operational-railway-gpt-fixes.md` §2 (Railway-часть §3 — не-GPT ops, остаётся в REQ-47); первичный источник — [`1.06.26-testing-gap-report.md`](../analysis/1.06.26-testing-gap-report.md).
-> **Технический контекст:** backend `normalize_location_query()` ([`src/core/geo/normalize.py`](../../doge-complaints-gateway/src/core/geo/normalize.py)) приводит запрос к lowercase; кириллица расширяется парным REQ-46 (backend, ready-for-tasking), латиница предпочтительна для надёжности geo-резолва.
+> **Технический контекст:** backend `normalize_location_query()` ([`src/core/geo/normalize.py`](../../../doge-complaints-gateway/src/core/geo/normalize.py)) приводит запрос к lowercase; кириллица расширяется парным REQ-46 (backend, ready-for-tasking), латиница предпочтительна для надёжности geo-резолва.
 
 **Версия:** 1.0 · 2026-06-03
 **Статус:** Done — instruction P3 (pkg-000016 · GIM-152…155 🟢 2026-06-03); manual replay Advisory pending
 **Приоритет:** P2 (качество данных demo: geo-поля, атрибуция канала, severity-сигнал)
 **Тип:** GPT instruction update — `story-normalizer.md` §4.6 + §4.3; `api-orchestrator.md` §5.2.1
 **Серверная сторона:** не требует изменений (backend принимает все поля; geo-расширение — отдельный REQ-46)
-**Парные REQ:** [REQ-26](./REQ-26-location-query-normalizer-to-wire.md) (location_query wire), [REQ-32](./REQ-32-origin-traceability-sending-enforcement.md) (origin.source enforcement), [REQ-34](./REQ-34-summary-generation-and-canonical-type-clarity.md) (summary generation), [REQ-27](./REQ-27-gpt-signals-enum-sync-and-data-model-update.md) (gpt_signals enums) · backend [REQ-46](../../doge-complaints-gateway/docs/requirements/46-demo-backend-geo-intake-notes-logging.md), [REQ-47](../../doge-complaints-gateway/docs/requirements/47-demo-operational-railway-gpt-fixes.md)
+**Парные REQ:** [REQ-26](./REQ-26-location-query-normalizer-to-wire.md) (location_query wire), [REQ-32](./REQ-32-origin-traceability-sending-enforcement.md) (origin.source enforcement), [REQ-34](./REQ-34-summary-generation-and-canonical-type-clarity.md) (summary generation), [REQ-27](./REQ-27-gpt-signals-enum-sync-and-data-model-update.md) (gpt_signals enums) · backend [REQ-46](../../../doge-complaints-gateway/docs/requirements/46-demo-services-enablement-and-response-transparency.md), [REQ-47](../../../doge-complaints-gateway/docs/requirements/47-demo-operational-railway-gpt-fixes.md)
 
 ---
 
@@ -87,7 +87,7 @@
 
 ## 5. Не в scope этого REQ
 
-- **Railway deployment / ops** (REQ-47 §3: env vars, `/ready`, миграции `story_signals`) — не-GPT инфраслой, остаётся в [REQ-47](../../doge-complaints-gateway/docs/requirements/47-demo-operational-railway-gpt-fixes.md).
-- Изменения backend (geo-расширение, кириллица, `intake_notes`) — [REQ-46](../../doge-complaints-gateway/docs/requirements/46-demo-backend-geo-intake-notes-logging.md).
+- **Railway deployment / ops** (REQ-47 §3: env vars, `/ready`, миграции `story_signals`) — не-GPT инфраслой, остаётся в [REQ-47](../../../doge-complaints-gateway/docs/requirements/47-demo-operational-railway-gpt-fixes.md).
+- Изменения backend (geo-расширение, кириллица, `intake_notes`) — [REQ-46](../../../doge-complaints-gateway/docs/requirements/46-demo-services-enablement-and-response-transparency.md).
 - `origin.source` / summary generation / gpt_signals enums / location wire-маппинг — уже закрыты (см. §1.1).
 - Реальный geocoding API — product backlog.

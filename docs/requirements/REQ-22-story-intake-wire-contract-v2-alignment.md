@@ -5,7 +5,7 @@
 > **Анализ исходных gap-ов:** `doge-complaints-gateway/docs/analysis/gap-analysis-gpt-to-server-story-model-2026-05-21.md` (GAP-W-01…05).
 
 **Версия:** 1.0 · 2026-05-21  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-09 wave (M1-09-01…05 + related) closed; was `ready for tasking`  
 **Приоритет:** P0 (блокирует intake: текущие GPT-отправки отвергаются сервером)  
 **Источник:** Gap-интервью 2026-05-21, все P0 гапы в одном батче  
 **Связанные серверные REQ:** `doge-complaints-gateway/docs/requirements/33-multilingual-story-intake-contract-v2.md`  

@@ -6,7 +6,7 @@
 
 ## Roles export surface (sibling root)
 
-After implement, `GPT UI/instructions-roles-req15/` is intended to hold **flat root children** suitable for direct use as `DOGESTONIA_INSTRUCTIONS_DIR`:
+After implement, `GPT UI/instructions-roles/` is intended to hold **flat root children** suitable for direct use as `DOGESTONIA_INSTRUCTIONS_DIR`:
 
 | Contract field | Value |
 |----------------|-------|

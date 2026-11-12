@@ -9,7 +9,7 @@
 |------|----------------------|------|
 | Working as-was | `GPT UI/instructions/` | Custom GPT Knowledge / as-built docs links; continuity (**C2**) |
 | Snapshot archive | `GPT UI/instructions-archive-module1-req48/` | Immutable baseline copy of pre-cutover Module-1 + active pack (**B2**, AC-04) |
-| Roles sibling | `GPT UI/instructions-roles-req15/` | New-line authoring SSOT + export-ready flat root children (**B**, AC-02/05) |
+| Roles sibling | `GPT UI/instructions-roles/` | New-line authoring SSOT + export-ready flat root children (**B**, AC-02/05) |
 
 **Name ≠ create:** paths are target architecture. Do not scaffold empty trees until an implement wave explicitly orders creation.
 
@@ -23,7 +23,7 @@
 ## Custom GPT policy (C2)
 
 - As-was channel: **continuity / best-effort**, not a second feature roadmap inside REQ-48.  
-- New authoring only in `instructions-roles-req15/`.  
+- New authoring only in `instructions-roles/`.  
 - Long-term Actions sunset remains **Open** (REQ-48 §6) — not decided by this arch.  
 - AC-03 (no model-owned stash/SPA) applies to the **new** line; rewriting as-was `api-orchestrator.md` is not required for REQ-48 DoD under C2.
 

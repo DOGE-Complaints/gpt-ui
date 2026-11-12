@@ -5,7 +5,7 @@
 > **Технический контекст:** `services.py:208` корректно маппит `request.origin.source → origin_source` в БД. Если поле null в БД — значит `origin.source` не было в запросе. Backend не виноват.
 
 **Версия:** 1.0 · 2026-06-01  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-06 (M1-06-13…15) closed; was `ready for tasking`  
 **Приоритет:** P2 (traceability gap — нет runtime breakage, но диагностика инцидентов без origin_source существенно сложнее)  
 **Тип:** GPT instruction update — `api-orchestrator.md` §5.2.1; `custom-gpt-story-intake-actions.openapi.yaml` annotation fix  
 **Серверная сторона:** не требует изменений (backend код корректен)  

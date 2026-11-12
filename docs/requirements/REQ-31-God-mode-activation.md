@@ -4,7 +4,7 @@
 > **Источник:** продуктовое требование — UX quality / operator observability (автор: Product Management)
 
 **Версия:** 1.0 · 2026-05-29  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-06 (M1-06-08…12) closed; was `ready for tasking`  
 **Приоритет:** P2 (UX quality risk; нет runtime-breakage, но citizen UX некорректен без этого)  
 **Тип:** GPT instruction update — `api-orchestrator.md` pre-submit preview; новый instruction block для debug-token activation; `custom-gpt-story-intake-actions.openapi.yaml` (action naming + description)  
 **Серверная сторона:** не требует изменений  

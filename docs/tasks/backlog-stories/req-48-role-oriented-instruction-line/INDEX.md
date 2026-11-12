@@ -16,6 +16,10 @@
 **Progress:** 4/4 Done (Awaiting Commits) · **As-of:** 2026-11-02T14:39:55Z  
 **Technical subtaks:** ROL-01…04 product Present (archive · mapping · sibling · manifest/evidence/operator-note)
 
+## Peer residual (do not reopen 01–04)
+
+REQ15 TG interviewer roles UX (proactivity + surface): package [`../req15-tg-interviewer-roles-ux/INDEX.md`](../req15-tg-interviewer-roles-ux/INDEX.md) · **STORY-GPT-ROL-05** / **06** · Todo · requirements-only · [root triage](../../../../../docs/analysis/req15-tg-interviewer-ux-gap-triage-2026-11-06.md).
+
 ## Граница
 
 - GPT UI owns instruction **texts**, mapping, export layout/parity evidence, operator publish note.

@@ -6,7 +6,15 @@
 > При расхождении между этим REQ и §19 приоритет у **§19**; REQ-18 задаёт обязательность для GPT и трассировку к **REQ-01…18** (включая связанные FR из REQ-09).
 
 **Версия:** 0.1 · 2026-04-19  
-**Статус:** активный draft, синхронизирован с §19 (включая `schema_version` `m2.story_intake_envelope.v1`).
+**Статус:** Done (superseded details) — handoff реализован (GIM-97; [REQ-22](./REQ-22-story-intake-wire-contract-v2-alignment.md); EPIC-M1-06; GPT-SUBMIT-01/02). Тело документа ниже частично **historical**.
+
+### Current SoT / Obsolete in this draft
+
+| Topic | Normative now | Obsolete in body below |
+|-------|---------------|------------------------|
+| Wire envelope | `schema_version` **`m2.story_intake_envelope.v2`** — [REQ-22](./REQ-22-story-intake-wire-contract-v2-alignment.md), OpenAPI 0.7.0, [`api-orchestrator.md`](../../instructions/api-orchestrator.md) §5.2 | `m2.story_intake_envelope.v1` |
+| User path | Stash `POST /story-drafts` + browser redirect (GPT-SUBMIT-01/02); Actions body = `StoryDraftStashRequest`, **no `submitter`** | GPT `submitter.external_user_id`; direct user `POST` intake as primary path |
+| Field lock | [`story-api-methods-reference.md`](../../instructions/story-api-methods-reference.md) + orchestrator §5.2.1 | Dual «Issues Actions vs Story Intake» wording where it contradicts stash-only Actions |
 
 ---
 

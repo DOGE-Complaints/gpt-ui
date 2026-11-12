@@ -4,7 +4,7 @@
 > **Источник:** `GPT UI/docs/audit-field-provenance-2026-05-24.md` (FINDING-04)
 
 **Версия:** 1.0 · 2026-05-25  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-02 (M1-02-07…08) closed; was `ready for tasking`  
 **Приоритет:** P3 (civic quality / transparency; нет runtime-breakage)  
 **Тип:** GPT instruction update — `story-interview-flow.md` §7.2 Phase 7; поведение не блокирующее  
 **Серверная сторона:** не требует изменений  

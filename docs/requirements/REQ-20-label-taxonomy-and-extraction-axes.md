@@ -2,7 +2,7 @@
 
 > **Назначение:** зафиксировать requirements-level модель того, как Custom GPT должен извлекать `labels` из истории жителя, используя не одну плоскую тему, а несколько осей анализа: практическую, системную, социальную, эмоционально-смысловую, административную и safety/privacy.
 >
-> **Статус:** active draft. Это требования к GPT instruction layer и logical Issue draft, **не transport/API schema**.
+> **Статус:** Done — EPIC-M1-08 (GM8-01…07). Live SSOT: [`story-label-taxonomy.md`](../../instructions/story-label-taxonomy.md) (13 axes); wire: GPT-TAX-01 `narrative.taxonomy` (per-axis `{label, disposition}`). §5 flat `labels[]` shape below is **historical** vs current transport. Further expansions: REQ-33/36/38.
 
 **Версия:** 0.1 · 2026-04-26  
 **Связанные документы:** [REQ-09](./REQ-09-functional-requirements.md), [REQ-10](./REQ-10-output-content-model.md), [REQ-12](./REQ-12-anti-patterns.md), [REQ-15](./REQ-15-working-assumptions.md), [REQ-16](./REQ-16-open-decisions.md), [REQ-18](./REQ-18-api-inbound-story-intake-and-gpt-handoff.md), [`story-data-model.md`](../../instructions/story-data-model.md), [`story-interview-flow.md`](../../instructions/story-interview-flow.md), [`story-normalizer.md`](../../instructions/story-normalizer.md).

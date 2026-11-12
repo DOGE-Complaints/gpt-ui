@@ -6,14 +6,15 @@ Siblings:
 - [doge-ai-bridge REQ-13](../../../doge-ai-bridge/docs/requirements/REQ-13-REQ15-SEMANTIC-STATE-ROLES-INSTRUCTION-ASSEMBLY.md) (contract: per-role assembly from `DOGESTONIA_INSTRUCTIONS_DIR` + manifest / volume; **consume parity Pass**; **§3b export target** below)
 - [doge-ai-bridge REQ-11](../../../doge-ai-bridge/docs/requirements/REQ-11-REQ15-DUAL-CONFIRM-GATEWAY-SUBMIT-SPA-HANDOFF.md) (stash + SPA continuation **in server code**, not in instruction prose)
 - [doge-ai-bridge REQ-12](../../../doge-ai-bridge/docs/requirements/REQ-12-REQ15-INTERVIEW-DEEPSEEK-OPENAI-PROVIDERS.md) (no instruction authorship)
-Status: Draft — awaiting PA.2 · **target tech-arch Present**  
-Дата: 2026-10-31 · cascade refresh: 2026-11-02  
+Status: Draft — stories ROL-01…04 Done; Product Status not Accepted (consume/volume residuals) · **target tech-arch Present**  
+Дата: 2026-10-31 · cascade refresh: 2026-11-03  
 Locks: hybrid **C**; parity **both** sides; operator lock B — this REQ owns instruction **content** work in GPT UI  
 **Disambiguation:** **GPT UI REQ-48** (this file, REQ15 role-oriented instructions) **≠** gateway [`48-early-signal-pre-cluster-data-readiness.md`](../../../doge-complaints-gateway/docs/requirements/48-early-signal-pre-cluster-data-readiness.md) (Early Signal program — different product)  
-**Stitch audit:** [`docs/analysis/req15-aibridge-telegram-gpt48-stitch-audit-2026-11-02.md`](../../../docs/analysis/req15-aibridge-telegram-gpt48-stitch-audit-2026-11-02.md)  
+**Gap audit:** [`docs/analysis/req15-target-state-code-gap-audit-2026-11-03.md`](../../../docs/analysis/req15-target-state-code-gap-audit-2026-11-03.md)  
+**Stitch audit:** [`docs/analysis/req15-aibridge-telegram-gpt48-stitch-audit-2026-11-02.md`](../../../docs/analysis/req15-aibridge-telegram-gpt48-stitch-audit-2026-11-02.md) (S5 superseded)  
 **Architecture:** [`../architecture/req-48-role-oriented-instruction-line/00-overview.md`](../architecture/req-48-role-oriented-instruction-line/00-overview.md)  
 **Interview report:** [`../analysis/zeya888.target-tech-arch-interview-req-48-role-oriented-instruction-line-2026-11-02.md`](../analysis/zeya888.target-tech-arch-interview-req-48-role-oriented-instruction-line-2026-11-02.md)  
-**Backlog package:** [`../tasks/backlog-stories/req-48-role-oriented-instruction-line/INDEX.md`](../tasks/backlog-stories/req-48-role-oriented-instruction-line/INDEX.md) (GPT-ROL-01…04)
+**Backlog package:** [`../tasks/backlog-stories/req-48-role-oriented-instruction-line/INDEX.md`](../tasks/backlog-stories/req-48-role-oriented-instruction-line/INDEX.md) (GPT-ROL-01…04 Done)
 
 ---
 
@@ -66,19 +67,21 @@ Locks: hybrid **C**; parity **both** sides; operator lock B — this REQ owns in
 - Sense-brief / poster worker content.  
 - Telegram transport.
 
-## 3) Verified current state (cascade 2026-11-02)
+## 3) Verified current state (cascade 2026-11-03)
 
 | Fact | Path / note |
 |------|-------------|
-| Module-1 SSOT (as-was) | `GPT UI/instructions/` · [`instruction-modules-index.md`](../../instructions/instruction-modules-index.md) |
-| One-personality chain | ingest → safety → policy → normalizer → api-orchestrator (+ interview-flow, packs) |
-| Model-owned stash + SPA redirect | [`api-orchestrator.md`](../../instructions/api-orchestrator.md) §5.2 / §5.2.B — must become **server-only** in new line |
-| Channel path (aibridge) | Still single assembled string / Keep `InterviewEngine` on `/v1/channel/turns` — **not** per-role orchestration yet |
-| Role registry + assembly (harness) | **Present** in aibridge REQ-13 (STORY-62…64): `roles/registry.py`, `roles/assembly.py`, fixture [`roles.manifest.json`](../../../doge-ai-bridge/tests/fixtures/content/roles.manifest.json) |
-| ASGI / channel wire for roles + semantic state | **Absent / WAIVED** (REQ-13 G-02) — blocking live AC-06/09, **not** blocking GPT-48 authoring under §3b |
-| Phase-A content load | `content.py` + `files[]` manifest — **legacy/transitional** readiness; **not** SSOT of the new export line |
+| Module-1 SSOT (as-was active tree) | `GPT UI/instructions/` · [`instruction-modules-index.md`](../../instructions/instruction-modules-index.md) |
+| Archive prerequisite | **Present:** `GPT UI/instructions-archive-module1-req48/` |
+| Mapping table | **Present:** [`docs/analysis/req-48-module1-role-mapping.md`](../analysis/req-48-module1-role-mapping.md) |
+| New roles line + manifest | **Present:** `GPT UI/instructions-roles/` (`core.md` + five role files + `roles.manifest.json`) |
+| Export parity evidence | **Present:** [`docs/analysis/req-48-export-parity-evidence.md`](../analysis/req-48-export-parity-evidence.md) (export Pass ≠ consume Pass) |
+| Model-owned stash + SPA in **as-was** | Still in [`api-orchestrator.md`](../../instructions/api-orchestrator.md) §5.2 — **archive/server-only**; new line must not own submit |
+| Channel path (aibridge) | Still mega-string Keep `InterviewEngine` — roles assembly **not** channel-wired (REQ-13 G-02 WAIVED) |
+| Role registry + assembly (harness) | **Present** aibridge REQ-13; fixture [`roles.manifest.json`](../../../doge-ai-bridge/tests/fixtures/content/roles.manifest.json) |
+| Phase-A content load | `content.py` `files[]` — legacy/transitional on channel; **not** cut over to roles-schema |
 | Sync GPT UI → aibridge | Script **not found**; v1 may be manual volume upload |
-| This REQ export bodies / archive tree / mapping table | **Absent** (name ≠ create until PA.2 / implement ordered) |
+| Stories | ROL-01…04 **Done** (package INDEX); this REQ Status remains **Draft** until consume/volume residuals accepted |
 
 ### 3b) Export consumer contract (locked · copy from aibridge REQ-13 §3b)
 

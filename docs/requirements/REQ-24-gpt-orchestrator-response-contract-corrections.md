@@ -5,7 +5,7 @@
 > **Технический SoT (сервер):** `doge-complaints-gateway/docs/runtime-docs/api-reference/API_REFERENCE.md §4, §6.5, §6.6, §6.7`.
 
 **Версия:** 1.0 · 2026-05-22  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-09 (M1-09-06…08) closed; was `ready for tasking`  
 **Приоритет:** P1  
 **Тип:** документационные исправления — поведение GPT не меняется, только описание контракта  
 **Парные REQ:** [REQ-22](./REQ-22-story-intake-wire-contract-v2-alignment.md), [REQ-23](./REQ-23-gpt-behavioral-extensions-pii-signals-consistency.md)

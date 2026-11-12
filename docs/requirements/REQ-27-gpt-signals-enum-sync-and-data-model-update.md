@@ -5,7 +5,7 @@
 > **Технический SoT (сервер):** `src/core/intake/contracts.py:61-65` (frozensets); `_parse_gpt_signal_enum()` (lines 128-148).
 
 **Версия:** 1.0 · 2026-05-25  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-10 (M1-10-07…09) closed; was `ready for tasking`  
 **Приоритет:** P1 (GAP-01/03 — прямой HTTP 400); P2 (GAP-02/04 — runtime-risk / confusion-risk)  
 **Тип:** документационные исправления — поведение GPT не меняется (normalizer уже содержит корректные значения); исправляется только data-model как SoT и один ошибочный hint в orchestrator  
 **Серверная сторона:** не требует изменений  

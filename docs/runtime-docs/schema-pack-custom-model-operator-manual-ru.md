@@ -2,11 +2,48 @@
 
 > **Для кого:** оператор / продукт, которому нужно «переключить» GPT на другую ноду или другую модель полей — без переписывания всего интервью.  
 > **Метод:** [`.cursor/rules/analysis.mdc`](../../../.cursor/rules/analysis.mdc) — факты с диска.  
-> **Сверка:** 2026-09-03 (GPT-SSR-13 flat six-file + locale).  
+> **Сверка:** 2026-09-06 (flat upload naming FAQ + active-pair index path).  
 > **Не** юридический документ. **Не** marketplace / §30.
 
 As-built по «мусору» и допускам: [`story-validation-and-garbage-filtering-as-built.md`](./story-validation-and-garbage-filtering-as-built.md).  
 PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-processing-before-send-as-built.md).
+
+---
+
+## 0. FAQ: переименовывать ли файлы пака при загрузке в Custom GPT?
+
+**Короткий ответ: нет. Для Instructions / Knowledge в ChatGPT оставляйте имена как на диске в `GPT UI/instructions/` — с префиксом `schema-packs.<schema_id>.<schema_version>.`.**
+
+| Поверхность | Имена файлов | Переименовывать? |
+|-------------|--------------|------------------|
+| **Custom GPT Instructions** (этот мануал) | Flat: `schema-packs.tallinn_civic.v1.pack.json`, … | **Нет.** Префикс **обязателен**. Не обрезайте до голого `pack.json`. |
+| **Gateway Volume / nested SSOT** | Nested: `…/schema-packs/<id>/<ver>/pack.json` | Да — только **там**: short names без GPT-префикса (другой контур, не upload в GPT). |
+
+**Почему префикс нужен в GPT**
+
+Custom GPT при upload **отбрасывает субдиректории**. Поэтому пак не кладут в `schema-packs/tallinn_civic/v1/pack.json`, а «сплющивают» путь в имя файла: `schema-packs.tallinn_civic.v1.pack.json` ([REQ-45a](../requirements/REQ-45a-pack-prose-identities-and-flat-layout.md) §5; [GPT-SSR-11](../tasks/backlog-stories/semantic-schema-runtime/STORY-GPT-SSR-11-flat-schema-packs-prefix-layout.md)).
+
+Если загрузить голые `pack.json` / `inbound-validation.md`:
+
+- имена **перестанут** совпадать с active-pair index и с тем, что ядро просит открыть;
+- при нескольких нодах в Knowledge легко перепутать файлы;
+- это **не** целевой layout.
+
+**Как инструкции находят файлы с префиксами (и это нормально)**
+
+1. Ядро читает active-pair index: [`schema-packs.README.md`](../../instructions/schema-packs.README.md) (`schema_id` + `schema_version`).
+2. В том же README — **Locked paths**: полные flat-имена с префиксом (например `schema-packs.tallinn_civic.v1.pack.json`).
+3. GPT открывает **эти** файлы из загруженного набора Instructions / Knowledge.
+4. Логические ярлыки в тексте ядра (`pack.json`, `interview-overlay.md`) означают *роль* артефакта; **физическое имя на upload** = строка из README (с префиксом).
+
+Работает штатно, пока: загружены **все шесть** flat-файлов active pair + `schema-packs.README.md` (и ядро), и README указывает на ту же пару, что вы загрузили.
+
+**Частая путаница с gateway**
+
+| Шаг | Имя |
+|-----|-----|
+| Copy с gateway → GPT disk | gateway `pack.json` → GPT `schema-packs.<id>.<ver>.pack.json` (**добавить** префикс) |
+| GPT → Volume activate | GPT flat → nested short `pack.json` (**убрать** GPT-префикс; это сервер, не ChatGPT) |
 
 ---
 
@@ -31,7 +68,7 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 | Слой | Что это | Где на диске |
 |------|---------|--------------|
 | **Ядро инструкций** | Интервью, safety, policy *process*, normalizer process, orchestrator HTTP | [`GPT UI/instructions/`](../../instructions/) (`story-interview-flow.md`, `story-policy-gate.md`, `story-normalizer.md`, `api-orchestrator.md`, …) |
-| **Active pair** | Какая нода сейчас активна (`schema_id` + `schema_version`) | [`GPT UI/instructions/schema-packs/README.md`](../../instructions/schema-packs/README.md) **v2.1** |
+| **Active pair** | Какая нода сейчас активна (`schema_id` + `schema_version`) | [`GPT UI/instructions/schema-packs.README.md`](../../instructions/schema-packs.README.md) **v2.1** (flat index; **не** nested `schema-packs/README.md`) |
 | **Pack JSON (модель)** | `field_policy`, `geo_intake`, clustering, payload shape, taxonomy | Flat: [`schema-packs.tallinn_civic.v1.pack.json`](../../instructions/schema-packs.tallinn_civic.v1.pack.json) + [`payload.schema.json`](../../instructions/schema-packs.tallinn_civic.v1.payload.schema.json) + [`taxonomy.json`](../../instructions/schema-packs.tallinn_civic.v1.taxonomy.json) — COPY gateway |
 | **Interview overlay** | Phase→axes, ecosystem cues (prose); script/canon → locale | [`schema-packs.tallinn_civic.v1.interview-overlay.md`](../../instructions/schema-packs.tallinn_civic.v1.interview-overlay.md) |
 | **Правила валидации (inbound)** | Domain lists / completeness vs pack fields | [`schema-packs.tallinn_civic.v1.inbound-validation.md`](../../instructions/schema-packs.tallinn_civic.v1.inbound-validation.md) |
@@ -52,10 +89,11 @@ PII pre-send: [`story-pii-processing-before-send-as-built.md`](./story-pii-proce
 
 ## 3. Pack bundle: что писать куда (flat six-file — GPT-SSR-11…13)
 
-Layout для любой ноды (Custom GPT **upload** = flat prefix names):
+Layout для любой ноды (Custom GPT **upload** = flat prefix names — **не** обрезать до `pack.json`):
 
 ```text
 GPT UI/instructions/
+  schema-packs.README.md                                       ← active pair + Locked paths
   schema-packs.<schema_id>.<schema_version>.pack.json              ← COPY gateway
   schema-packs.<schema_id>.<schema_version>.payload.schema.json    ← COPY gateway
   schema-packs.<schema_id>.<schema_version>.taxonomy.json          ← COPY gateway
@@ -64,10 +102,11 @@ GPT UI/instructions/
   schema-packs.<schema_id>.<schema_version>.locale-jurisdiction.md ← languages / jurisdiction
 ```
 
-Плюс правка active pair в [`schema-packs/README.md`](../../instructions/schema-packs/README.md).
+Плюс правка active pair в [`schema-packs.README.md`](../../instructions/schema-packs.README.md).
 
 > **Historical nested GPT tree** `schema-packs/<schema_id>/<schema_version>/` — **не** live upload layout; snapshot only under [`archive/schema-packs-nested-tallinn_civic-v1/`](../../instructions/archive/schema-packs-nested-tallinn_civic-v1/). Gateway executable SSOT stays nested under `doge-complaints-gateway/schema-packs/<id>/<ver>/`.
 
+> **Не делать при upload в GPT:** переименовывать `schema-packs.uus_veerenni_civic.v2.pack.json` → `pack.json` (и аналогично остальные). См. §0.
 ### 3.1 JSON pack files — модель (read-only)
 
 Сюда **byte-identical copy** gateway `pack.json` + `payload.schema.json` + `taxonomy.json`:
@@ -103,7 +142,7 @@ Geo formation canon, phase→axes tables, ecosystem-deficit cues, demo stash exa
 
 ## 4. Active pair и `schema_binding`
 
-Перед stash orchestrator **читает** README (active pair), открывает flat six-file set — **`pack.json`** + **`payload.schema.json`** + **`taxonomy.json`** + inbound / overlay / **`locale-jurisdiction.md`** (+ normalizer handoff), и **MUST** положить в HTTP:
+Перед stash orchestrator **читает** [`schema-packs.README.md`](../../instructions/schema-packs.README.md) (active pair + Locked paths), открывает **flat six-file** set по **полным** именам из README — **`schema-packs.<id>.<ver>.pack.json`** и siblings (не голые `pack.json`), затем **MUST** положить в HTTP:
 
 ```json
 "schema_binding": {
@@ -132,39 +171,40 @@ Citizen Mode может **не показывать** binding в разгово�
 
 ### Шаг 1 — copy-paste gateway JSON → flat GPT names (GPT-SSR-11…13)
 
-**Default policy:** byte-identical copy from gateway SSOT; GPT upload uses **flat** filenames.
+**Default policy:** byte-identical copy from gateway SSOT; GPT upload uses **flat** filenames **with** `schema-packs.<id>.<ver>.` prefix (do **not** keep gateway short names for ChatGPT).
 
 1. Открыть gateway nested SSOT `doge-complaints-gateway/schema-packs/<new_id>/<new_ver>/` (`pack.json`, `payload.schema.json`, **`taxonomy.json`**).
-2. Скопировать **три JSON** в flat GPT paths:
+2. Скопировать **три JSON** в flat GPT paths (**добавить** префикс, не оставлять голые имена):
    - `GPT UI/instructions/schema-packs.<new_id>.<new_ver>.pack.json`
    - `GPT UI/instructions/schema-packs.<new_id>.<new_ver>.payload.schema.json`
    - `GPT UI/instructions/schema-packs.<new_id>.<new_ver>.taxonomy.json`
 3. **Optional diff-check** перед upload: `cmp` все три файла с gateway (должны совпадать байт-в-байт).
 4. Сохранить или обновить flat prose trio: `inbound-validation.md` + **`interview-overlay.md`** + **`locale-jurisdiction.md`** (`schema-packs.<new_id>.<new_ver>.*`).
 5. **Не** перепроецировать JSON→MD вручную. **Не** re-import Actions, если менялись только JSON/MD.
-6. **Не** использовать archived `data-model.md` / nested GPT tree как SSOT — только flat six-file + README.
-
+6. **Не** использовать archived `data-model.md` / nested GPT tree как SSOT — только flat six-file + `schema-packs.README.md`.
+7. При загрузке в Custom GPT — **те же** flat-имена (см. §0).
 > **Gateway prerequisite:** on-disk `taxonomy.json` SSOT — [GW-SSR-26/28/29](../../../../doge-complaints-gateway/docs/tasks/backlog-stories/semantic-schema-runtime/INDEX.md) Done on gateway side.
 
 > **Historical (wave 1 — до GPT-SSR-04):** ручная проекция gateway JSON → `data-model.md` + `inbound-validation.md` («спроецировать»). Deprecated для новых swap; оставлено только как fallback до SSR-09 archive.
 
 ### Шаг 2 — объявить active pair
 
-В [`schema-packs/README.md`](../../instructions/schema-packs/README.md) обновить таблицу Active pair:
+В [`schema-packs.README.md`](../../instructions/schema-packs.README.md) обновить таблицу Active pair:
 
 | Key | Value |
 |-----|--------|
 | `schema_id` | `<new_id>` |
 | `schema_version` | `<new_ver>` |
 
-И ссылки на **flat six-file** pack artifacts (JSON trio + inbound + overlay + **locale-jurisdiction**); README swap table v5 / SSR-13.
+И блок **Locked paths** на **полные flat-имена** шести файлов новой пары (с префиксом `schema-packs.<new_id>.<new_ver>.`); README swap table v5 / SSR-13.
 
 ### Шаг 3 — загрузить Instructions в Custom GPT
 
-Загрузить **ядро** + **README** + **flat six-file** pack artifacts (`pack.json`, `payload.schema.json`, `taxonomy.json`, `inbound-validation.md`, `interview-overlay.md`, **`locale-jurisdiction.md`**).
+Загрузить **ядро** + **`schema-packs.README.md`** + **flat six-file** pack artifacts **с теми же именами, что на диске** (`schema-packs.<id>.<ver>.pack.json`, …payload…, …taxonomy…, inbound, overlay, locale).
+
+**Не** переименовывать в `pack.json` / `payload.schema.json` и т.п. при upload (см. §0).
 
 Если менялись **только** pack files и README → **Actions re-import не нужен**.
-
 ### Шаг 4 — когда нужен Actions re-import
 
 | Изменение | Действие |
@@ -228,12 +268,13 @@ Citizen Mode может **не показывать** binding в разгово�
 5. **Перепутали envelope `m2.story_intake_envelope.v2` и pack `v1`** → кладут envelope string в `schema_binding.schema_version`.
 6. **Думают, что pack «валидирует» как сервер** → pack = инструкция; validate = gateway.
 7. **Ждут, что сервер отрежет spam** → as-built нет; только GPT policy gate.
-
+8. **Обрезали flat-префикс при upload в GPT** (`schema-packs.…pack.json` → `pack.json`) → имена не совпадают с Locked paths в `schema-packs.README.md`; lookup ломается. **Не делать** (см. §0).
+9. **Перепутали GPT flat и gateway nested** → на Volume нужны short names; в ChatGPT — наоборот, только flat с префиксом.
 ---
 
 ## 9. Чеклист AC-016 (после swap)
 
-Из [`schema-packs/README.md`](../../instructions/schema-packs/README.md):
+Из [`schema-packs.README.md`](../../instructions/schema-packs.README.md):
 
 | # | Проверка | Pass когда |
 |---|----------|------------|
@@ -251,11 +292,10 @@ Fail: ради имён полей ноды пришлось править orch
 ## 10. Быстрый указатель файлов (копипаста)
 
 ```text
-# Active pair + swap
-GPT UI/instructions/schema-packs/README.md
+# Active pair + swap (flat index — upload this filename as-is)
 GPT UI/instructions/schema-packs.README.md
 
-# Flat six-file pack bundle (tallinn_civic/v1) — Custom GPT upload
+# Flat six-file pack bundle (tallinn_civic/v1) — Custom GPT upload AS-IS (keep prefixes)
 GPT UI/instructions/schema-packs.tallinn_civic.v1.pack.json
 GPT UI/instructions/schema-packs.tallinn_civic.v1.payload.schema.json
 GPT UI/instructions/schema-packs.tallinn_civic.v1.taxonomy.json
@@ -271,7 +311,7 @@ GPT UI/instructions/story-normalizer.md          # §4.6 geo, §4.7 structured_p
 GPT UI/docs/custom-gpt-story-intake-actions.openapi.yaml   # 0.8.0
 GPT UI/instructions/story-api-methods-reference.md
 
-# Gateway projection source (executable — not GPT upload layout)
+# Gateway projection source (executable — not GPT upload layout; short nested names)
 doge-complaints-gateway/schema-packs/tallinn_civic/v1/
 ```
 
@@ -281,10 +321,11 @@ doge-complaints-gateway/schema-packs/tallinn_civic/v1/
 
 | Поле | Значение |
 |------|----------|
-| Дата | 2026-09-03 |
-| Pack README | v2.1 (flat six-file + locale) |
-| pack JSON / payload / taxonomy | flat `schema-packs.tallinn_civic.v1.*` (gateway copy) |
+| Дата | 2026-09-06 |
+| Pack README | v2.1 — live path `schema-packs.README.md` (flat six-file + locale) |
+| pack JSON / payload / taxonomy | flat `schema-packs.tallinn_civic.v1.*` (gateway copy) — **upload with prefixes** |
 | interview-overlay / inbound / locale | flat MD trio (SSR-11/12/13) |
 | nested GPT upload paths | retired — archive only |
+| Strip prefixes for ChatGPT? | **No** (§0) |
 | OpenAPI | 0.8.0 |
 | Orchestrator (emit) | 0.5.9+ + SSR-13 locale in active artifact list |

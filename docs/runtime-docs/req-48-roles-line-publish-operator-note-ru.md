@@ -10,15 +10,15 @@
 |------|------|------|
 | **Working / C2** | `GPT UI/instructions/` | Текущая Custom GPT continuity (не удалять ради REQ-48) |
 | **Archive Module-1** | `GPT UI/instructions-archive-module1-req48/` | As-was snapshot (ROL-01) |
-| **New roles line** | `GPT UI/instructions-roles-req15/` | Authoring + export SSOT новой линии (ROL-03/04) |
+| **New roles line** | `GPT UI/instructions-roles/` | Authoring + export SSOT новой линии (ROL-03/04) |
 
-Archive ≠ new line: архив — снимок; publish volume для новой линии берёт **sibling** `instructions-roles-req15/`, не `instructions/archive/` и не весь Module-1 working tree.
+Archive ≠ new line: архив — снимок; publish volume для новой линии берёт **sibling** `instructions-roles/`, не `instructions/archive/` и не весь Module-1 working tree.
 
 ## Env cutover
 
 | Переменная | Значение |
 |------------|----------|
-| `DOGESTONIA_INSTRUCTIONS_DIR` | Корень sibling (или копия на volume) — `…/instructions-roles-req15` |
+| `DOGESTONIA_INSTRUCTIONS_DIR` | Корень sibling (или копия на volume) — `…/instructions-roles` |
 | `DOGESTONIA_INSTRUCTIONS_MANIFEST` | Файл `roles.manifest.json` внутри этого корня |
 
 **Phase-A `files[]`** — не SSOT новой линии. Не переключайте consume на Phase-A list как «новую» схему ролей.

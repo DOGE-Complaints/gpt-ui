@@ -5,7 +5,7 @@
 > **Технический контекст:** Pipeline (`story-normalizer.md`, `api-orchestrator.md`, `contracts.py`, DB) полностью готов принять и сохранить `institution` — ограничение существует только в `story-data-model.md §4.2` («Demo scope: do NOT populate from dialogue»).
 
 **Версия:** 1.0 · 2026-05-25  
-**Статус:** requirements — ready for tasking  
+**Статус:** Done — EPIC-M1-10 (M1-10-10…12) closed; was `ready for tasking`  
 **Приоритет:** P2 (demo-integrity risk; нет HTTP-breakage, но сохранение поля нарушит demo-scope контракт)  
 **Тип:** GPT instruction update — `story-normalizer.md` + `api-orchestrator.md`; сервер не затрагивается  
 **Серверная сторона:** не требует изменений  
