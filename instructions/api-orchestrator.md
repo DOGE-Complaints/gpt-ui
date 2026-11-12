@@ -267,13 +267,13 @@ After successful stash (`draft_id` in response `data`), redirect the user to the
 
 | Setting | Value |
 |---------|--------|
-| `SPA_BASE` (pilot default) | `https://spa-app-tallinn-demo.up.railway.app` |
+| `SPA_BASE` (pilot default) | `https://uus-veerenni-civic-spa.dogestonia.me` |
 | **Where to set** | ChatGPT → **Configure** → **Instructions** (top text field). Paste operator block from [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) **§4.1**. Do **not** edit `{SPA_BASE}` in this repo file for deploy — only the Instructions field in the GPT editor. |
-| Resolved example (with default) | `https://spa-app-tallinn-demo.up.railway.app/#/story/submit?draft_id=<draft_id>` |
+| Resolved example (with default) | `https://uus-veerenni-civic-spa.dogestonia.me/#/story/submit?draft_id=<draft_id>` |
 
 | Part | Rule |
 |------|------|
-| `SPA_BASE` | Public HTTPS **origin** of the deployed SPA (scheme + host, no path, no trailing `/`). Pilot default: `https://spa-app-tallinn-demo.up.railway.app`. Operator replaces after deploy. **Not** in SPA repo env — only ChatGPT Instructions. Full steps: [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) §4.1. Cross-ref emergent **E4** (`VITE_STORY_GPT_URL` = link **to** GPT from SPA, not SPA origin). |
+| `SPA_BASE` | Public HTTPS **origin** of the deployed SPA (scheme + host, no path, no trailing `/`). Pilot default: `https://uus-veerenni-civic-spa.dogestonia.me`. Operator replaces after deploy. **Not** in SPA repo env — only ChatGPT Instructions. Full steps: [`gpt-story-submit-handoff-operator-guide.md`](../docs/gpt-story-submit-handoff-operator-guide.md) §4.1. Cross-ref emergent **E4** (`VITE_STORY_GPT_URL` = link **to** GPT from SPA, not SPA origin). |
 | Hash route | SPA HashRouter canonical path **`/story/submit`** — [`storyHandoffFlowState.js`](../../spa-app/src/auth/storyHandoffFlowState.js) `STORY_SUBMIT_PATH` (SPA-ID-12). |
 | Query | `draft_id` = verbatim value from stash response `data.draft_id`. |
 

@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Candidate semantic pack uus_veerenni_civic/v3. detail_level ⊆ GEO_PRECISION_LEVELS. geo.streets remains a proposed gateway contract extension pending gateway alignment. Distinct from envelope m2.story_intake_envelope.v2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "signals"
+  ],
+  "properties": {
+    "signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "civic_domain",
+        "failure_pattern"
+      ],
+      "properties": {
+        "civic_domain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failure_pattern": {
+          "type": "string",
+          "minLength": 1
+        },
+        "civic_weight": {
+          "type": "string",
+          "minLength": 1
+        },
+        "desired_outcome": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affected_group": {
+          "type": "string",
+          "minLength": 1
+        },
+        "service_object": {
+          "type": "string",
+          "minLength": 1
+        },
+        "facility_or_service_need": {
+          "type": "string",
+          "minLength": 1
+        },
+        "need": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ecosystem_signal": {
+          "type": "string",
+          "minLength": 1
+        },
+        "canonical_type": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "geo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "district": {
+          "type": "string",
+          "minLength": 1
+        },
+        "settlement": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+        "country": {
+          "type": "string",
+          "minLength": 1
+        },
+        "street": {
+          "type": "string",
+          "minLength": 1
+        },
+        "house": {
+          "type": "string",
+          "minLength": 1
+        },
+        "house_range": {
+          "type": "string",
+          "minLength": 1
+        },
+        "houses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "streets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "street"
+            ],
+            "properties": {
+              "street": {
+                "type": "string",
+                "minLength": 1
+              },
+              "house": {
+                "type": "string",
+                "minLength": 1
+              },
+              "house_range": {
+                "type": "string",
+                "minLength": 1
+              },
+              "houses": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "detail_level": {
+          "type": "string",
+          "enum": [
+            "region",
+            "settlement",
+            "district",
+            "street",
+            "house",
+            "house_range",
+            "coordinates"
+          ]
+        }
+      }
+    }
+  }
+}
